@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/02/24 10:40:31 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/02/24 10:42:30 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,51 @@ server::createBindListen()
 		throw std::runtime_error("listen");
 }
 
+server::start()
+{
+	fd_set	sockets;
+	fd_set	read_fds;
+	int		newSocket;
+	int		maxSocket;
+	struct sockaddr_storage addr;
+	socklen_t len;
 
+	createBindListen();
+	//make it non blocking
+	fcntl(listner, F_SETFL, O_NONBLOCK);
+	maxSocket = listner;
+	FD_SET(listner, sockets);
+	while (1)
+	{
+		read_fds = sockets;
+		select(maxSocket + 1, &read_fds, NULL, NULL, NULL);
+		for (int i = 0; i < maxSocket; i++)
+		{
+			if (FD_ISSET(i, read_fds))
+			{
+				if (i == listner)
+				{
+					//add new connection
+					//accept it check if it's bigger than max and add it to sockets so that select can detect it after
+					len = sizeof(addr);
+					newSocket = accept(listner, reinterpret_cast<sockaddr*>(&addr), &len);
+					if (newSocket == -1)
+						throw std::runtime_error("accept");
+					if (newSocket > maxSocket)
+						maxSocket = newSocket;
+					FD_SET(newSocket, sockets);
+				}
+				else
+				{
+					//receive and respond
+					Socket_ client(i);
+					//if client.receive is 0 :
+					FD_CLR(i, sockets);
+				}
+			}
+		}
+	}
+}
 server::~server()
 {
 	if (listner != -1)
