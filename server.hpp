@@ -11,16 +11,7 @@
 /* ************************************************************************** */
 
 #include "socket.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+
 class server
 {
 	private:
@@ -28,7 +19,7 @@ class server
 		int port;
 	public:
 		server(int port_);
-		start();
-		createBindListen();
+		void start();
+		void createBindListen();
 		~server();
 };

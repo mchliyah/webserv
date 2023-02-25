@@ -1,31 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   socket.cpp                                         :+:      :+:    :+:   */
+/*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/22 02:51:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/02/25 05:56:46 by slahrach         ###   ########.fr       */
+/*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
+/*   Updated: 2023/02/25 07:58:29 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "socket.hpp"
-
-Socket_::Socket_(int sock) : socket_fd(sock)
+#include "server.hpp"
+int main()
 {
-	if (sock < 0)
-		throw std::runtime_error("socket error");
+	try
+	{
+	
+		server my(3000);
+		my.start();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 }
-
-size_t Socket_::sd(int s, const void *buf, size_t len, int flags) const
-{
-	return (send(s, buf, len, flags));
-}
-
-size_t Socket_::receive(char* buffer, size_t length) const
-{
-	return (recv(socket_fd, buffer, length, 0));
-}
-
-int Socket_::getSocket() const{return (socket_fd);}

@@ -6,82 +6,89 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/02/24 10:42:30 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/02/25 07:56:36 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
-server::server(int port_) : port(port_), listner(-1) {}
+server::server(int port_) :listner(-1) , port(port_){}
 
-server::createBindListen()
+void server::createBindListen()
 {
-	struct addrinfo hints, *ai, *p;
+	struct addrinfo hints, *res;
 
 	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;
+	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
-	if (getaddrinfo(NULL, port, &hints, &ai) != 0)
+	//const char *string = std::to_string(port);
+	if (getaddrinfo(NULL, "3000", &hints, &res) != 0)
 		throw std::runtime_error("getaddrinfo error");
-	for(p = ai; p != NULL; p = p->ai_next)
-	{
-		listener = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-		if (listener < 0)
-			continue;
-		if (bind(listener, p->ai_addr, p->ai_addrlen) < 0){
-			close(listener);
-			continue;
-		}
-		break;
-	}
+	if((listner = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
+			throw std::runtime_error("cant socket");
+	if (fcntl(listner, F_SETFL, O_NONBLOCK) == -1)
+		throw std::runtime_error("cant make it non blocking");
+	// Bind the socket to the localhost address and port 8080
+	if (bind(listner, res->ai_addr, res->ai_addrlen))
+		throw std::runtime_error("cant bind it");
 
-	if (p == NULL)
-		std::runtime_error("failed to bind");
-	freeaddrinfo(ai);
-	if (listen(listener, 10) == -1)
+	//freeaddrinfo(res);
+	if (listen(listner, 10) == -1)
 		throw std::runtime_error("listen");
+	std::cout << "listening on port " << port << std::endl;
 }
 
-server::start()
+void server::start()
 {
-	fd_set	sockets;
 	fd_set	read_fds;
 	int		newSocket;
 	int		maxSocket;
+	std::vector<int> v;
 	struct sockaddr_storage addr;
 	socklen_t len;
 
 	createBindListen();
-	//make it non blocking
-	fcntl(listner, F_SETFL, O_NONBLOCK);
-	maxSocket = listner;
-	FD_SET(listner, sockets);
+	v.push_back(listner);
+	v.reserve(250);
 	while (1)
 	{
-		read_fds = sockets;
-		select(maxSocket + 1, &read_fds, NULL, NULL, NULL);
-		for (int i = 0; i < maxSocket; i++)
+		std::cout << "iteration" << std::endl;
+		FD_ZERO(&read_fds);
+		for (std::vector<int>::iterator b = v.begin(); b < v.end(); b++)
 		{
-			if (FD_ISSET(i, read_fds))
+			std::cout << "ouii " << *b << std::endl;
+			FD_SET(*b, &read_fds);
+		}
+		maxSocket = *std::max_element(v.begin(), v.end());
+		std::cout <<" maxSocket : " << maxSocket << std::endl;
+		select(maxSocket + 1, &read_fds, NULL, NULL, NULL);
+		for (std::vector<int>::iterator b = v.begin(); b < v.end(); b++)
+		{
+			if (FD_ISSET(*b, &read_fds))
 			{
-				if (i == listner)
+				if (*b == listner)
 				{
-					//add new connection
+					std::cout << "new connection " <<std::endl;
+					//add new connection?
 					//accept it check if it's bigger than max and add it to sockets so that select can detect it after
 					len = sizeof(addr);
 					newSocket = accept(listner, reinterpret_cast<sockaddr*>(&addr), &len);
 					if (newSocket == -1)
 						throw std::runtime_error("accept");
-					if (newSocket > maxSocket)
-						maxSocket = newSocket;
-					FD_SET(newSocket, sockets);
+					v.push_back(newSocket);
+					std::cout <<  newSocket <<" pushed " << std::endl;
 				}
 				else
 				{
-					//receive and respond
-					Socket_ client(i);
-					//if client.receive is 0 :
-					FD_CLR(i, sockets);
+					std::cout << *b << " is readyyy " << std::endl;
+					//char	buf[512];
+					const char *msg = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, world!";
+					int bytes_sent;
+					//recv(*b, buf, sizeof buf, 0);
+					//std::cout << "received  " << std::endl;
+					bytes_sent = send(*b, msg, strlen(msg), 0);
+					std::cout << bytes_sent << "sent successfully" << std::endl;
+					
 				}
 			}
 		}
