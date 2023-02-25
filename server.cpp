@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/02/25 07:56:36 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/02/25 08:38:40 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@ server::server(int port_) :listner(-1) , port(port_){}
 
 void server::createBindListen()
 {
-	struct addrinfo hints, *res;
-
+	struct addrinfo hints, *res, *p;
+	int	yes = 1;
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
@@ -24,15 +24,26 @@ void server::createBindListen()
 	//const char *string = std::to_string(port);
 	if (getaddrinfo(NULL, "3000", &hints, &res) != 0)
 		throw std::runtime_error("getaddrinfo error");
-	if((listner = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
-			throw std::runtime_error("cant socket");
-	if (fcntl(listner, F_SETFL, O_NONBLOCK) == -1)
-		throw std::runtime_error("cant make it non blocking");
-	// Bind the socket to the localhost address and port 8080
-	if (bind(listner, res->ai_addr, res->ai_addrlen))
-		throw std::runtime_error("cant bind it");
+	for(p = res; p != NULL; p = p->ai_next)
+	{
+    	listner = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+    	if (listner < 0)
+    	    continue;
+    	// lose the pesky "address already in use" error message
+    	setsockopt(listner, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+		if (fcntl(listner, F_SETFL, O_NONBLOCK) == -1)
+			continue;
+    	if (bind(listner, p->ai_addr, p->ai_addrlen) < 0) {
+    	    close(listner);
+    	    continue;
+    	}
+    	break;
+    }
 
-	//freeaddrinfo(res);
+    // if we got here, it means we didn't get bound
+    if (p == NULL)
+		throw std::runtime_error("cant bind it");
+    freeaddrinfo(res);
 	if (listen(listner, 10) == -1)
 		throw std::runtime_error("listen");
 	std::cout << "listening on port " << port << std::endl;
@@ -40,6 +51,9 @@ void server::createBindListen()
 
 void server::start()
 {
+	//char	buf[512];
+	const char *msg = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, world!";
+	int bytes_sent;
 	fd_set	read_fds;
 	int		newSocket;
 	int		maxSocket;
@@ -81,14 +95,19 @@ void server::start()
 				else
 				{
 					std::cout << *b << " is readyyy " << std::endl;
-					//char	buf[512];
-					const char *msg = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, world!";
-					int bytes_sent;
-					//recv(*b, buf, sizeof buf, 0);
-					//std::cout << "received  " << std::endl;
-					bytes_sent = send(*b, msg, strlen(msg), 0);
-					std::cout << bytes_sent << "sent successfully" << std::endl;
-					
+					// int	r = recv(*b, buf, sizeof buf, 0);
+					// if (r <= 0)
+					// {
+					// 	if (r < 0)
+					// 		std::cout << "" << std::endl;
+					// 	close(*b);
+					// 	v.erase(b);
+					// }
+					//else
+					{
+						bytes_sent = send(*b, msg, strlen(msg), 0);
+						std::cout << bytes_sent << "sent successfully" << std::endl;
+					}
 				}
 			}
 		}
