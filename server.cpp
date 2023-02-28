@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/02/26 22:05:14 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/02/28 09:22:00 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ void server::createBindListen()
 	}
 
     // if we got here, it means we didn't get bound
-    if (p == NULL)
+	if (p == NULL)
 		throw std::runtime_error("cant bind it");
-    freeaddrinfo(res);
+	freeaddrinfo(res);
 	int flags = fcntl(listner, F_GETFL, 0);
 	fcntl(listner, F_SETFL, flags | O_NONBLOCK);
 	if (listen(listner, 10) == -1)
@@ -50,7 +50,7 @@ void server::createBindListen()
 
 void server::start()
 {
-	char	buf[512];
+	char	buf[1028];
 	const char *msg = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, world!";
 	int bytes_sent;
 	fd_set	read_fds;
@@ -91,11 +91,21 @@ void server::start()
 				}
 				else
 				{
-					int	r = recv(*b, buf, sizeof buf, 0);
-					if (r <= 0)
+					if (fork() == 0)
 					{
-						close(*b);
-						v.erase(b);
+						int	r = recv(*b, buf, sizeof buf, 0);
+						if (r <= 0)
+						{
+							close(*b);
+							v.erase(b);
+						}
+						else
+						{
+							std::string s = buf;
+							request r(s);
+							r.print_attr();
+							exit(0);
+						}
 					}
 				}
 			}

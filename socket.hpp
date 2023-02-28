@@ -6,10 +6,12 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 21:24:17 by slahrach          #+#    #+#             */
-/*   Updated: 2023/02/25 07:00:24 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/02/28 09:14:49 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef SOCKET_HPP
+# define SOCKET_HPP
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
@@ -36,3 +38,4 @@ class Socket_
 		size_t receive(char* buffer, size_t length) const;
 		int getSocket() const;
 };
+#endif

@@ -6,7 +6,7 @@
 #    By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/02/25 05:52:45 by slahrach         ###   ########.fr        #
+#    Updated: 2023/02/28 09:13:38 by slahrach         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ CFLAGS = -Wall -Wextra -Werror
 
 STDFLAGS = -std=c++98
 
-SRCS = main.cpp server.cpp socket.cpp
+SRCS = main.cpp server.cpp socket.cpp request.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 

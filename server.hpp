@@ -10,7 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "socket.hpp"
+#ifndef SERVER_HPP
+# define SERVER_HPP
+# include "socket.hpp"
+# include "request.hpp"
 
 class server
 {
@@ -23,3 +26,4 @@ class server
 		void createBindListen();
 		~server();
 };
+#endif
