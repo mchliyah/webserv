@@ -12,7 +12,20 @@
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
-# include "socket.hpp"
+#include <iostream>
+#include <stdlib.h>
+#include <string>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <stdexcept>
+#include <sys/select.h>
+#include <vector>
+#include <algorithm>
 # include "request.hpp"
 
 class server
@@ -20,6 +33,7 @@ class server
 	private:
 		int listner;
 		int port;
+		std::vector<int> v;
 	public:
 		server(int port_);
 		void start();
