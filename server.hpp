@@ -32,10 +32,10 @@ class server
 {
 	private:
 		int listner;
-		int port;
+		std::string port;
 		std::vector<int> v;
 	public:
-		server(int port_);
+		server(std::string port_);
 		void start();
 		void createBindListen();
 		~server();

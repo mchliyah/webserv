@@ -6,15 +6,13 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/01 11:09:54 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/01 22:53:07 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
 std::string process_request() {
-    // Parse the request and generate a response
-    // In this example, we always return a "Hello, world!" response
     std::string response = "HTTP/1.1 200 OK\r\n";
     response += "Content-Type: text/plain\r\n";
     response += "Content-Length: 13\r\n";
@@ -22,7 +20,7 @@ std::string process_request() {
     response += "Hello, world!";
     return response;
 }
-server::server(int port_) :listner(-1) , port(port_){}
+server::server(std::string port_) :listner(-1) , port(port_){}
 
 void server::createBindListen()
 {
@@ -32,7 +30,7 @@ void server::createBindListen()
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
-	if (getaddrinfo(NULL, "3000", &hints, &res) != 0)
+	if (getaddrinfo(NULL, port.c_str(), &hints, &res) != 0)
 		throw std::runtime_error("getaddrinfo error");
 	for(p = res; p != NULL; p = p->ai_next)
 	{
@@ -78,8 +76,7 @@ void server::start()
 		timeout.tv_usec = 0;
 		int activity = select(maxSocket + 1, &read_fds, NULL, NULL, &timeout);
 		if (activity == -1) {
-			std::cerr << "Error in select\n";
-			break;
+			throw std::runtime_error("select");
 		}
 		else
 		{
@@ -110,6 +107,7 @@ void server::start()
 					{
 						std::string response = process_request();
 						send(*b, response.c_str(), response.size(), 0);
+						
 					}
 				}
 			}

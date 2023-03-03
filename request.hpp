@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/01 08:51:50 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/02 03:37:40 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,17 @@ private:
 	std::map<std::string, std::string> http_request;
 public:
 	request(std::string& request);
-	void parseRequestLine(std::string first_line);
+	int parseRequestLine(std::string first_line);
 	void parseHeader(std::string header);
 	void parseBody(std::string request);
 	void printAttr() const;
 	void makeError(int err, const std::string& msg);
 	std::string& getValue(const std::string& key);
 	void parse();
-	void errorHandling();
+	int checkMethod();
+	int getError() const;
+	std::string getErrorMessage() const;
+	int checkMandatoryElements();
 	~request();
 };
 #endif
