@@ -26,18 +26,19 @@
 #include <sys/select.h>
 #include <vector>
 #include <algorithm>
+#include <utility>
 # include "request.hpp"
 
 class server
 {
 	private:
-		int listner;
-		std::string port;
-		std::vector<int> v;
+		std::vector<std::string> ports;
+		std::vector<std::pair<int, std::string> > listners;
+		std::vector<Socket_> clients;
 	public:
-		server(std::string port_);
+		server(std::vector<std::string> ports_);
 		void start();
-		void createBindListen();
+		std::pair<int,std::string> createBindListen(std::string port);
 		~server();
 };
 #endif

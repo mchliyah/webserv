@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 21:24:17 by slahrach          #+#    #+#             */
-/*   Updated: 2023/02/28 09:14:49 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/03 11:40:04 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,13 @@
 class Socket_
 {
 	private:
-		int	socket_fd;
+		int			socket_fd;
+		std::string	port;
 	public:
-		Socket_(int sock);
+		Socket_(int sock, std::string port_);
 		size_t sd(int s, const void *buf, size_t len, int flags)const;
 		size_t receive(char* buffer, size_t length) const;
 		int getSocket() const;
+		std::string getPort() const;
 };
 #endif
