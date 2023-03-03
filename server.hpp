@@ -27,14 +27,14 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
-# include "request.hpp"
+# include "client.hpp"
 
 class server
 {
 	private:
 		std::vector<std::string> ports;
 		std::vector<std::pair<int, std::string> > listners;
-		std::vector<Socket_> clients;
+		std::vector<client> clients;
 	public:
 		server(std::vector<std::string> ports_);
 		void start();

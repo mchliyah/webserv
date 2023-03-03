@@ -1,29 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   request.cpp                                        :+:      :+:    :+:   */
+/*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/03 11:18:14 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/03 21:07:48 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "request.hpp"
+#include "client.hpp"
 
-request::request(std::string& request) : _request(request) , error(0), err_message("")
+client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), err_message("")
 {
 	this->parse();
 }
+client::~client() {}
+//getters & setters
+int client::getSocket() const {return socket_fd;}
+std::string client::getPort() const {return port;}
+bool client::getIsSent() const {return isSent;}
+void client::setIsSent(bool b) {isSent = b;}
+void client::setRequest(char *req) {request = req;}
 
-void request::makeError(int err, const std::string& msg)
+void client::makeError(int err, const std::string& msg)
 {
 	error= err;
 	err_message = msg;
 }
-request::~request() {}
-int	request::checkMethod()
+int	client::checkMethod()
 {
 	bool	found = 0;
 	std::string	methods[3] = {"GET", "POST", "DELETE"};
@@ -44,7 +50,7 @@ void	print(std::pair<std::string, std::string> p)
 	std::cout << p.first << " is : " << p.second << std::endl;
 }
 
-void	request::printAttr() const
+void	client::printAttr() const
 {
 	for_each(http_request.begin(), http_request.end(), print);
 }
@@ -53,7 +59,7 @@ bool BothAreSpaces(char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
 
 
 
-int	request::parseRequestLine(std::string first_line)
+int	client::parseRequestLine(std::string first_line)
 {
 	size_t	pos;
 	size_t	last;
@@ -81,7 +87,7 @@ int	request::parseRequestLine(std::string first_line)
 		return (1);
 	return 0;
 }
-void request::parseHeader(std::string header)
+void client::parseHeader(std::string header)
 {
 	std::string	key = "";
 	std::string	value = "";
@@ -92,54 +98,54 @@ void request::parseHeader(std::string header)
 	value = header.substr(pos + 1);
 	http_request[key] = value;
 }
-void request::parseBody(std::string body)
+void client::parseBody(std::string body)
 {
 	http_request["Body"] = body;
 }
-void request::parse()
+void client::parse()
 {
 	std::size_t	pos;
 	std::size_t	last;
 
 	
-	pos = _request.find_first_of("\r\n");
+	pos = request.find_first_of("\r\n");
 	if (pos == std::string::npos)
 	{
 		makeError(400, "bad request: Seperator Is Missing");
 		return ;
 	}
-	if (parseRequestLine(_request.substr(0, pos)))
+	if (parseRequestLine(request.substr(0, pos)))
 		return ;
 	while (1)
 	{
 		last = pos + 2;
-		pos = _request.find("\r\n", last);
+		pos = request.find("\r\n", last);
 		if (pos == std::string::npos)
 		{
 			makeError(400, "Bad Request: Seperator Is Missing");
 			return ;
 		}
-		std::string line = _request.substr(last, pos - last);
+		std::string line = request.substr(last, pos - last);
 		if (!line.empty())
 			parseHeader(line);
 		else
 			break ;
 	}
-	if (pos + 2 < _request.size())
-		parseBody(_request.substr(pos + 2));
+	if (pos + 2 < request.size())
+		parseBody(request.substr(pos + 2));
 	if (checkMandatoryElements())
 		return ;
 }
-std::string&	request::getValue(const std::string& key)
+std::string&	client::getValue(const std::string& key)
 {
 	return (http_request[key]);
 }
 
-int request::getError() const {return error;}
+int client::getError() const {return error;}
 
-std::string request::getErrorMessage() const {return err_message;}
+std::string client::getErrorMessage() const {return err_message;}
 
-int request::checkMandatoryElements()
+int client::checkMandatoryElements()
 {
 	if (getValue("Host").empty())
 	{

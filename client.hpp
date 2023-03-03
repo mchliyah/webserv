@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   request.hpp                                        :+:      :+:    :+:   */
+/*   client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/02 03:37:40 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/03 21:06:48 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,24 @@
 #include <map>
 #include <string>
 #include <algorithm>
-#include "socket.hpp"
-class request
+#include <iostream>
+class client
 {
 private:
-	std::string	_request;
+	std::string	request;
+	std::string	port;
+	int			socket_fd;
+	bool		isSent;
 	int			error;
 	std::string	err_message;
 	std::map<std::string, std::string> http_request;
 public:
-	request(std::string& request);
+	client(int sock, std::string port_);
+	int			getSocket() const;
+	std::string getPort() const;
+	bool		getIsSent() const;
+	void		setIsSent(bool a);
+	void setRequest(char *req);
 	int parseRequestLine(std::string first_line);
 	void parseHeader(std::string header);
 	void parseBody(std::string request);
@@ -36,6 +44,6 @@ public:
 	int getError() const;
 	std::string getErrorMessage() const;
 	int checkMandatoryElements();
-	~request();
+	~client();
 };
 #endif

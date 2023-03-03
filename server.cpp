@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/03 13:18:20 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/03 21:21:56 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,9 @@ std::pair<int, std::string> server::createBindListen(std::string port)
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
+	hints.ai_flags = AI_PASSIVE; //assign the adress of my localhost for me
 	if (getaddrinfo(NULL, port.c_str(), &hints, &res) != 0)
-		throw std::runtime_error("getaddrinfo error");
+		throw std::runtime_error("gai_strerror()");
 	for(p = res; p != NULL; p = p->ai_next)
 	{
 		listner = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
@@ -60,25 +60,29 @@ std::pair<int, std::string> server::createBindListen(std::string port)
 
 void server::start()
 {
+	clients.reserve(300);
 	for (std::vector<std::string>::iterator p = ports.begin(); p < ports.end(); p++)
 		listners.push_back(createBindListen(*p));
 	while (1)
 	{
 		fd_set	read_fds;
+		fd_set	write_fds;
+		FD_ZERO(&read_fds);
 		FD_ZERO(&read_fds);
 		for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
 			FD_SET(l->first, &read_fds);
 		int		maxSocket = std::max_element(listners.begin(), listners.end())->first;
-		for (std::vector<Socket_>::iterator c = clients.begin(); c < clients.end(); c++)
+		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
 			FD_SET(c->getSocket(), &read_fds);
+			FD_SET(c->getSocket(), &write_fds);
 			if (c->getSocket() > maxSocket)
 				maxSocket = c->getSocket();
 		}
 		struct timeval timeout;
 		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
-		int activity = select(maxSocket + 1, &read_fds, NULL, NULL, &timeout);
+		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, NULL);
 		if (activity == -1) {
 			throw std::runtime_error("select");
 		}
@@ -93,30 +97,37 @@ void server::start()
 					int newSocket = accept(listner->first, reinterpret_cast<sockaddr*>(&addr), &len);
 					if (newSocket == -1)
 						throw std::runtime_error("accept");
+					std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
 					int flags = fcntl(newSocket, F_GETFL, 0);
 					fcntl(newSocket, F_SETFL, flags | O_NONBLOCK);
-					Socket_ client(newSocket, listner->second);
-					clients.push_back(client);
+					client c(newSocket, listner->second);
+					clients.push_back(c);
 				}
 			}
-			for (std::vector<Socket_>::iterator client = clients.begin(); client < clients.end(); client++)
+			for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 			{
-				if (FD_ISSET(client->getSocket(), &read_fds))
+				if (FD_ISSET(c->getSocket(), &read_fds))
 				{
 					char	buf[1028];
-					int	r = recv(client->getSocket(), buf, sizeof(buf), 0);
+					int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
 					if (r <= 0)
 					{
-						close(client->getSocket());
-						FD_CLR(client->getSocket(), &read_fds);
-						clients.erase(client);
+						close(c->getSocket());
+						FD_CLR(c->getSocket(), &read_fds);
+						FD_CLR(c->getSocket(), &write_fds);
+						clients.erase(c);
 					}
 					else
 					{
-						std::string response = process_request();
-						send(client->getSocket(), response.c_str(), response.size(), 0);
-						
+						c->setIsSent(0);
+						c->setRequest(buf);
 					}
+				}
+				else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
+				{
+						std::string response = process_request();
+						int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
+						c->setIsSent(1);
 				}
 			}
 		}
@@ -124,5 +135,8 @@ void server::start()
 }
 server::~server()
 {
-	//close fds
+	for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
+		close(l->first);
+	for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
+		close(c->getSocket());
 }
