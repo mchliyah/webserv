@@ -15,6 +15,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string>
+#include <fstream>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -35,10 +36,15 @@ class server
 		std::vector<std::string> ports;
 		std::vector<std::pair<int, std::string> > listners;
 		std::vector<client> clients;
+		std::vector<std::string> config_file;
+		std::ifstream config;
 	public:
+		server(std::string path);
 		server(std::vector<std::string> ports_);
 		void start();
 		std::pair<int,std::string> createBindListen(std::string port);
+		std::ifstream GetConfige() const;
 		~server();
 };
+
 #endif
