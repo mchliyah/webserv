@@ -28,7 +28,8 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
-# include "client.hpp"
+#include "client.hpp"
+#include "config.hpp"
 
 class server
 {

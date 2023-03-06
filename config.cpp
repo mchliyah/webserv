@@ -1,4 +1,4 @@
-#include "config.hpp"
+#include "server.hpp"
 
 config::config() {
 	server_name = "";
@@ -63,6 +63,10 @@ void config::setCgiPass(std::string cgi_pass) {
 		this->cgi_pass = cgi_pass;
 }
 
+void config::setBuffer(std::vector<std::string> buffer) {
+	this->buffer = buffer;
+}
+
 std::string config::getServerName() {
 	return server_name;
 }
@@ -99,8 +103,12 @@ std::string config::getReturn() {
 	return return_;
 }
 
+std::vector<std::string> config::getBuffer() {
+	return buffer;
+}
+
 void	config::printConfig(){
-	std::cout << "server_name: " << getServerName() << std::endl;
+	std::cout << "server_name: " << server_name << std::endl;
 	std::cout << "listen: " << listen << std::endl;
 	std::cout << "root: " << root << std::endl;
 	std::cout << "index: " << index << std::endl;

@@ -1,9 +1,8 @@
 
-#include "server.hpp"
-
 class config
 {
 	private:
+		std::vector<std::string> buffer;
 		std::string server_name;
 		std::string listen;
 		std::string root;
@@ -28,6 +27,7 @@ class config
 		void setClientMaxBodySize(std::string client_max_body_size);
 		void setReturn(std::string return_);
 		void setCgiPass(std::string cgi_pass);
+		void setBuffer(std::vector<std::string> buffer);
 		std::string getServerName();
 		std::string getListen();
 		std::string getRoot();
@@ -38,6 +38,9 @@ class config
 		std::string getClientMaxBodySize();
 		std::string getReturn();
 		std::string getCgiPass();
+		std::vector<std::string> getBuffer();
 
 		void printConfig();
 };
+
+void parse(std::string path);
