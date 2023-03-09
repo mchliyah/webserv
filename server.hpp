@@ -30,22 +30,8 @@
 #include <utility>
 #include "client.hpp"
 #include "config.hpp"
+#include <sstream>
 
-class server
-{
-	private:
-		std::vector<std::string> ports;
-		std::vector<std::pair<int, std::string> > listners;
-		std::vector<client> clients;
-		std::vector<std::string> config_file;
-		std::ifstream config;
-	public:
-		server(std::string path);
-		server(std::vector<std::string> ports_);
-		void start();
-		std::pair<int,std::string> createBindListen(std::string port);
-		std::ifstream GetConfige() const;
-		~server();
-};
+
 
 #endif
