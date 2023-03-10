@@ -18,7 +18,7 @@ CFLAGS = -Wall -Wextra -Werror
 
 STDFLAGS = -std=c++98
 
-SRCS = main.cpp server.cpp client.cpp config.cpp parse.cpp
+SRCS = main.cpp server.cpp client.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 

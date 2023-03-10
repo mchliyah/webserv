@@ -11,8 +11,7 @@
 /* ************************************************************************** */
 
 #include "server.hpp"
-
-int main(int argc, char **argv)
+int main()
 {
 	try
 	{
@@ -20,14 +19,13 @@ int main(int argc, char **argv)
 		// request req(s);
 		// std::cout << req.getError() << "   " << req.getErrorMessage() << std::endl;
 		// req.printAttr();
-		parse(argv[1]);
-		// std::vector<std::string> v;
-		// v.push_back("80");
-		// v.push_back("3000");
-		// v.push_back("9000");
-		// v.push_back("5000");
-		// server my(v);
-		// my.start();
+		std::vector<std::string> v;
+		v.push_back("80");
+		v.push_back("3000");
+		v.push_back("9000");
+		v.push_back("5000");
+		server my(v);
+		my.start();
 	}
 	catch(const std::exception& e)
 	{
