@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+         #
+#    By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/03/03 20:48:41 by slahrach         ###   ########.fr        #
+#    Updated: 2023/03/11 19:17:15 by mchliyah         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,14 +18,14 @@ CFLAGS = -Wall -Wextra -Werror
 
 STDFLAGS = -std=c++98
 
-SRCS = main.cpp server.cpp client.cpp
+SRCS = main.cpp server.cpp client.cpp parse.cpp config.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 
 all : ${NAME}
 
 ${NAME} : ${OBJS}
-	${CC} ${STDFLAGS} ${OBJS} -fsanitize=address -o ${NAME}
+	${CC} ${STDFLAGS} ${OBJS} -o ${NAME}
 
 clean :
 	rm -rf ${OBJS}
