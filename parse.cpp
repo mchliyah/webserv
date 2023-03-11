@@ -16,7 +16,10 @@ void parse(std::string path){
 		if (line.find("#") != std::string::npos)
 			throw std::runtime_error("Error: comment is not allowed");
 		if (line.find("server") == std::string::npos || line.find("server") != 0)
+		{
+			std::cout << " === line :" <<line << std::endl;
 			throw std::runtime_error("Error: ruller is not at the top of the file");
+		}
 		line = server.readServer(os, line);
 		// server.printServer();
 		// std::cout << " ====================================== "<< std::endl;

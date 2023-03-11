@@ -6,7 +6,7 @@
 #    By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/03/11 19:17:15 by mchliyah         ###   ########.fr        #
+#    Updated: 2023/03/11 23:41:50 by mchliyah         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,8 +18,7 @@ CFLAGS = -Wall -Wextra -Werror
 
 STDFLAGS = -std=c++98
 
-SRCS = main.cpp server.cpp client.cpp parse.cpp config.cpp
-
+SRCS = main.cpp server.cpp client.cpp parse.cpp utils.cpp locationconfig.cpp serverconfig.cpp 
 OBJS = ${SRCS:.cpp=.o}
 
 all : ${NAME}

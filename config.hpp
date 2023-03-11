@@ -29,6 +29,10 @@ class locationconf
 	public:
 		std::string readlocation(std::ifstream& inputFile, std::string line);
 		void printlocation();
+		std::string getRoot() const;
+		std::string getCgiPass() const;
+		std::vector<std::string> getIndex() const;
+		std::map<std::string, bool> getAllowsMethod() const;
 };
 
 class serverconfig
@@ -41,7 +45,11 @@ class serverconfig
 	public:
 	std::string readServer(std::ifstream& inputFile, std::string line);
 	void printServer();
-
+	std::string getServerName() const;
+	int getListen() const;
+	int getMaxClientBodySize() const;
+	std::map<int, std::string> getErrorPages() const;
+	std::map<std::string, locationconf> getLocations() const;
 };
 
 void parse(std::string path);
