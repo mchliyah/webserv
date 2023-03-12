@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/12 00:00:38 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/12 19:18:56 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,14 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			key.clear();
 			std::istringstream iss(line);
 			iss >> key >> value;
+			if (value.empty())
+				throw std::runtime_error("Error: server block has empty value");
+			if (key != "server_name" && key != "listen" && key != "max_client_body_size" && key != "location"
+				&& key != "server_name" && key != "listen" && key != "max_client_body_size" && key != "error_page" && key != "location")
+				{
+					std::cout << key << "exiut" << std::endl;
+					throw std::runtime_error("Error: server block has invalid key");
+				}
 			if (key == "server_name") {
 				server_name = value;
 			}
@@ -98,6 +106,7 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			return (line);
 		if (has_only_spaces(line) || line.empty())
 			throw std::runtime_error("Error: empty line inside server block\n \t or two or more empty lines");
+		value.clear();
 	}
 	return (line);
 	}

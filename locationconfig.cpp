@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:32 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/11 23:56:31 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/12 19:27:30 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,10 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 		value.clear();
 		std::istringstream iss(line);
 		iss >> key >> value;
+		if (value.empty() || value == "")
+			throw std::runtime_error("Error: location block value is empty");
+		if (key != "root" && key != "index" && key != "allow_method" && key != "cgi_pass")
+			throw std::runtime_error("Error: location block key is not valid");
 		if (key == "root") {
 			root = value;
 		}
@@ -65,7 +69,7 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 			}
 		}
 		else if (key == "cgi_pass") {
-			iss >> value;
+			std::cout << "cgi value: " << value << std::endl;
 			cgipass = value;
 		}
 		value.clear();
@@ -74,6 +78,7 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 			throw std::runtime_error("Error: value argument is more than 2");
 		std::getline(inputFile, line);
 		g_tab_count = tab_count(line);
+		value.clear();
 	}
 	return (line);
 }

@@ -25,6 +25,7 @@ class locationconf
 	std::string cgipass;
 	std::vector<std::string> index;
 	std::map<std::string, bool> allowsmethod;
+	std::string cgi_pass;
 
 	public:
 		std::string readlocation(std::ifstream& inputFile, std::string line);
