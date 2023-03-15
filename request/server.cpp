@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/15 20:31:36 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/15 23:20:35 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,8 +117,7 @@ void server::start()
 				}
 				else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
 				{
-						response res;
-						res = process_request();
+						response res = process_request();
 						int bytes = send(c->getSocket(), res.get_response().c_str(), res.get_response().size(), 0);
 						c->setIsSent(1);
 						(void)bytes;
