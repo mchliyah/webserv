@@ -3,23 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/03 21:21:56 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/15 20:31:36 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#include "../includes/server.hpp"
 
-std::string process_request() {
-    std::string response = "HTTP/1.1 200 OK\r\n";
-    response += "Content-Type: text/plain\r\n";
-    response += "Content-Length: 13\r\n";
-    response += "\r\n";
-    response += "Hello, world!";
-    return response;
-}
 server::server(std::vector<std::string> ports_) : ports(ports_){}
 
 std::pair<int, std::string> server::createBindListen(std::string port)
@@ -125,9 +117,11 @@ void server::start()
 				}
 				else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
 				{
-						std::string response = process_request();
-						int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
+						response res;
+						res = process_request();
+						int bytes = send(c->getSocket(), res.get_response().c_str(), res.get_response().size(), 0);
 						c->setIsSent(1);
+						(void)bytes;
 				}
 			}
 		}
