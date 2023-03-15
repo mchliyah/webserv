@@ -15,6 +15,7 @@
 
 #include "config.hpp"
 #include "client.hpp"
+#include "response.hpp"
 
 class server
 {
