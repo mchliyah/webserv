@@ -6,21 +6,21 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/12 19:18:56 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/15 17:41:34 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#include "../includes/server.hpp"
 
 std::string serverconfig::getServerName() const{
 	return (this->server_name);
 }
 
-int serverconfig::getListen() const {
+std::string serverconfig::getListen() const {
 	return (this->listen);
 }
 
-int serverconfig::getMaxClientBodySize() const {
+std::string serverconfig::getMaxClientBodySize() const {
 	return (this->maxclientboddysize);
 }
 
@@ -32,9 +32,12 @@ std::map<std::string, locationconf> serverconfig::getLocations() const {
 	return (this->locations);
 }
 
+// serverconfig serverconfig::getServers() const {
+// 	return (*this);
+// }
+
 std::string serverconfig::readServer(std::ifstream& inputFile, std::string line) {
 	std::string key, value;
-	int i = 0;
 
 	if (line.find("server") != std::string::npos)
 	{
@@ -83,10 +86,10 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 				server_name = value;
 			}
 			else if (key == "listen") {
-				listen = atoi(value.c_str());
+				listen = value;
 			}
 			else if (key == "max_client_body_size") {
-				maxclientboddysize = atoi(value.c_str());
+				maxclientboddysize = value;
 			}
 			else if (key == "error_page") {
 				std::string errorpage;
@@ -128,4 +131,21 @@ void serverconfig::printServer() {
 		it2->second.printlocation();
 		it2++;
 	}
+}
+
+serverconfig::serverconfig() {
+	server_name.clear();
+	listen.clear();
+	maxclientboddysize.clear();
+	errorpages.clear();
+	locations.clear();
+}
+
+serverconfig::~serverconfig() {
+	server_name.clear();
+	listen.clear();
+	maxclientboddysize.clear();
+	errorpages.clear();
+	locations.clear();
+
 }

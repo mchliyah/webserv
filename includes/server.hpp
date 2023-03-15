@@ -28,4 +28,5 @@ class server
 		std::pair<int,std::string> createBindListen(std::string port);
 		~server();
 };
+
 #endif

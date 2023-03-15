@@ -3,23 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/03 21:21:56 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/15 17:41:12 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#include "../includes/server.hpp"
 
 std::string process_request() {
     std::string response = "HTTP/1.1 200 OK\r\n";
     response += "Content-Type: text/plain\r\n";
-    response += "Content-Length: 13\r\n";
+    response += "Content-Length: 41\r\n";
     response += "\r\n";
-    response += "Hello, world!";
+    response += "Hello, world! will i need to change this?";
     return response;
 }
+
 server::server(std::vector<std::string> ports_) : ports(ports_){}
 
 std::pair<int, std::string> server::createBindListen(std::string port)
@@ -128,6 +129,7 @@ void server::start()
 						std::string response = process_request();
 						int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
 						c->setIsSent(1);
+						(void)bytes;
 				}
 			}
 		}

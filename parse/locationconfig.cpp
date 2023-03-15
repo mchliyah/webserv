@@ -6,11 +6,11 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:32 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/12 19:27:30 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/15 17:08:41 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#include "../includes/server.hpp"
 
 
 
@@ -30,6 +30,9 @@ std::vector<std::string> locationconf::getIndex() const{
 	return (this->index);
 }
 
+std::string locationconf::getAutoIndex() const{
+	return (this->autoindex);
+}
 
 std::string locationconf::readlocation(std::ifstream& inputFile, std::string line) {
 	std::string key, value;
@@ -52,7 +55,14 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 		if (key != "root" && key != "index" && key != "allow_method" && key != "cgi_pass")
 			throw std::runtime_error("Error: location block key is not valid");
 		if (key == "root") {
+			// std::cout << "root: " << value << std::endl;
 			root = value;
+		}
+		else if (key == "cgi_pass") {
+			cgipass = value;
+		}
+		else if (key == "autoindex"){
+			autoindex = value;
 		}
 		else if (key == "index") {
 			while (!value.empty()) {
@@ -67,10 +77,6 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 				value.clear();
 				iss >> value;
 			}
-		}
-		else if (key == "cgi_pass") {
-			std::cout << "cgi value: " << value << std::endl;
-			cgipass = value;
 		}
 		value.clear();
 		iss >> value;
@@ -98,5 +104,18 @@ void locationconf::printlocation() {
 		std::cout << "	allow_method: " << it2->first << std::endl;
 		it2++;
 	}
-	std::cout << "	cgi_pass: " << cgipass << std::endl;
+}
+
+locationconf::locationconf() {
+	root.clear();
+	index.clear();
+	allowsmethod.clear();
+	cgipass.clear();
+}
+
+locationconf::~locationconf() {
+	root.clear();
+	index.clear();
+	allowsmethod.clear();
+	cgipass.clear();
 }

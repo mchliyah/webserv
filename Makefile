@@ -6,7 +6,7 @@
 #    By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/03/11 23:41:50 by mchliyah         ###   ########.fr        #
+#    Updated: 2023/03/15 17:40:31 by mchliyah         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,23 +18,31 @@ CFLAGS = -Wall -Wextra -Werror
 
 STDFLAGS = -std=c++98
 
-SRCS = main.cpp server.cpp client.cpp parse.cpp utils.cpp locationconfig.cpp serverconfig.cpp 
-OBJS = ${SRCS:.cpp=.o}
+FILES = main.cpp \
+	./request/server.cpp \
+	./request/client.cpp \
+	./parse/parse.cpp \
+	./parse/utils.cpp \
+	./parse/locationconfig.cpp \
+	./parse/serverconfig.cpp
+	
+OBJECTS = $(FILES:.cpp=.o)
 
-all : ${NAME}
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-${NAME} : ${OBJS}
-	${CC} ${STDFLAGS} ${OBJS} -o ${NAME}
+all : $(NAME)
+
+$(NAME) :  $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) 
+
 
 clean :
-	rm -rf ${OBJS}
+	$(RM) $(OBJECTS)
 
 fclean : clean
-	rm -rf ${NAME}
+	$(RM) $(NAME)
 
 re : fclean all
 
-%.o : %.cpp
-	${CC} ${STDFLAGS} -c $<
-
-.PHONY: clean all fclean re
+.PHONY: all clean re fclean

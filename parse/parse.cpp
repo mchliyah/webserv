@@ -1,7 +1,19 @@
-#include "server.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse.cpp                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/03/15 17:08:17 by mchliyah          #+#    #+#             */
+/*   Updated: 2023/03/15 17:08:28 by mchliyah         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/server.hpp"
 
 
-void check_all_set(std::vector<serverconfig> servers)
+void check_all_set(std::vector<serverconfig>& servers)
 {
 	std::vector<serverconfig>::iterator it;
 	std::map<std::string, locationconf>::iterator it2;
@@ -10,9 +22,9 @@ void check_all_set(std::vector<serverconfig> servers)
 	{
 		if (it->getServerName().empty())
 			throw std::runtime_error("Error: server_name is not set");
-		if (it->getListen() == 0)
+		if (it->getListen().empty())
 			throw std::runtime_error("Error: listen is not set");
-		if (it->getMaxClientBodySize() == 0)
+		if (it->getMaxClientBodySize().empty())
 			throw std::runtime_error("Error: max_client_body_size is not set");
 		if (it->getErrorPages().empty())
 			throw std::runtime_error("Error: error_page is not set");
@@ -20,6 +32,7 @@ void check_all_set(std::vector<serverconfig> servers)
 			throw std::runtime_error("Error: location is not set");
 		for (it2 = it->getLocations().begin(); it2 != it->getLocations().end(); it2++)
 		{
+			// it2->second.printlocation();
 			if (it2->second.getRoot().empty())
 				throw std::runtime_error("Error: root is not set");
 			if (it2->second.getAllowsMethod().empty())
@@ -28,11 +41,13 @@ void check_all_set(std::vector<serverconfig> servers)
 				throw std::runtime_error("Error: cgi_pass is not set");
 			if (it2->second.getIndex().empty())
 				throw std::runtime_error("Error: index is not set");
+			if (it2->second.getAutoIndex().empty())
+				throw std::runtime_error("Error: autoindex is not set");
 		}
 	}
 }
 
-void parse(std::string path){
+std::vector<serverconfig> parse(std::string path){
 	std::string line;
     std::ifstream os(path);
 	std::vector<serverconfig> servers;
@@ -56,12 +71,6 @@ void parse(std::string path){
 		// std::cout << " ====================================== "<< std::endl;
 		servers.push_back(server);
 	}
-	check_all_set(servers);
-	std::vector<serverconfig>::iterator it = servers.begin();
-	while (it != servers.end())
-	{
-		it->printServer();
-		std::cout << " ====================================== "<< std::endl;
-		it++;
-	}
+	// check_all_set(servers);
+	return (servers);
 }
