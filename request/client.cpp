@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/15 17:07:49 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/16 02:25:33 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ int	client::parseRequestLine(std::string first_line)
 	size_t	pos;
 	size_t	last;
 
+	last = 0;
 	std::string items[3] = {"Method", "URL"};
 	std::string::iterator new_end = std::unique(first_line.begin(), first_line.end(), BothAreSpaces);
 	first_line.erase(new_end, first_line.end());
