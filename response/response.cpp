@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/15 23:36:43 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/16 00:05:30 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,9 +65,11 @@ response::response(const std::string& request_type) {
 	    status_message = "No Content";
 	}
 	content_type = "Content-Type: text/plain\r\n";
-	content_length = "Content-Length: 41\r\n";
-	content = "Hello, world! will i need to change this?";
-
+	content_length = "Content-Length: ";
+	content_length += std::to_string(14 + request_type.length());
+	content = "\r\nHello, world! ";
+	content += request_type;
+	std::cout << "request_type: " << request_type << std::endl;
 }
 std::string response::get_response() {
 	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
@@ -82,15 +84,15 @@ std::string response::get_response() {
 	return response;
 }
 
-response process_request(void) {
-	// response resp("GET");
-	return response("POST");
-    // std::string response = "HTTP/1.1 200 OK\r\n";
-    // response += "Content-Type: text/plain\r\n";
-    // response += "Content-Length: 41\r\n";
-    // response += "\r\n";
-    // response += "Hello, world! will i need to change this?";
-    // return response;
-}
+// response process_request(void) {
+// 	// response resp("GET");
+// 	return response("POST");
+//     // std::string response = "HTTP/1.1 200 OK\r\n";
+//     // response += "Content-Type: text/plain\r\n";
+//     // response += "Content-Length: 41\r\n";
+//     // response += "\r\n";
+//     // response += "Hello, world! will i need to change this?";
+//     // return response;
+// }
 
 response::~response() { }
