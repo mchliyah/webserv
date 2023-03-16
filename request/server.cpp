@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/15 20:31:36 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/16 18:48:07 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,9 @@ void server::start()
 					{
 						c->setIsSent(0);
 						c->setRequest(buf);
+						c->parse();
+						//std::cout << c->getValue("Method") << std::endl;
+						c->printAttr();
 					}
 				}
 				else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
