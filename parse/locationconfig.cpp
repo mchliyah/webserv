@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:32 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/15 17:08:41 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/17 20:11:26 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,17 +93,11 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 void locationconf::printlocation() {
 	std::cout << "	root: " << root << std::endl;
 	std::vector<std::string>::iterator it = index.begin();
-	while (it != index.end())
-	{
+	while (it++ != index.end())
 		std::cout << "	index: " << *it << std::endl;
-		it++;
-	}
 	std::map<std::string, bool>::iterator it2 = allowsmethod.begin();
-	while (it2 != allowsmethod.end())
-	{
+	while (it2++ != allowsmethod.end())
 		std::cout << "	allow_method: " << it2->first << std::endl;
-		it2++;
-	}
 }
 
 locationconf::locationconf() {

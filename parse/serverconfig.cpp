@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/15 17:41:34 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/17 20:13:06 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			if (key != "server_name" && key != "listen" && key != "max_client_body_size" && key != "location"
 				&& key != "server_name" && key != "listen" && key != "max_client_body_size" && key != "error_page" && key != "location")
 				{
-					std::cout << key << "exiut" << std::endl;
+					std::cout << key << "exit" << std::endl;
 					throw std::runtime_error("Error: server block has invalid key");
 				}
 			if (key == "server_name") {
