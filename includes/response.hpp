@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/17 21:08:28 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/15 23:30:37 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,6 @@
 class response
 {
 	private:
-		serverconfig server;
-		
 		std::string status_code;
     	std::string status_message;
     	std::string content_type;
@@ -44,7 +42,6 @@ class response
 		std::string content_length;
     	std::string date;
     	std::vector<std::string> headers;
-
 	public:
 		response(const std::string& request_type);
 		~response();

@@ -13,7 +13,6 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-#include <cstring>
 #include "config.hpp"
 #include "client.hpp"
 #include "response.hpp"

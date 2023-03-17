@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/17 20:08:18 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/17 21:50:30 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void server::start()
 		struct timeval timeout;
 		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
-		(void)timeout;
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, NULL);
 		if (activity == -1) {
 			throw std::runtime_error("select");
@@ -121,11 +120,11 @@ void server::start()
 				{
 					for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 					{
+						std::cout << "client " << c->getSocket() << " : " << c->getValue("Method") << std::endl;
 						response res(c->getValue("Method"));
-						// response res = process_request();
 						int bytes = send(c->getSocket(), res.get_response().c_str(), res.get_response().size(), 0);
 						c->setIsSent(1);
-						(void)bytes;
+						std::cout << "sent " << bytes << " bytes" << std::endl;
 					}
 				}
 			}

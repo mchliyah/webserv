@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/17 20:14:09 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/17 21:37:18 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,9 @@ void response::set_status_message(std::string status_message) { this->status_mes
 
 
 response::response(const std::string& request_type) {
-	// std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(nullptr);
 	char buffer[128];
-	// std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::locale(&t));
+	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
 	this->date = "Date: " + std::string(buffer) + "\r\n";
 	if (request_type == "GET") {
 	    status_code = "200";
@@ -69,6 +69,7 @@ response::response(const std::string& request_type) {
 	content_length += std::to_string(14 + request_type.length());
 	content = "\r\nHello, world! ";
 	content += request_type;
+	std::cout << "request_type: " << request_type << std::endl;
 }
 std::string response::get_response() {
 	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
