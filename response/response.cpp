@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/16 00:05:30 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/17 01:19:41 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,9 @@ void response::set_status_message(std::string status_message) { this->status_mes
 
 
 response::response(const std::string& request_type) {
-	std::time_t t = std::time(nullptr);
+	// std::time_t t = std::time(nullptr);
 	char buffer[128];
-	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
+	// std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::locale(&t));
 	this->date = "Date: " + std::string(buffer) + "\r\n";
 	if (request_type == "GET") {
 	    status_code = "200";
