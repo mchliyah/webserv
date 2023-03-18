@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/17 21:50:30 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/18 02:09:09 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,10 @@ std::pair<int, std::string> server::createBindListen(std::string port)
 	return (r);
 }
 
-void server::start()
+void server::start(std::vector<serverconfig> &servers)
 {
 	clients.reserve(300);
+	(void)servers;
 	for (std::vector<std::string>::iterator p = ports.begin(); p < ports.end(); p++)
 		listners.push_back(createBindListen(*p));
 	while (1)
@@ -78,10 +79,8 @@ void server::start()
 		if (activity == -1) {
 			throw std::runtime_error("select");
 		}
-		else
-		{
-			for (std::vector<std::pair<int, std::string> >::iterator listner = listners.begin(); listner < listners.end(); listner++)
-			{
+		else {
+			for (std::vector<std::pair<int, std::string> >::iterator listner = listners.begin(); listner < listners.end(); listner++) {
 				if (FD_ISSET(listner->first, &read_fds))
 				{
 					struct sockaddr_storage addr;
@@ -96,10 +95,8 @@ void server::start()
 					clients.push_back(c);
 				}
 			}
-			for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
-			{
-				if (FD_ISSET(c->getSocket(), &read_fds))
-				{
+			for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) {
+				if (FD_ISSET(c->getSocket(), &read_fds)) {
 					char	buf[1028];
 					int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
 					if (r <= 0)
@@ -116,21 +113,19 @@ void server::start()
 						c->parse();
 					}
 				}
-				else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
-				{
-					for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
-					{
-						std::cout << "client " << c->getSocket() << " : " << c->getValue("Method") << std::endl;
+				else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent()) {
+					for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) {
 						response res(c->getValue("Method"));
 						int bytes = send(c->getSocket(), res.get_response().c_str(), res.get_response().size(), 0);
 						c->setIsSent(1);
-						std::cout << "sent " << bytes << " bytes" << std::endl;
+						(void)bytes;
 					}
 				}
 			}
 		}
 	}
 }
+
 server::~server()
 {
 	for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)

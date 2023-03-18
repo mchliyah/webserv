@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/15 17:41:34 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/18 02:31:32 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,6 @@ std::map<int, std::string> serverconfig::getErrorPages() const {
 std::map<std::string, locationconf> serverconfig::getLocations() const {
 	return (this->locations);
 }
-
-// serverconfig serverconfig::getServers() const {
-// 	return (*this);
-// }
 
 std::string serverconfig::readServer(std::ifstream& inputFile, std::string line) {
 	std::string key, value;
@@ -67,6 +63,8 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			locations.insert(std::make_pair(value, location));
 			if (inputFile.eof() ||  (line.find("server") != std::string::npos && line.find("server") == 0))
 				return (line);
+			else
+				continue;
 		}
 		else
 		{
@@ -94,9 +92,11 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			else if (key == "error_page") {
 				std::string errorpage;
 				iss  >> errorpage;
+				std::cout << "errorpage: " << errorpage << std::endl;
 				if (value.empty() || errorpage.empty())
 					throw std::runtime_error("Error: error_page has less than 2 arguments");
 				errorpages.insert(std::make_pair(atoi(value.c_str()), errorpage));
+				errorpage.clear();
 			}
 			value.clear();
 			iss >> value;
@@ -119,14 +119,12 @@ void serverconfig::printServer() {
 	std::cout << "listen: " << listen << std::endl;
 	std::cout << "max_client_body_size: " << maxclientboddysize << std::endl;
 	std::map<int, std::string>::iterator it = errorpages.begin();
-	while (it != errorpages.end())
-	{
+	while (it != errorpages.end()) {
 		std::cout << "error_page: " << it->first << " " << it->second << std::endl;
 		it++;
 	}
 	std::map<std::string, locationconf>::iterator it2 = locations.begin();
-	while (it2 != locations.end())
-	{
+	while (it2 != locations.end()) {
 		std::cout << "location: " << it2->first << std::endl;
 		it2->second.printlocation();
 		it2++;

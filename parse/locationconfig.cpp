@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:32 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/15 17:08:41 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/18 01:24:51 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 		iss >> key >> value;
 		if (value.empty() || value == "")
 			throw std::runtime_error("Error: location block value is empty");
-		if (key != "root" && key != "index" && key != "allow_method" && key != "cgi_pass")
+		if (key != "root" && key != "index" && key != "allow_method" && key != "cgi_pass" && key != "autoindex")
 			throw std::runtime_error("Error: location block key is not valid");
 		if (key == "root") {
 			// std::cout << "root: " << value << std::endl;
@@ -73,7 +73,9 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 		}
 		else if (key == "allow_method") {
 			while (!value.empty()) {
-				allowsmethod.insert(std::make_pair(value, true));
+				if (value != "GET" && value != "POST" && value != "DELETE")
+					throw std::runtime_error("Error: allow_method value is not valid");
+				allowsmethod[value] = true;
 				value.clear();
 				iss >> value;
 			}
@@ -89,28 +91,28 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 	return (line);
 }
 
-
 void locationconf::printlocation() {
-	std::cout << "	root: " << root << std::endl;
+	std::cout << "\troot: " << root << std::endl;
 	std::vector<std::string>::iterator it = index.begin();
-	while (it != index.end())
-	{
-		std::cout << "	index: " << *it << std::endl;
+	while (it != index.end()) {
+		std::cout << "\tindex: " << *it << std::endl;
 		it++;
 	}
 	std::map<std::string, bool>::iterator it2 = allowsmethod.begin();
-	while (it2 != allowsmethod.end())
-	{
-		std::cout << "	allow_method: " << it2->first << std::endl;
+	while (it2 != allowsmethod.end()) {
+		std::cout << "\tallow_method: " << it2->first << std::endl;
 		it2++;
 	}
 }
 
 locationconf::locationconf() {
+	std::string g_allowsmethod[3] = {"GET", "POST", "DELETE"};
+	for (int i = 0; i < 3; i++)
+		allowsmethod.insert(std::make_pair(g_allowsmethod[i], false));
 	root.clear();
 	index.clear();
-	allowsmethod.clear();
 	cgipass.clear();
+	autoindex.clear();
 }
 
 locationconf::~locationconf() {

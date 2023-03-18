@@ -63,3 +63,4 @@ class serverconfig
 std::vector<serverconfig> parse(std::string path);
 bool has_only_spaces(std::string str);
 int tab_count(std::string str);
+void check_all_set(std::vector<serverconfig>& servers);

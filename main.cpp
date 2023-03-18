@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/16 01:07:47 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/18 02:22:09 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ int main(int argc, char **argv)
 			throw std::runtime_error("Usage: ./webserv <config_file>");
 		std::vector<serverconfig> servers = parse(argv[1]);
 		std::vector<std::string> v;
+		check_all_set(servers);
 		// std::string s = "    GET     kkk      a     \r\nHost:n\r\nContent-Type:mm\r\n\r\nbodyyyy";
 		// request req(s);
 		// std::cout << req.getError() << "   " << req.getErrorMessage() << std::endl;
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
 	std::vector<serverconfig>::iterator it = servers.begin();
 		while (it != servers.end())
 		{
-			it->printServer();
+			// it->printServer();
 			std::cout << " ====================================== "<< std::endl;
 			it++;
 		}
@@ -37,7 +38,7 @@ int main(int argc, char **argv)
 		for (it1 = servers.begin(); it1 != servers.end(); it1++)
 			v.push_back(it1->getListen());
 		server my(v);
-		my.start();
+		my.start(servers);
 	}
 	catch(const std::exception& e)
 	{
