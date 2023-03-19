@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/19 01:09:47 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/19 01:17:24 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,7 +150,7 @@ int client::checkMandatoryElements()
 {
 	if (getValue("Host").empty())
 	{
-		makeError(400, "Bad Request: Host is Missing");
+		makeError(400, "Bad Request: Host is Missing!");
 		return (1);
 	}
 	if (!getValue("Content-Length").empty())
