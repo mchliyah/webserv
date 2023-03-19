@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/16 02:25:33 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/19 01:21:50 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,9 +150,15 @@ int client::checkMandatoryElements()
 {
 	if (getValue("Host").empty())
 	{
-		makeError(400, "Bad Request: Host is Missing");
+		makeError(400, "Bad Request: Missing Host!");
 		return (1);
 	}
-	//add checks for every method
+	if (!getValue("Content-Length").empty())
+	{
+		std::istringstream iss(getValue("Content-Length"));
+    	int num;
+    	iss >> num;
+		http_request["Body"] = getValue("Body").erase(num, http_request["Body"].size() - num);
+	}
 	return (0);
 }
