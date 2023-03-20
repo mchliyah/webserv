@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/18 02:31:32 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/19 20:22:20 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			else if (key == "error_page") {
 				std::string errorpage;
 				iss  >> errorpage;
-				std::cout << "errorpage: " << errorpage << std::endl;
 				if (value.empty() || errorpage.empty())
 					throw std::runtime_error("Error: error_page has less than 2 arguments");
 				errorpages.insert(std::make_pair(atoi(value.c_str()), errorpage));
@@ -112,7 +111,7 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 		value.clear();
 	}
 	return (line);
-	}
+}
 
 void serverconfig::printServer() {
 	std::cout << "server_name: " << server_name << std::endl;

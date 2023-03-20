@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/16 01:45:53 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/20 00:57:38 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ int	client::checkMethod()
 	bool	found = 0;
 	std::string	methods[3] = {"GET", "POST", "DELETE"};
 	std::string method = getValue("Method");
-	std::cout << "method is : " << method << std::endl;
 	for (int i = 0; i < 3; i++)
 		if (methods[i] == method)
 			found = 1;
@@ -99,22 +98,17 @@ void client::parseHeader(std::string header)
 	value = header.substr(pos + 1);
 	http_request[key] = value;
 }
-void client::parseBody(std::string body)
-{
+void client::parseBody(std::string body) {
 	http_request["Body"] = body;
 }
 void client::parse()
 {
 	std::size_t	pos;
 	std::size_t	last;
-
 	
 	pos = request.find_first_of("\r\n");
-	std::cout << "request " << request << std::endl;
-	if (pos == std::string::npos)
-	{
+	if (pos == std::string::npos) {
 		makeError(400, "bad request: Seperator Is Missing");
-		std::cout << "ana ldaakhel " << std::endl;
 		return ;
 	}
 	if (parseRequestLine(request.substr(0, pos)))
@@ -123,8 +117,7 @@ void client::parse()
 	{
 		last = pos + 2;
 		pos = request.find("\r\n", last);
-		if (pos == std::string::npos)
-		{
+		if (pos == std::string::npos) {
 			makeError(400, "Bad Request: Seperator Is Missing");
 			return ;
 		}
@@ -139,8 +132,8 @@ void client::parse()
 	if (checkMandatoryElements())
 		return ;
 }
-std::string&	client::getValue(const std::string& key)
-{
+
+std::string&	client::getValue(const std::string& key) {
 	return (http_request[key]);
 }
 
@@ -150,8 +143,7 @@ std::string client::getErrorMessage() const {return err_message;}
 
 int client::checkMandatoryElements()
 {
-	if (getValue("Host").empty())
-	{
+	if (getValue("Host").empty()) {
 		makeError(400, "Bad Request: Host is Missing");
 		return (1);
 	}

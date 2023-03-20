@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/15 23:30:37 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/20 00:15:19 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,8 @@ class response
 		void set_status_code(std::string status_code);
 		void set_status_message(std::string status_message);
 		void set_date(std::string date);
-		std::string get_response();
+		void set_body(std::string body);
+		std::string get_response(std::string body);
 
 };
 

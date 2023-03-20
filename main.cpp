@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/18 02:22:09 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/20 00:53:29 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,13 @@ int main(int argc, char **argv)
 		// request req(s);
 		// std::cout << req.getError() << "   " << req.getErrorMessage() << std::endl;
 		// req.printAttr();
-	std::vector<serverconfig>::iterator it = servers.begin();
-		while (it != servers.end())
-		{
+	// std::vector<serverconfig>::iterator it = servers.begin();
+		// while (it != servers.end())
+		// {
 			// it->printServer();
-			std::cout << " ====================================== "<< std::endl;
-			it++;
-		}
+		// 	std::cout << " ====================================== "<< std::endl;
+		// 	it++;
+		// }
 		std::vector<serverconfig>::iterator it1;
 		for (it1 = servers.begin(); it1 != servers.end(); it1++)
 			v.push_back(it1->getListen());
