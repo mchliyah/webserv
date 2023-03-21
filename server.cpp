@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/03 21:21:56 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/21 19:38:03 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,8 @@ void server::start()
 					{
 						c->setIsSent(0);
 						c->setRequest(buf);
+						c->parse();
+						c->printAttr();
 					}
 				}
 				else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
