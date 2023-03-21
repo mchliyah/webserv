@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/21 19:23:15 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/21 19:31:43 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,21 +121,16 @@ void server::start(std::vector<serverconfig> &servers)
 			if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent()) {
 				for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) {
 					response res(c->getValue("Method"));
-					std::ifstream file("test.txt");
-					std::string responce;
-					if (!file.is_open())
-						throw std::runtime_error("cant open file 1");
-					std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-					responce = res.get_response(str);
-					int bytes = send(c->getSocket(), responce.c_str(), responce.size(), 0);
+					std::string response;
+					response = res.get_response(servers);
+					int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
 					close(c->getSocket());
 					FD_CLR(c->getSocket(), &read_fds);
 					FD_CLR(c->getSocket(), &write_fds);
 					clients.erase(c);
 					c->setIsSent(1);
-					str.clear();
+					// str.clear();
 					(void)bytes;
-					// break;
 				}
 			}
 		}

@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/21 17:14:04 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/21 19:32:45 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,10 @@ response::response(const std::string& request_type) {
 	content = "\r\n";
 	content += request_type;
 }
-std::string response::get_response(std::string content_str) {
+std::string response::get_response(std::vector<serverconfig> &servers) {
+	(void)servers;
 	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
-	content += content_str;
+	content += "content_str";
 	content_length += std::to_string(content.length()) + "\r\n";
 	response += date;
 	response += content_type;
@@ -84,6 +85,14 @@ std::string response::get_response(std::string content_str) {
 	return response;
 }
 
+
+
+
+					// std::ifstream file("test.txt");
+					// std::string responce;
+					// if (!file.is_open())
+					// 	throw std::runtime_error("cant open file 1");
+					// std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 // response process_request(void) {
 // 	// response resp("GET");
 // 	return response("POST");
