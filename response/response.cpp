@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/17 21:37:18 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/21 17:14:04 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,13 +66,13 @@ response::response(const std::string& request_type) {
 	}
 	content_type = "Content-Type: text/plain\r\n";
 	content_length = "Content-Length: ";
-	content_length += std::to_string(14 + request_type.length());
-	content = "\r\nHello, world! ";
+	content = "\r\n";
 	content += request_type;
-	std::cout << "request_type: " << request_type << std::endl;
 }
-std::string response::get_response() {
+std::string response::get_response(std::string content_str) {
 	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+	content += content_str;
+	content_length += std::to_string(content.length()) + "\r\n";
 	response += date;
 	response += content_type;
 	response += content_length;

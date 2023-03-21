@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/21 12:57:23 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/21 19:23:15 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,11 @@ std::pair<int, std::string> server::createBindListen(std::string port)
 	return (r);
 }
 
-void server::start()
+void server::start(std::vector<serverconfig> &servers)
 {
+	signal(SIGPIPE, SIG_IGN);
 	clients.reserve(300);
+	(void)servers;
 	for (std::vector<std::string>::iterator p = ports.begin(); p < ports.end(); p++)
 		listners.push_back(createBindListen(*p));
 	while (1)
@@ -60,11 +62,11 @@ void server::start()
 		fd_set	read_fds;
 		fd_set	write_fds;
 		FD_ZERO(&read_fds);
-		FD_ZERO(&read_fds);
+		FD_ZERO(&write_fds);
 		for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
 			FD_SET(l->first, &read_fds);
 		int		maxSocket = std::max_element(listners.begin(), listners.end())->first;
-		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
+		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)// Add client sockets to read_fds and write_fds
 		{
 			FD_SET(c->getSocket(), &read_fds);
 			FD_SET(c->getSocket(), &write_fds);
@@ -76,61 +78,70 @@ void server::start()
 		timeout.tv_usec = 0;
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, NULL);
 		if (activity == -1) {
-			throw std::runtime_error("select");
+        	perror("select error");
+        	break;
+    	}
+		for (std::vector<std::pair<int, std::string> >::iterator listner = listners.begin(); listner < listners.end(); listner++) {
+			if (FD_ISSET(listner->first, &read_fds)) {
+				// struct sockaddr_storage addr;
+				// socklen_t len = sizeof(addr);
+				// int newSocket = accept(listner->first, reinterpret_cast<sockaddr*>(&addr), &len);
+				int newSocket = accept(listner->first, (struct sockaddr *)&(listner->second), (socklen_t*)&(listner->second));
+				if (newSocket == -1){
+                	perror("accept failed");
+                	continue;
+            	}
+				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
+				clients.push_back(client(newSocket, listner->second));
+				// int flags = fcntl(newSocket, F_GETFL, 0);
+				// fcntl(newSocket, F_SETFL, flags | O_NONBLOCK);
+				// client c(newSocket, listner->second);
+				// clients.push_back(c);
+			}
 		}
-		else
-		{
-			for (std::vector<std::pair<int, std::string> >::iterator listner = listners.begin(); listner < listners.end(); listner++)
-			{
-				if (FD_ISSET(listner->first, &read_fds))
+		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) {
+			if (FD_ISSET(c->getSocket(), &read_fds)) {
+				char	buf[1028];
+				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
+				if (r <= 0)
 				{
-					struct sockaddr_storage addr;
-					socklen_t len = sizeof(addr);
-					int newSocket = accept(listner->first, reinterpret_cast<sockaddr*>(&addr), &len);
-					if (newSocket == -1)
-						throw std::runtime_error("accept");
-					std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
-					int flags = fcntl(newSocket, F_GETFL, 0);
-					fcntl(newSocket, F_SETFL, flags | O_NONBLOCK);
-					client c(newSocket, listner->second);
-					clients.push_back(c);
+					close(c->getSocket());
+					FD_CLR(c->getSocket(), &read_fds);
+					FD_CLR(c->getSocket(), &write_fds);
+					clients.erase(c);
+					continue;
+				}
+				else
+				{
+					c->setIsSent(0);
+					c->setRequest(buf);
+					c->parse();
 				}
 			}
-			for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
-			{
-				if (FD_ISSET(c->getSocket(), &read_fds))
-				{
-					char	buf[1028];
-					int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
-					if (r <= 0)
-					{
-						close(c->getSocket());
-						FD_CLR(c->getSocket(), &read_fds);
-						FD_CLR(c->getSocket(), &write_fds);
-						clients.erase(c);
-					}
-					else
-					{
-						c->setIsSent(0);
-						c->setRequest(buf);
-						c->parse();
-					}
-				}
-				else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
-				{
-					for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
-					{
-						// std::cout << "client " << c->getSocket() << " : " << c->getValue("Method") << std::endl;
-						response res(c->getValue("Method"));
-						int bytes = send(c->getSocket(), res.get_response().c_str(), res.get_response().size(), 0);
-						c->setIsSent(1);
-						(void)bytes;
-					}
+			if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent()) {
+				for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) {
+					response res(c->getValue("Method"));
+					std::ifstream file("test.txt");
+					std::string responce;
+					if (!file.is_open())
+						throw std::runtime_error("cant open file 1");
+					std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+					responce = res.get_response(str);
+					int bytes = send(c->getSocket(), responce.c_str(), responce.size(), 0);
+					close(c->getSocket());
+					FD_CLR(c->getSocket(), &read_fds);
+					FD_CLR(c->getSocket(), &write_fds);
+					clients.erase(c);
+					c->setIsSent(1);
+					str.clear();
+					(void)bytes;
+					// break;
 				}
 			}
 		}
 	}
 }
+
 server::~server()
 {
 	for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
