@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+         #
+#    By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/03/03 20:48:41 by slahrach         ###   ########.fr        #
+#    Updated: 2023/03/15 20:32:32 by mchliyah         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,24 +18,28 @@ CFLAGS = -Wall -Wextra -Werror
 
 STDFLAGS = -std=c++98
 
-SRCS = main.cpp server.cpp client.cpp
+FILES = main.cpp \
+	./parse/parse.cpp ./parse/utils.cpp ./parse/locationconfig.cpp ./parse/serverconfig.cpp \
+	./request/server.cpp ./request/client.cpp \
+	./response/response.cpp
+	
+OBJECTS = $(FILES:.cpp=.o)
 
-OBJS = ${SRCS:.cpp=.o}
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-all : ${NAME}
+all : $(NAME)
 
-${NAME} : ${OBJS}
-	${CC} ${STDFLAGS} ${OBJS} -fsanitize=address -o ${NAME}
+$(NAME) :  $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) 
+
 
 clean :
-	rm -rf ${OBJS}
+	$(RM) $(OBJECTS)
 
 fclean : clean
-	rm -rf ${NAME}
+	$(RM) $(NAME)
 
 re : fclean all
 
-%.o : %.cpp
-	${CC} ${STDFLAGS} -c $<
-
-.PHONY: clean all fclean re
+.PHONY: all clean re fclean

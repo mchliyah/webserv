@@ -6,11 +6,11 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/03 21:07:48 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/19 01:21:50 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "client.hpp"
+#include "../includes/client.hpp"
 
 client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), err_message("")
 {
@@ -64,6 +64,7 @@ int	client::parseRequestLine(std::string first_line)
 	size_t	pos;
 	size_t	last;
 
+	last = 0;
 	std::string items[3] = {"Method", "URL"};
 	std::string::iterator new_end = std::unique(first_line.begin(), first_line.end(), BothAreSpaces);
 	first_line.erase(new_end, first_line.end());
@@ -149,9 +150,15 @@ int client::checkMandatoryElements()
 {
 	if (getValue("Host").empty())
 	{
-		makeError(400, "Bad Request: Host is Missing");
+		makeError(400, "Bad Request: Missing Host!");
 		return (1);
 	}
-	//add checks for every method
+	if (!getValue("Content-Length").empty())
+	{
+		std::istringstream iss(getValue("Content-Length"));
+    	int num;
+    	iss >> num;
+		http_request["Body"] = getValue("Body").erase(num, http_request["Body"].size() - num);
+	}
 	return (0);
 }

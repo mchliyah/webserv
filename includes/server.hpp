@@ -12,22 +12,10 @@
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
-#include <iostream>
-#include <stdlib.h>
-#include <string>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <stdexcept>
-#include <sys/select.h>
-#include <vector>
-#include <algorithm>
-#include <utility>
-# include "client.hpp"
+
+#include "config.hpp"
+#include "client.hpp"
+#include "response.hpp"
 
 class server
 {
@@ -41,4 +29,5 @@ class server
 		std::pair<int,std::string> createBindListen(std::string port);
 		~server();
 };
+
 #endif
