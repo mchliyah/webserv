@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/20 00:22:44 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/17 21:37:18 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void response::set_status_code(std::string status_code) { this->status_code = st
 
 void response::set_status_message(std::string status_message) { this->status_message = status_message; }
 
-// void response::set_body(std::string body) { this->content += body; }
 
 // response::response(void) {
 // 	this->status = "HTTP/1.1 200 OK\r\n";
@@ -51,10 +50,10 @@ void response::set_status_message(std::string status_message) { this->status_mes
 
 
 response::response(const std::string& request_type) {
-	// std::time_t t = std::time(nullptr);
-	// char buffer[128];
-	// std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
-	// this->date = "Date: " + std::string(buffer) + "\r\n";
+	std::time_t t = std::time(nullptr);
+	char buffer[128];
+	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
+	this->date = "Date: " + std::string(buffer) + "\r\n";
 	if (request_type == "GET") {
 	    status_code = "200";
 	    status_message = "OK";
@@ -66,17 +65,15 @@ response::response(const std::string& request_type) {
 	    status_message = "No Content";
 	}
 	content_type = "Content-Type: text/plain\r\n";
-	content_length = "";
-	content = "\r\n";
-	content += request_type;
-}
-
-std::string response::get_response(std::string body) {
-	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 	content_length = "Content-Length: ";
-	content += body;
-	content_length += std::to_string(content.length());
-	// response += date;
+	content_length += std::to_string(14 + request_type.length());
+	content = "\r\nHello, world! ";
+	content += request_type;
+	std::cout << "request_type: " << request_type << std::endl;
+}
+std::string response::get_response() {
+	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+	response += date;
 	response += content_type;
 	response += content_length;
 	std::vector<std::string>::iterator it;
@@ -97,6 +94,5 @@ std::string response::get_response(std::string body) {
 //     // response += "Hello, world! will i need to change this?";
 //     // return response;
 // }
-
 
 response::~response() { }

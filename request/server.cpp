@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/21 12:54:25 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/21 12:57:23 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ std::pair<int, std::string> server::createBindListen(std::string port)
 
 void server::start()
 {
-	signal(SIGPIPE, SIG_IGN);
 	clients.reserve(300);
 	for (std::vector<std::string>::iterator p = ports.begin(); p < ports.end(); p++)
 		listners.push_back(createBindListen(*p));
@@ -76,19 +75,6 @@ void server::start()
 		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, NULL);
-		//networking
-		// for loop i = 0  ; i < maxsocket 
-		// if (i == server socket)
-		// 		accept + get data + break
-		// else if (i == read )
-		// 		read 
-		// 		if read == -1
-		// 			i => write + break
-		// else if (i == write)
-		// 		write
-		// 		if write == 0
-		// 			close(i)
-
 		if (activity == -1) {
 			throw std::runtime_error("select");
 		}
@@ -136,29 +122,9 @@ void server::start()
 					{
 						// std::cout << "client " << c->getSocket() << " : " << c->getValue("Method") << std::endl;
 						response res(c->getValue("Method"));
-						std::ifstream file("test.txt");
-						std::string responce;
-						if (!file.is_open())
-							throw std::runtime_error("cant open file 1");
-						std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-						// res.set_body(str);
-						// const char *args[] = {"/bin/pwd", NULL};
-						// const char *path = args[0];
-						// int pid = fork();
-						// if (pid == 0)
-						// {
-						// 	std::cout << "executing pwd" << std::endl;
-						// 	std::cout <<  execv(path, (char* const*)args) << std::endl;
-						// 	exit(0);
-						// }
-						// else
-						// 	wait(NULL);
-						responce = res.get_response(str);
-						int bytes = send(c->getSocket(), responce.c_str(), responce.size(), 0);
-						std::cout << "sent " << bytes << " bytes" << std::endl;
-						// close(c->getSocket());
+						int bytes = send(c->getSocket(), res.get_response().c_str(), res.get_response().size(), 0);
 						c->setIsSent(1);
-						std::cout << "sent " << bytes << " bytes" << std::endl;
+						(void)bytes;
 					}
 				}
 			}

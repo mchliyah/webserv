@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 17:08:17 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/21 12:51:29 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/21 12:57:30 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ std::vector<serverconfig> parse(std::string path){
 	std::vector<serverconfig> servers;
 
 	if (!os.is_open())
-		throw std::runtime_error("Error: can't open config file 0");
+		throw std::runtime_error("Error: can't open config file");
 	std::getline(os, line);
 	g_tab_count = tab_count(line);
 	while (!os.eof())

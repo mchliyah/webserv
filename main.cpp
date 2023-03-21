@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/21 12:51:57 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/21 12:57:46 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	std::vector<serverconfig>::iterator it = servers.begin();
 		while (it != servers.end())
 		{
-			it->printServer();
+			// it->printServer();
 			std::cout << " ====================================== "<< std::endl;
 			it++;
 		}
