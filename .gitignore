@@ -1,7 +1,0 @@
-a.out
-server
-.vscode
-*.o
-*.out
-*/*.o
-*/*.out

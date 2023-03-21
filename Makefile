@@ -6,7 +6,7 @@
 #    By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/03/17 22:52:02 by mchliyah         ###   ########.fr        #
+#    Updated: 2023/03/15 20:32:32 by mchliyah         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ FILES = main.cpp \
 	./parse/parse.cpp ./parse/utils.cpp ./parse/locationconfig.cpp ./parse/serverconfig.cpp \
 	./request/server.cpp ./request/client.cpp \
 	./response/response.cpp
-
+	
 OBJECTS = $(FILES:.cpp=.o)
 
 %.o: %.cpp
@@ -31,7 +31,7 @@ OBJECTS = $(FILES:.cpp=.o)
 all : $(NAME)
 
 $(NAME) :  $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) -fsanitize=address
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) 
 
 
 clean :
