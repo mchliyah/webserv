@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 02:16:12 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/23 04:39:39 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,25 @@ void client::parseHeader(std::string header)
 }
 void client::parseBody(std::string body)
 {
-	http_request["Body"] = body;
+	std::stringstream stream(body);
+	std::string final;
+	if (!getValue("Transfer-Encoding").empty() && http_request["Transfer-Encoding"] == "chuncked")
+	{
+		int	l;
+		while (std::getline(stream, line, '\r'))
+		{
+			if (line[0] != '\n')
+			{
+				makeError(400, "bad request: Seperator Is Missing");
+				return ;
+			}
+			line >> l;
+			if (l == 0 && line == "0")
+				break ;
+			if (l == 0)
+		}
+	}
+	http_request["Body"] = final;
 }
 void client::parse()
 {
