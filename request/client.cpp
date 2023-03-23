@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/21 20:22:18 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/21 23:25:36 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,7 @@ void	print(std::pair<std::string, std::string> p)
 	std::cout << p.first << " is : " << p.second << std::endl;
 }
 
-void	client::printAttr() const
-{
+void	client::printAttr() const {
 	for_each(http_request.begin(), http_request.end(), print);
 }
 

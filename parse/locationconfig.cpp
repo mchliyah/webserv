@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   locationconfig.cpp                                 :+:      :+:    :+:   */
+/*   locationconfigig.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -14,27 +14,27 @@
 
 
 
-std::string locationconf::getRoot() const{
+std::string locationconfig::getRoot() const{
 	return (this->root);
 }
 
-std::string locationconf::getCgiPass() const{
+std::string locationconfig::getCgiPass() const{
 	return (this->cgipass);
 }
 
-std::map<std::string, bool> locationconf::getAllowsMethod() const{
+std::map<std::string, bool> locationconfig::getAllowsMethod() const{
 	return (this->allowsmethod);
 }
 
-std::vector<std::string> locationconf::getIndex() const{
+std::vector<std::string> locationconfig::getIndex() const{
 	return (this->index);
 }
 
-std::string locationconf::getAutoIndex() const{
+std::string locationconfig::getAutoIndex() const{
 	return (this->autoindex);
 }
 
-std::string locationconf::readlocation(std::ifstream& inputFile, std::string line) {
+std::string locationconfig::readlocation(std::ifstream& inputFile, std::string line) {
 	std::string key, value;
 	std::pair<std::string, std::string> pair;
 
@@ -52,10 +52,9 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 		iss >> key >> value;
 		if (value.empty() || value == "")
 			throw std::runtime_error("Error: location block value is empty");
-		if (key != "root" && key != "index" && key != "allow_method" && key != "cgi_pass")
+		if (key != "root" && key != "index" && key != "allow_method" && key != "cgi_pass" && key != "autoindex")
 			throw std::runtime_error("Error: location block key is not valid");
 		if (key == "root") {
-			// std::cout << "root: " << value << std::endl;
 			root = value;
 		}
 		else if (key == "cgi_pass") {
@@ -90,8 +89,10 @@ std::string locationconf::readlocation(std::ifstream& inputFile, std::string lin
 }
 
 
-void locationconf::printlocation() {
+void locationconfig::printlocation() {
 	std::cout << "	root: " << root << std::endl;
+	std::cout << "	cgi_pass: " << cgipass << std::endl;
+	std::cout << "	autoindex: " << autoindex << std::endl;
 	std::vector<std::string>::iterator it = index.begin();
 	while (it != index.end())
 	{
@@ -106,16 +107,18 @@ void locationconf::printlocation() {
 	}
 }
 
-locationconf::locationconf() {
+locationconfig::locationconfig() {
 	root.clear();
 	index.clear();
 	allowsmethod.clear();
 	cgipass.clear();
+	autoindex.clear();
 }
 
-locationconf::~locationconf() {
+locationconfig::~locationconfig() {
 	root.clear();
 	index.clear();
 	allowsmethod.clear();
 	cgipass.clear();
+	autoindex.clear();
 }
