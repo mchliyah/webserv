@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/21 19:32:45 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/23 00:30:59 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,12 +66,40 @@ response::response(const std::string& request_type) {
 	}
 	content_type = "Content-Type: text/plain\r\n";
 	content_length = "Content-Length: ";
-	content = "\r\n";
-	content += request_type;
 }
-std::string response::get_response(std::vector<serverconfig> &servers) {
-	(void)servers;
+std::string response::get_response(serverconfig &server, std::string &path) {
+	std::cout << "path: " << path << std::endl;
 	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+	std::map<std::string, locationconfig> locations = server.getLocations();
+	std::map<std::string, locationconfig>::iterator loc;
+	std::string frst;
+	std::string last;
+	std::string::size_type pos = path.find_last_of('/');
+	if (pos != std::string::npos) {
+		frst = path.substr(0, pos);
+		last = path.substr(pos + 1);
+	}
+	std::cout << "frst: " << frst << std::endl;
+	std::cout << "last: " << last << std::endl;
+
+	for (loc = locations.begin() ; loc != locations.end() ; loc++) {
+		std::cout << "loc->first: " << loc->first << std::endl;
+		// if (loc->first == path) {
+		// 	if (loc->second.getAutoIndex() == "on") {
+		// 		content += "autoindex";
+		// 		content_length += std::to_string(content.length()) + "\r\n";
+		// 		response += date;
+		// 		response += content_type;
+		// 		response += content_length;
+		// 		std::vector<std::string>::iterator it;
+		// 		for (it = headers.begin(); it != headers.end(); it++)
+		// 			response += *it;
+		// 		response += "\r\n";
+		// 		response += content;
+		// 		return response;
+		// 	}
+		// }
+	}
 	content += "content_str";
 	content_length += std::to_string(content.length()) + "\r\n";
 	response += date;
@@ -85,23 +113,55 @@ std::string response::get_response(std::vector<serverconfig> &servers) {
 	return response;
 }
 
+std::string response::post_response(serverconfig &server, std::string &path, std::string &body) {
+	(void)server;
+	(void)path;
+	(void)body;
+	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+	content += "success";
+	content_length += std::to_string(content.length()) + "\r\n";
+	response += date;
+	response += content_type;
+	response += content_length;
+	std::vector<std::string>::iterator it;
+	for (it = headers.begin(); it != headers.end(); it++)
+		response += *it;
+	response += "\r\n";
+	response += content;
+	return response;
+}
 
+std::string response::delete_response(serverconfig &server, std::string &path) {
+	(void)server;
+	(void)path;
+	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+	content += "success";
+	content_length += std::to_string(content.length()) + "\r\n";
+	response += date;
+	response += content_type;
+	response += content_length;
+	std::vector<std::string>::iterator it;
+	for (it = headers.begin(); it != headers.end(); it++)
+		response += *it;
+	response += "\r\n";
+	response += content;
+	return response;
+}
 
-
-					// std::ifstream file("test.txt");
-					// std::string responce;
-					// if (!file.is_open())
-					// 	throw std::runtime_error("cant open file 1");
-					// std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-// response process_request(void) {
-// 	// response resp("GET");
-// 	return response("POST");
-//     // std::string response = "HTTP/1.1 200 OK\r\n";
-//     // response += "Content-Type: text/plain\r\n";
-//     // response += "Content-Length: 41\r\n";
-//     // response += "\r\n";
-//     // response += "Hello, world! will i need to change this?";
-//     // return response;
-// }
+// std::ifstream file("test.txt");
+// std::string responce;
+// if (!file.is_open())
+// 	throw std::runtime_error("cant open file 1");
+// std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+std::string process_request(void) {
+	// response resp("GET");
+	// return response("POST");
+    std::string response = "HTTP/1.1 200 OK\r\n";
+    response += "Content-Type: text/plain\r\n";
+    response += "Content-Length: 41\r\n";
+    response += "\r\n";
+    response += "Hello, world! will i need to change this?";
+    return response;
+}
 
 response::~response() { }

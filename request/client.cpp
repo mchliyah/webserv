@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 02:16:12 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/23 03:06:56 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,7 @@ void	print(std::pair<std::string, std::string> p)
 	std::cout << p.first << " is : " << p.second << std::endl;
 }
 
-void	client::printAttr() const
-{
+void	client::printAttr() const {
 	for_each(http_request.begin(), http_request.end(), print);
 }
 
