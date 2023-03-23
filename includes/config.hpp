@@ -33,7 +33,7 @@
 
 extern int g_tab_count;
 
-class locationconf
+class locationconfig
 {
 	std::string root;
 	std::string cgipass;
@@ -43,8 +43,8 @@ class locationconf
 	std::map<std::string, bool> allowsmethod;
 
 	public:
-		locationconf();
-		~locationconf();
+		locationconfig();
+		~locationconfig();
 		std::string readlocation(std::ifstream& inputFile, std::string line);
 		void printlocation();
 		std::string getRoot() const;
@@ -57,7 +57,7 @@ class locationconf
 class serverconfig
 {
 		std::string server_name;
-		std::map<std::string, locationconf> locations;
+		std::map<std::string, locationconfig> locations;
 		std::string listen;
 		std::string maxclientboddysize;
 		std::map<int, std::string> errorpages;
@@ -70,7 +70,7 @@ class serverconfig
 	std::string getListen() const;
 	std::string getMaxClientBodySize() const;
 	std::map<int, std::string> getErrorPages() const;
-	std::map<std::string, locationconf> getLocations() const;
+	std::map<std::string, locationconfig> getLocations() const;
 	// serverconfig getServers() const;
 };
 

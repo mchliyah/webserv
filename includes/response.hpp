@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/21 19:31:57 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/22 19:17:06 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,11 @@ class response
 		void set_status_code(std::string status_code);
 		void set_status_message(std::string status_message);
 		void set_date(std::string date);
-		std::string get_response(std::vector<serverconfig> &servers);
-
+		std::string get_response(serverconfig &server, std::string &path);
+		std::string post_response(serverconfig &server, std::string &path, std::string &body);
+		std::string delete_response(serverconfig &server, std::string &path);
 };
 
-response process_request(void);
+std::string process_request(void);
 
 #endif

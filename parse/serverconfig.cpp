@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/21 19:12:53 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/23 00:50:54 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ std::map<int, std::string> serverconfig::getErrorPages() const {
 	return (this->errorpages);
 }
 
-std::map<std::string, locationconf> serverconfig::getLocations() const {
+std::map<std::string, locationconfig> serverconfig::getLocations() const {
 	return (this->locations);
 }
 
@@ -54,7 +54,7 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			throw std::runtime_error("Error: comment is not allowed");
 		if (line.find("location") != std::string::npos)
 		{
-			locationconf location;
+			locationconfig location;
 			value.clear();
 			key.clear();
 			std::istringstream iss(line);
@@ -67,6 +67,8 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			locations.insert(std::make_pair(value, location));
 			if (inputFile.eof() ||  (line.find("server") != std::string::npos && line.find("server") == 0))
 				return (line);
+			else
+				continue;
 		}
 		else
 		{
@@ -76,12 +78,8 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			iss >> key >> value;
 			if (value.empty())
 				throw std::runtime_error("Error: server block has empty value");
-			if (key != "server_name" && key != "listen" && key != "max_client_body_size" && key != "location"
-				&& key != "server_name" && key != "listen" && key != "max_client_body_size" && key != "error_page" && key != "location")
-				{
-					std::cout << key << "exiut" << std::endl;
+			if (key != "server_name" && key != "listen" && key != "max_client_body_size" && key != "location" && key != "error_page")
 					throw std::runtime_error("Error: server block has invalid key");
-				}
 			if (key == "server_name") {
 				server_name = value;
 			}
@@ -103,7 +101,8 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			if (!value.empty())
 				throw std::runtime_error("Error: error_page has more than 2 arguments");
 		}
-		std::getline(inputFile, line);
+		if (line.find("location") == std::string::npos)
+			getline(inputFile, line);
 		g_tab_count = tab_count(line);
 		if (inputFile.eof() || (line.find("server") != std::string::npos && line.find("server") == 0))
 			return (line);
@@ -124,7 +123,7 @@ void serverconfig::printServer() {
 		std::cout << "error_page: " << it->first << " " << it->second << std::endl;
 		it++;
 	}
-	std::map<std::string, locationconf>::iterator it2 = locations.begin();
+	std::map<std::string, locationconfig>::iterator it2 = locations.begin();
 	while (it2 != locations.end())
 	{
 		std::cout << "location: " << it2->first << std::endl;

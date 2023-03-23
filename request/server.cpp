@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 02:17:32 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/23 03:11:08 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ std::pair<int, std::string> server::createBindListen(std::string port)
 void server::start()
 {
 	signal(SIGPIPE, SIG_IGN);
+	std::vector<serverconfig>::iterator serv = servers.begin();
 	clients.reserve(300);
 	for (std::vector<std::string>::iterator p = ports.begin(); p < ports.end(); p++)
 		listners.push_back(createBindListen(*p));
@@ -92,6 +93,7 @@ void server::start()
 					continue;
 				}
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
+				// clients.push_back(client(newSocket, listner->second));
 				int flags = fcntl(newSocket, F_GETFL, 0);
 				fcntl(newSocket, F_SETFL, flags | O_NONBLOCK);
 				client c(newSocket, listner->second);
@@ -121,11 +123,16 @@ void server::start()
 					//c->printAttr();
 				}
 			}
-			if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
+			else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
 			{
 				response res(c->getValue("Method"));
 				std::string response;
-				response = res.get_response(hosts);
+				if (c->getValue("Method") == "GET")
+					response = res.get_response(*serv, c->getValue("URL"));
+				else if (c->getValue("Method") == "POST")
+					response = res.post_response(*serv, c->getValue("Path"), c->getValue("Body"));
+				else if (c->getValue("Method") == "DELETE")
+					response = res.delete_response(*serv, c->getValue("Path"));
 				int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
 				c->setIsSent(1);
 				(void)bytes;
