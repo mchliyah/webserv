@@ -6,13 +6,13 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/21 20:21:19 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/23 02:17:32 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
-server::server(std::vector<std::string> ports_) : ports(ports_){}
+server::server(std::vector<std::string>& ports_, std::vector<serverconfig>& servers) : ports(ports_), hosts(servers){}
 
 std::pair<int, std::string> server::createBindListen(std::string port)
 {
@@ -50,11 +50,10 @@ std::pair<int, std::string> server::createBindListen(std::string port)
 	return (r);
 }
 
-void server::start(std::vector<serverconfig> &servers)
+void server::start()
 {
 	signal(SIGPIPE, SIG_IGN);
 	clients.reserve(300);
-	(void)servers;
 	for (std::vector<std::string>::iterator p = ports.begin(); p < ports.end(); p++)
 		listners.push_back(createBindListen(*p));
 	while (1)
@@ -78,29 +77,31 @@ void server::start(std::vector<serverconfig> &servers)
 		timeout.tv_usec = 0;
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, NULL);
 		if (activity == -1) {
-        	perror("select error");
-        	break;
-    	}
-		for (std::vector<std::pair<int, std::string> >::iterator listner = listners.begin(); listner < listners.end(); listner++) {
-			if (FD_ISSET(listner->first, &read_fds)) {
-				// struct sockaddr_storage addr;
-				// socklen_t len = sizeof(addr);
-				// int newSocket = accept(listner->first, reinterpret_cast<sockaddr*>(&addr), &len);
-				int newSocket = accept(listner->first, (struct sockaddr *)&(listner->second), (socklen_t*)&(listner->second));
+		perror("select error");
+			break;
+		}
+		for (std::vector<std::pair<int, std::string> >::iterator listner = listners.begin(); listner < listners.end(); listner++)
+		{
+			if (FD_ISSET(listner->first, &read_fds))
+			{
+				struct sockaddr_storage addr;
+				socklen_t len = sizeof(addr);
+				int newSocket = accept(listner->first, reinterpret_cast<sockaddr*>(&addr), &len);
 				if (newSocket == -1){
-                	perror("accept failed");
-                	continue;
-            	}
+					perror("accept failed");
+					continue;
+				}
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
-				clients.push_back(client(newSocket, listner->second));
-				// int flags = fcntl(newSocket, F_GETFL, 0);
-				// fcntl(newSocket, F_SETFL, flags | O_NONBLOCK);
-				// client c(newSocket, listner->second);
-				// clients.push_back(c);
+				int flags = fcntl(newSocket, F_GETFL, 0);
+				fcntl(newSocket, F_SETFL, flags | O_NONBLOCK);
+				client c(newSocket, listner->second);
+				clients.push_back(c);
 			}
 		}
-		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) {
-			if (FD_ISSET(c->getSocket(), &read_fds)) {
+		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
+		{
+			if (FD_ISSET(c->getSocket(), &read_fds))
+			{
 				char	buf[1028];
 				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
 				if (r <= 0)
@@ -109,43 +110,25 @@ void server::start(std::vector<serverconfig> &servers)
 					FD_CLR(c->getSocket(), &read_fds);
 					FD_CLR(c->getSocket(), &write_fds);
 					clients.erase(c);
-					continue;
 				}
 				else
 				{
-					char	buf[1028];
-					int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
-					if (r <= 0)
-					{
-						close(c->getSocket());
-						FD_CLR(c->getSocket(), &read_fds);
-						FD_CLR(c->getSocket(), &write_fds);
-						clients.erase(c);
-					}
-					else
-					{
-						c->setIsSent(0);
-						c->setRequest(buf);
-						c->parse();
-						//std::cout << c->getValue("Method") << std::endl;
-						c->printAttr();
-					}
+					c->setIsSent(0);
+					c->setRequest(buf);
+					c->parse();
+					c->matchHost(this->hosts);
+					//c->getHost().printServer();
+					//c->printAttr();
 				}
 			}
-			if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent()) {
-				for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) {
-					response res(c->getValue("Method"));
-					std::string response;
-					response = res.get_response(servers);
-					int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
-					close(c->getSocket());
-					FD_CLR(c->getSocket(), &read_fds);
-					FD_CLR(c->getSocket(), &write_fds);
-					clients.erase(c);
-					c->setIsSent(1);
-					// str.clear();
-					(void)bytes;
-				}
+			if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
+			{
+				response res(c->getValue("Method"));
+				std::string response;
+				response = res.get_response(hosts);
+				int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
+				c->setIsSent(1);
+				(void)bytes;
 			}
 		}
 	}

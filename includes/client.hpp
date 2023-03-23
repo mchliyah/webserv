@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/19 01:10:16 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/23 00:35:03 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include "config.hpp"
 
 class client
 {
@@ -28,6 +29,7 @@ private:
 	int			error;
 	std::string	err_message;
 	std::map<std::string, std::string> http_request;
+	serverconfig host;
 public:
 	client(int sock, std::string port_);
 	int			getSocket() const;
@@ -46,6 +48,8 @@ public:
 	int getError() const;
 	std::string getErrorMessage() const;
 	int checkMandatoryElements();
+	void matchHost(std::vector<serverconfig> hosts);
+	serverconfig getHost(void);
 	~client();
 };
 #endif

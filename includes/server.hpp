@@ -22,10 +22,11 @@ class server
 	private:
 		std::vector<std::string> ports;
 		std::vector<std::pair<int, std::string> > listners;
+		std::vector<serverconfig> hosts;
 		std::vector<client> clients;
 	public:
-		server(std::vector<std::string> ports_);
-		void start(std::vector<serverconfig> &servers);
+		server(std::vector<std::string>& ports_, std::vector<serverconfig>& servers);
+		void start();
 		std::pair<int,std::string> createBindListen(std::string port);
 		~server();
 };

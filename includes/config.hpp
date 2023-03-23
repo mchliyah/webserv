@@ -1,3 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   config.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/03/22 23:58:49 by slahrach          #+#    #+#             */
+/*   Updated: 2023/03/22 23:59:27 by slahrach         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef CONFIG_HPP
+# define CONFIG_HPP
 #include <iostream>
 #include <stdlib.h>
 #include <string>
@@ -63,3 +77,4 @@ class serverconfig
 std::vector<serverconfig> parse(std::string path);
 bool has_only_spaces(std::string str);
 int tab_count(std::string str);
+#endif

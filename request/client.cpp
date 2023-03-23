@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/21 20:22:18 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/23 02:16:12 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,8 @@ void client::parseHeader(std::string header)
 
 	pos = header.find(":");
 	key = header.substr(0, pos);
+	if (pos + 1 < header.size() && header[pos + 1] == ' ')
+		pos++;
 	value = header.substr(pos + 1);
 	http_request[key] = value;
 }
@@ -161,4 +163,22 @@ int client::checkMandatoryElements()
 		http_request["Body"] = getValue("Body").erase(num, http_request["Body"].size() - num);
 	}
 	return (0);
+}
+void client::matchHost(std::vector<serverconfig> hosts)
+{
+	std::string name = http_request["Host"];
+	size_t f = name.find(":");
+	if (f != std::string::npos)
+		name = name.substr(0, f);
+	host = *(hosts.begin());
+	for (std::vector<serverconfig>::iterator it= hosts.begin(); it < hosts.end(); it++)
+	{
+		if (it->getServerName() == name && it->getListen() == port)
+			host = *it;
+	}
+}
+
+serverconfig client::getHost(void)
+{
+	return (this->host);
 }

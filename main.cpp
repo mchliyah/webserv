@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/21 17:16:48 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/22 22:29:49 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ int main(int argc, char **argv)
 		std::vector<serverconfig>::iterator it1;
 		for (it1 = servers.begin(); it1 != servers.end(); it1++)
 			v.push_back(it1->getListen());
-		server my(v);
-		my.start(servers);
+		server my(v, servers);
+		my.start();
 	}
 	catch(const std::exception& e)
 	{
