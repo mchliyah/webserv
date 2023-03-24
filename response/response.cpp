@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/24 03:55:52 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/24 15:50:36 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ response::response(const std::string& request_type) {
 }
 
 std::string response::get_response(serverconfig &server, std::string &path) {
-	std::cout << "path: " << path << std::endl;
 	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 	std::map<std::string, locationconfig> locations = server.getLocations();
 	std::map<std::string, locationconfig>::iterator loc;
@@ -77,88 +76,61 @@ std::string response::get_response(serverconfig &server, std::string &path) {
 	std::string::size_type pos = path.find_last_of('/');
 	if (pos != std::string::npos)
 		frst = path.substr(0, pos + 1);
-
-	std::cout << "location : " << frst << std::endl;
 	for (loc = locations.begin() ; loc != locations.end() ; loc++)
 	{
 		if (loc->first.compare(frst) == 0)
 		{
-			std::cout << "location found" << std::endl;
-			// std::vector<std::string> index = loc->second.getIndex();
-			// std::vector<std::string>::iterator it;
-			// for (it = index.begin() ; it != index.end() ; it++) {
-			// 	if (*it == last) {
-			// 		std::cout << "index found" << std::endl;
-				std::string file_path = loc->second.getRoot() + path;
-				if (access(file_path.c_str(), F_OK) != -1)
+			std::string file_path = loc->second.getRoot() + path;
+			if (access(file_path.c_str(), F_OK) != -1)
+			{
+				 struct stat path_stat;
+				  stat(file_path.c_str(), &path_stat);
+				if (S_ISDIR(path_stat.st_mode))
 				{
-					 struct stat path_stat;
-					  stat(file_path.c_str(), &path_stat);
-					std::cout << "file pathe : " << file_path << std::endl;
-					if (S_ISDIR(path_stat.st_mode))
+					std::cout << "is dir" << std::endl;
+					if (!default_index(*this, loc, path) && loc->second.getAutoIndex() == "on")
 					{
-						std::cout << "is dir" << std::endl;
-						std::vector<std::string> index = loc->second.getIndex();
-						std::vector<std::string>::iterator it;
-						for (it = index.begin() ; it != index.end() ; it++) {
-							std::string file_path = loc->second.getRoot() + path + *it;
-							if (access(file_path.c_str(), F_OK) != -1)
-							{
-								std::ifstream file(file_path);
-								if (!file.is_open()){
-									content = "403 Forbidden";
-									status_code = "403";
-									status_message = "Forbidden";
-									break;
-								}
-								std::string line;
-								while (getline(file, line)) {
-									content += line;
-								}
-								file.close();
-								content_type = "Content-Type: text/html\r\n";
-								break;
+						DIR *dir;
+						struct dirent *ent;
+						std::cout << "autoindex on" << std::endl;
+						std::cout << "file_path: " << file_path << std::endl;
+						if (file_path[file_path.length() - 1] != '/')
+							file_path += "/";
+						if ((dir = opendir (file_path.c_str())) != NULL) {
+							content += "<html><head><title>Index of " + path + "</title></head><body bgcolor=\"white\"><h1>Index of " + path + "</h1><hr><pre><a href=\"../\">../</a>";
+							while ((ent = readdir (dir)) != NULL) {
+								if (ent->d_name[0] != '.')
+									content += " <a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>";
 							}
-						}
-						if (loc->second.getAutoIndex() == "on")
-						{
-							DIR *dir;
-							struct dirent *ent;
-							if ((dir = opendir (file_path.c_str())) != NULL) {
-								content += "<html><head><title>Index of " + path + "</title></head><body bgcolor=\"white\"><h1>Index of " + path + "</h1><hr><pre><a href=\"../\">../</a>";
-								while ((ent = readdir (dir)) != NULL) {
-									if (ent->d_name[0] != '.')
-										content += " <a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>";
-								}
-								content += "</pre><hr></body></html>";
-								closedir (dir);
-								content_type = "Content-Type: text/html\r\n";
-							}
+							content += "</pre><hr></body></html>";
+							closedir (dir);
+							content_type = "Content-Type: text/html\r\n";
 						}
 					}
-					else if (S_ISREG(path_stat.st_mode))
-					{
-						std::ifstream file(file_path);
-						if (!file.is_open()){
-							content = "403 Forbidden";
-							status_code = "403";
-							status_message = "Forbidden";
-							break;
-						}
-						std::string line;
-						while (getline(file, line)) {
-							content += line;
-						}
-						file.close();
-						content_type = "Content-Type: text/plain\r\n";
-					}
-					else
-					{
+				}
+				else if (S_ISREG(path_stat.st_mode))
+				{
+					std::ifstream file(file_path);
+					if (!file.is_open()){
 						content = "403 Forbidden";
 						status_code = "403";
 						status_message = "Forbidden";
+						break;
 					}
+					std::string line;
+					while (getline(file, line)) {
+						content += line;
+					}
+					file.close();
+					content_type = "Content-Type: text/html\r\n";
 				}
+				// else
+				// {
+				// 	content += "<html><head><title> 404 file not found </title></head><body bgcolor=\"white\"><h1>404 file not found </h1><hr><pre><a href=\"../\">../</a>";
+				// 	status_code = "404";
+				// 	status_message = "file not found";
+				// }
+			}
 		}		
 	}
 	content_length += std::to_string(content.length()) + "\r\n";

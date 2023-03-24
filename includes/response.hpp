@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/22 19:17:06 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/24 14:56:33 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,5 +65,6 @@ class response
 };
 
 std::string process_request(void);
+bool default_index(response &res, std::map<std::string, locationconfig>::iterator loc, std::string path);
 
 #endif
