@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 00:35:03 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/23 03:22:00 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ public:
 	std::string getErrorMessage() const;
 	int checkMandatoryElements();
 	void matchHost(std::vector<serverconfig> hosts);
-	serverconfig getHost(void);
+	serverconfig& getHost(void);
 	~client();
 };
 #endif

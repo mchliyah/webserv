@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 17:08:17 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/21 12:57:30 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/23 00:33:00 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 void check_all_set(std::vector<serverconfig>& servers)
 {
 	std::vector<serverconfig>::iterator it;
-	std::map<std::string, locationconf>::iterator it2;
+	std::map<std::string, locationconfig>::iterator it2;
 
 	for (it = servers.begin(); it != servers.end(); it++)
 	{
@@ -59,6 +59,8 @@ std::vector<serverconfig> parse(std::string path){
 	while (!os.eof())
 	{
 		serverconfig server;
+		if (line.empty())
+			continue;
 		if (line.find("#") != std::string::npos)
 			throw std::runtime_error("Error: comment is not allowed");
 		if (line.find("server") == std::string::npos || line.find("server") != 0)
