@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 03:22:22 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/25 04:11:57 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,24 +157,37 @@ int client::checkMandatoryElements()
 	if (!getValue("Content-Length").empty())
 	{
 		std::istringstream iss(getValue("Content-Length"));
-    	int num;
-    	iss >> num;
+		int num;
+		iss >> num;
 		http_request["Body"] = getValue("Body").erase(num, http_request["Body"].size() - num);
 	}
 	return (0);
 }
+struct compare
+{
+	std::string name;
+	client c;
+	compare(std::string my_, client c_): name(my_), c(c_) {}
+ 
+	bool operator()(serverconfig s) {
+		if (name != "")
+			return (s.getServerName() == name && s.getListen() == c.getPort());
+		else
+			return s.getListen() == c.getPort();
+	}
+};
+
 void client::matchHost(std::vector<serverconfig> hosts)
 {
 	std::string name = http_request["Host"];
 	size_t f = name.find(":");
 	if (f != std::string::npos)
 		name = name.substr(0, f);
-	host = *(hosts.begin());
-	for (std::vector<serverconfig>::iterator it= hosts.begin(); it < hosts.end(); it++)
-	{
-		if (it->getServerName() == name && it->getListen() == port)
-			host = *it;
-	}
+	std::vector<serverconfig>::iterator s = std::find_if(hosts.begin(), hosts.end(), compare(name, *this));
+	if (s != hosts.end())
+		host = *s;
+	else
+		host = *(std::find_if(hosts.begin(), hosts.end(), compare("", *this)));
 }
 
 serverconfig& client::getHost(void)
