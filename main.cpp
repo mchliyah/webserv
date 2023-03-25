@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/24 14:20:25 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/25 02:45:41 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,30 @@
 
 int g_tab_count = 0;
 
+struct compare
+{
+    std::string my_port;
+    compare(std::string my): my_port(my) {}
+ 
+    bool operator()(std::string s) {
+        return (s == my_port);
+    }
+};
+ 
+// int main()
+// {
+//     std::vector<int> v = { 4, 7, 5, 2, 6, 9 };
+//     int key = 6;
+ 
+//     if (std::find_if(v.begin(), v.end(), compare(key)) != v.end()) {
+//         std::cout << "Element found";
+//     }
+//     else {
+//         std::cout << "Element not found";
+//     }
+ 
+//     return 0;
+// }
 int main(int argc, char **argv)
 {
 	try
@@ -35,7 +59,10 @@ int main(int argc, char **argv)
 	// 	}
 		std::vector<serverconfig>::iterator it1;
 		for (it1 = servers.begin(); it1 != servers.end(); it1++)
-			v.push_back(it1->getListen());
+		{
+			if (std::find_if(v.begin(), v.end(), compare(it1->getListen())) == v.end())
+				v.push_back(it1->getListen());
+		}
 		server my(v, servers);
 		my.start();
 	}

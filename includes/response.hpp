@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/25 03:44:17 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/25 16:46:26 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,12 @@ class response
 		std::string get_response(serverconfig &server, std::string &path);
 		std::string post_response(serverconfig &server, std::string &path, std::string &body);
 		std::string delete_response(serverconfig &server, std::string &path);
+		std::string put_response(void);
 };
 
-std::string process_request(void);
+bool is_dir(std::string path);
+bool is_file(std::string path);
 bool default_index(response &res, locationconfig loc, std::string path);
+locationconfig matchlocation(serverconfig &server, std::string &path);
 
 #endif
