@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/25 01:48:18 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/26 05:22:39 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ void server::start()
 					c->setRequest(buf);
 					c->parse();
 					c->matchHost(this->hosts);
-					c->getHost().printServer();
+					// c->getHost().printServer();
 					// c->printAttr();
 				}
 			}

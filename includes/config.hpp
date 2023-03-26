@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 23:58:49 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/24 03:50:17 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/26 05:24:48 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ extern int g_tab_count;
 
 class locationconfig
 {
+	std::string loc_name;
 	std::string root;
 	std::string cgipass;
 	std::string cgi_pass;
@@ -49,15 +50,18 @@ class locationconfig
 		~locationconfig();
 		std::string readlocation(std::ifstream& inputFile, std::string line);
 		void printlocation();
+		void setName(std::string name);
 		std::string getRoot() const;
 		std::string getCgiPass() const;
 		std::vector<std::string> getIndex() const;
 		std::map<std::string, bool> getAllowsMethod() const;
 		std::string getAutoIndex() const;
+		std::string getName() const;
 };
 
 class serverconfig
 {
+	private:
 		std::string server_name;
 		std::map<std::string, locationconfig> locations;
 		std::string listen;

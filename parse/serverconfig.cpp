@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/23 00:50:54 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/26 04:15:48 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 			getline(inputFile, line);
 			g_tab_count = tab_count(line);
 			line = location.readlocation(inputFile, line);
+			location.setName(value);
 			locations.insert(std::make_pair(value, location));
 			if (inputFile.eof() ||  (line.find("server") != std::string::npos && line.find("server") == 0))
 				return (line);

@@ -1,14 +1,23 @@
 
 #include "../includes/server.hpp"
 
-std::string response::get_response(serverconfig &server, std::string &path) {
+std::string response::get_response(serverconfig &server, std::string &in_path) {
 	locationconfig location;
-	location = matchlocation(server , path);
+	location = matchlocation(server , in_path);
+	std::string path = in_path.substr(location.getName().length() - 1, in_path.length() - location.getName().length() + 1);
 	std::string file_path = location.getRoot() + path;
+	std::cout << "file path :" << file_path << std::endl;
 	if (access(file_path.c_str(), F_OK) != -1)
 	{
 		if (is_dir(file_path))
 		{
+			if (file_path[file_path.length() - 1] != '/')
+			{
+				in_path += "/";
+    			status_code = "301";
+    			headers.push_back("Location: " + in_path + "\r\n");
+    			return (put_response());
+			}
 			if (!default_index(*this, location, path) && location.getAutoIndex() == "on")
 			{
 				DIR *dir;

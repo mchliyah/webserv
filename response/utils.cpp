@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 14:33:29 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/25 16:26:45 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/26 05:53:40 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ locationconfig matchlocation(serverconfig &server, std::string &path)
 	std::string frst = path;
 	while (frst.length() > 1 && !found)
 	{
+		std::cout << "frst : "<< frst << std::endl; 
 		for (loc = locations.begin() ; loc != locations.end() ; loc++)
 		{
 			if (loc->first.compare(frst + "/") == 0)

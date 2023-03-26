@@ -12,28 +12,6 @@
 
 #include "../includes/server.hpp"
 
-
-
-std::string locationconfig::getRoot() const{
-	return (this->root);
-}
-
-std::string locationconfig::getCgiPass() const{
-	return (this->cgipass);
-}
-
-std::map<std::string, bool> locationconfig::getAllowsMethod() const{
-	return (this->allowsmethod);
-}
-
-std::vector<std::string> locationconfig::getIndex() const{
-	return (this->index);
-}
-
-std::string locationconfig::getAutoIndex() const{
-	return (this->autoindex);
-}
-
 std::string locationconfig::readlocation(std::ifstream& inputFile, std::string line) {
 	std::string key, value;
 	std::pair<std::string, std::string> pair;
@@ -115,7 +93,34 @@ locationconfig::locationconfig() {
 	autoindex.clear();
 }
 
+std::string locationconfig::getRoot() const{
+	return (this->root);
+}
+
+std::string locationconfig::getCgiPass() const{
+	return (this->cgipass);
+}
+
+std::map<std::string, bool> locationconfig::getAllowsMethod() const{
+	return (this->allowsmethod);
+}
+
+std::vector<std::string> locationconfig::getIndex() const{
+	return (this->index);
+}
+
+std::string locationconfig::getAutoIndex() const{
+	return (this->autoindex);
+}
+std::string locationconfig::getName() const{
+	return (this->loc_name);
+}
+void locationconfig::setName(std::string name){
+	this->loc_name = name;
+}
+
 locationconfig::~locationconfig() {
+	loc_name.clear();
 	root.clear();
 	index.clear();
 	allowsmethod.clear();
