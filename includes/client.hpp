@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 00:35:03 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/26 03:57:36 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ public:
 	std::string getPort() const;
 	bool		getIsSent() const;
 	void		setIsSent(bool a);
-	void setRequest(char *req);
+	void setRequest(char *req, size_t r);
 	int parseRequestLine(std::string first_line);
 	void parseHeader(std::string header);
 	void parseBody(std::string request);

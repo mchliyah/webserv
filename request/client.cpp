@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 04:39:39 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/26 06:46:41 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int client::getSocket() const {return socket_fd;}
 std::string client::getPort() const {return port;}
 bool client::getIsSent() const {return isSent;}
 void client::setIsSent(bool b) {isSent = b;}
-void client::setRequest(char *req) {request = req;}
+void client::setRequest(char *req, size_t r){request = std::string(req, r);}
 
 void client::makeError(int err, const std::string& msg)
 {
@@ -101,25 +101,39 @@ void client::parseHeader(std::string header)
 	value = header.substr(pos + 1);
 	http_request[key] = value;
 }
-void client::parseBody(std::string body)
+void client::parseBody(std::string body)//MAKE IT RETURN 
 {
-	std::stringstream stream(body);
-	std::string final;
-	if (!getValue("Transfer-Encoding").empty() && http_request["Transfer-Encoding"] == "chuncked")
+	std::string final = "";
+	if (!getValue("Transfer-Encoding").empty() && http_request["Transfer-Encoding"] == "chunked")
 	{
-		int	l;
-		while (std::getline(stream, line, '\r'))
+		size_t pos = 0;
+		size_t old = 0;
+		std::cout << "here" << std::endl;
+		while (old < body.length())
 		{
-			if (line[0] != '\n')
-			{
-				makeError(400, "bad request: Seperator Is Missing");
-				return ;
-			}
-			line >> l;
-			if (l == 0 && line == "0")
-				break ;
+			pos = body.find("\r\n", old);
+			std::cout << old << pos << std::endl;
+			std::string length_string = body.substr(old, pos - old);
+			long l = strtol(length_string.c_str(), NULL, 16);
 			if (l == 0)
+				break ;
+			final += body.substr(pos+2, l);
+			old = pos + 4 + l;
 		}
+	}
+	else if (!getValue("Content-Length").empty())
+	{
+		std::string length = http_request["Content-Length"];
+		std::stringstream stream(length);
+		size_t l;
+		stream >> l;
+		std::cout << l << std::endl;
+		if (l > body.size() || (l == 0 && length != "0"))
+		{
+			makeError(400, "Bad Request : content length");
+			return ;
+		}
+		final = body.substr(0, l);
 	}
 	http_request["Body"] = final;
 }
@@ -154,8 +168,6 @@ void client::parse()
 	}
 	if (pos + 2 < request.size())
 		parseBody(request.substr(pos + 2));
-	if (checkMandatoryElements())
-		return ;
 }
 std::string&	client::getValue(const std::string& key)
 {

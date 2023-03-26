@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 03:40:47 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/26 06:43:48 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,13 @@ void server::start()
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
 				char	buf[1028];
-				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
+				memset(buf, 0, sizeof buf);
+				size_t	r = recv(c->getSocket(), buf, sizeof(buf), 0);
+				std::string s(buf, r);
+				std::cout <<"start----"<< s <<"---end-" << r<< "-" << std::endl;
+				// for(std::string::iterator it = s.begin(); it != s.end(); it++)
+				// 	std::cout << (int)*it;
+				// std::cout << std::endl;
 				if (r <= 0)
 				{
 					close(c->getSocket());
@@ -114,9 +120,11 @@ void server::start()
 				else
 				{
 					c->setIsSent(0);
-					c->setRequest(buf);
+					c->setRequest(buf, r);//set until r
 					c->parse();
 					c->matchHost(this->hosts);
+					std::cout << c->getError() << std::endl;
+					std::cout << c->getErrorMessage() << std::endl;
 					//c->getHost().printServer();
 					c->printAttr();
 				}
