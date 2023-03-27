@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/26 03:57:36 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/27 02:03:31 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,9 @@ private:
 	std::string	err_message;
 	std::map<std::string, std::string> http_request;
 	serverconfig host;
+	static int n;
 public:
+	std::string id;
 	client(int sock, std::string port_);
 	int			getSocket() const;
 	std::string getPort() const;

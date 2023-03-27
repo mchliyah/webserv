@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/26 06:46:41 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/27 02:03:39 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,13 @@
 
 client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), err_message("")
 {
-	this->parse();
+	std::stringstream ss;
+	ss << n++;
+	ss >> id;
+	std::cout << id << std::endl;
+	std::ofstream s(id);
 }
-client::~client() {}
+client::~client(){}
 //getters & setters
 int client::getSocket() const {return socket_fd;}
 std::string client::getPort() const {return port;}
@@ -212,3 +216,4 @@ serverconfig client::getHost(void)
 {
 	return (this->host);
 }
+int client::n = 0;

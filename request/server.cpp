@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/26 06:43:48 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/27 02:05:50 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,18 @@ void server::start()
 				// std::cout << std::endl;
 				if (r <= 0)
 				{
+					if (r == 0)
+					{
+						std::cout << "here2" << std::endl;
+						c->setIsSent(0);
+						// c->setRequest(buf, r);//set until r
+						// c->parse();
+						// c->matchHost(this->hosts);
+						// std::cout << c->getError() << std::endl;
+						// std::cout << c->getErrorMessage() << std::endl;
+						// //c->getHost().printServer();
+						// c->printAttr();
+					}
 					close(c->getSocket());
 					FD_CLR(c->getSocket(), &read_fds);
 					FD_CLR(c->getSocket(), &write_fds);
@@ -119,14 +131,10 @@ void server::start()
 				}
 				else
 				{
-					c->setIsSent(0);
-					c->setRequest(buf, r);//set until r
-					c->parse();
-					c->matchHost(this->hosts);
-					std::cout << c->getError() << std::endl;
-					std::cout << c->getErrorMessage() << std::endl;
-					//c->getHost().printServer();
-					c->printAttr();
+					std::cout << "here1" << std::endl;
+					std::string buff(buf, r);
+					std::ofstream file(c->id);
+					file << buff;
 				}
 			}
 			if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
