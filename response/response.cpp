@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/25 16:49:36 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/27 05:15:46 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ response::response(const std::string& request_type) {
 	    status_code = "204";
 	    status_message = "No Content";
 	}
+	body = "";
 	content_type = "Content-Type: text/plain\r\n";
 	content_length = "Content-Length: ";
 }
@@ -34,8 +35,8 @@ response::response(const std::string& request_type) {
 std::string response::put_response(void)
 {
 	std::string response;
-	response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
-	content_length += std::to_string(content.length()) + "\r\n";
+	response += content;
+	content_length += std::to_string(body.length()) + "\r\n";
 	response += date;
 	response += content_type;
 	response += content_length;
@@ -43,7 +44,7 @@ std::string response::put_response(void)
 	for (it = headers.begin(); it != headers.end(); it++)
 		response += *it;
 	response += "\r\n";
-	response += content;
+	response += body;
 	return response;
 }
 

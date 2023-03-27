@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/26 05:22:39 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/27 05:00:55 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,16 +127,17 @@ void server::start()
 			}
 			else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
 			{
+				std::cout << "sending response" << std::endl;
 				response res(c->getValue("Method"));
 				std::string response;
 				if (c->getValue("Method") == "GET")
-					response = res.get_response(c->getHost(), c->getValue("URL"));
-				else if (c->getValue("Method") == "POST")
-					response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
-				else if (c->getValue("Method") == "DELETE")
-					response = res.delete_response(c->getHost(), c->getValue("Path"));
+					response = res.get_response(*c);
+				// else if (c->getValue("Method") == "POST")
+				// 	response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
+				// else if (c->getValue("Method") == "DELETE")
+				// 	response = res.delete_response(c->getHost(), c->getValue("Path"));
 				int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
-				c->setIsSent(1);
+				// c->setIsSent(1);
 				(void)bytes;
 			}
 		}

@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/25 04:11:57 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/27 03:50:51 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), err_message("")
+client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), first_time(true), readfds(-1), err_message("")
 {
 	this->parse();
 }
@@ -194,3 +194,11 @@ serverconfig& client::getHost(void)
 {
 	return (this->host);
 }
+
+void client::setFirstTime(bool b) {first_time = b;}
+
+bool& client::getFirstTime() {return first_time;}
+
+int& client::getReadfds() {return readfds;}
+
+void client::setReadfds(int i) {readfds = i;}

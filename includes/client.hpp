@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 03:22:00 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/27 03:35:42 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ private:
 	int			socket_fd;
 	bool		isSent;
 	int			error;
+	bool		first_time;
+	int			readfds;
 	std::string	err_message;
 	std::map<std::string, std::string> http_request;
 	serverconfig host;
@@ -50,6 +52,10 @@ public:
 	int checkMandatoryElements();
 	void matchHost(std::vector<serverconfig> hosts);
 	serverconfig& getHost(void);
+	void setFirstTime(bool b);
+	bool& getFirstTime(void);
+	int& getReadfds(void);
+	void setReadfds(int a);
 	~client();
 };
 #endif

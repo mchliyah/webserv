@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/25 16:46:26 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/27 03:43:42 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class response
     	std::string status_message;
     	std::string content_type;
     	std::string content;
+		std::string body;
 		std::string content_length;
     	std::string date;
     	std::vector<std::string> headers;
@@ -59,7 +60,7 @@ class response
 		void set_status_code(std::string status_code);
 		void set_status_message(std::string status_message);
 		void set_date(std::string date);
-		std::string get_response(serverconfig &server, std::string &path);
+		std::string get_response(client &client);
 		std::string post_response(serverconfig &server, std::string &path, std::string &body);
 		std::string delete_response(serverconfig &server, std::string &path);
 		std::string put_response(void);
