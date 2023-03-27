@@ -6,19 +6,14 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/27 02:03:39 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/27 09:50:32 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), err_message("")
+client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), err_message(""), rcv(0)
 {
-	std::stringstream ss;
-	ss << n++;
-	ss >> id;
-	std::cout << id << std::endl;
-	std::ofstream s(id);
 }
 client::~client(){}
 //getters & setters
@@ -26,7 +21,7 @@ int client::getSocket() const {return socket_fd;}
 std::string client::getPort() const {return port;}
 bool client::getIsSent() const {return isSent;}
 void client::setIsSent(bool b) {isSent = b;}
-void client::setRequest(char *req, size_t r){request = std::string(req, r);}
+void client::resetRequest(){request = "";}
 
 void client::makeError(int err, const std::string& msg)
 {
@@ -105,41 +100,60 @@ void client::parseHeader(std::string header)
 	value = header.substr(pos + 1);
 	http_request[key] = value;
 }
-void client::parseBody(std::string body)//MAKE IT RETURN 
+void client::addToBody(std::string body)//MAKE IT RETURN 
 {
-	std::string final = "";
-	if (!getValue("Transfer-Encoding").empty() && http_request["Transfer-Encoding"] == "chunked")
+	//put body in a file
+	std::stringstream stream;
+	std::ofstream file;
+	stream << socket_fd;
+	std::string filename = "body" + stream.str() + ".txt";
+	std::cout << "rcv is " << rcv << std::endl;
+	if (rcv == 2)
 	{
-		size_t pos = 0;
-		size_t old = 0;
-		std::cout << "here" << std::endl;
-		while (old < body.length())
-		{
-			pos = body.find("\r\n", old);
-			std::cout << old << pos << std::endl;
-			std::string length_string = body.substr(old, pos - old);
-			long l = strtol(length_string.c_str(), NULL, 16);
-			if (l == 0)
-				break ;
-			final += body.substr(pos+2, l);
-			old = pos + 4 + l;
-		}
+		std::cout << "Nom Im clearing" << std::endl;
+		file.open("body" + stream.str() + ".txt", std::ios::out | std::ios::trunc);
+		file.close();
 	}
-	else if (!getValue("Content-Length").empty())
+	file.open("body" + stream.str() + ".txt", std::ios::app);
+	file.seekp(0, std::ios::end);
+	std::streampos size = file.tellp();
+	// if (!getValue("Transfer-Encoding").empty() && http_request["Transfer-Encoding"] == "chunked")
+	// {
+	// 	size_t pos = 0;
+	// 	size_t old = 0;
+	// 	std::cout << "here" << std::endl;
+	// 	while (old < body.length())
+	// 	{
+	// 		pos = body.find("\r\n", old);
+	// 		std::cout << old << pos << std::endl;
+	// 		std::string length_string = body.substr(old, pos - old);
+	// 		long l = strtol(length_string.c_str(), NULL, 16);
+	// 		if (l == 0)
+	// 			break ;
+	// 		final += body.substr(pos+2, l);
+	// 		old = pos + 4 + l;
+	// 	}
+	// }
+	std::string length = http_request["Content-Length"];
+	std::stringstream l(length);
+	int length_int;
+	l >> length_int;
+	int s = length_int - size;
+	std::cout << "now i'm writing -";
+	for (int i = 0; i < (int)body.length() && i < s; i++)
 	{
-		std::string length = http_request["Content-Length"];
-		std::stringstream stream(length);
-		size_t l;
-		stream >> l;
-		std::cout << l << std::endl;
-		if (l > body.size() || (l == 0 && length != "0"))
-		{
-			makeError(400, "Bad Request : content length");
-			return ;
-		}
-		final = body.substr(0, l);
+		file << body[i];
+		std::cout << body[i];
 	}
-	http_request["Body"] = final;
+	std::cout << "-" << std::endl;
+	file.seekp(0, std::ios::end);
+	int si = file.tellp();
+	std::cout << "size of file is " << si<< " and content length is " << length_int << std::endl;
+	if (rcv != 4)
+		rcv = 3;
+	if (size == length_int)
+		rcv = 4;
+	file.close();
 }
 void client::parse()
 {
@@ -170,8 +184,6 @@ void client::parse()
 		else
 			break ;
 	}
-	if (pos + 2 < request.size())
-		parseBody(request.substr(pos + 2));
 }
 std::string&	client::getValue(const std::string& key)
 {
@@ -192,8 +204,8 @@ int client::checkMandatoryElements()
 	if (!getValue("Content-Length").empty())
 	{
 		std::istringstream iss(getValue("Content-Length"));
-    	int num;
-    	iss >> num;
+		int num;
+		iss >> num;
 		http_request["Body"] = getValue("Body").erase(num, http_request["Body"].size() - num);
 	}
 	return (0);
@@ -216,4 +228,18 @@ serverconfig client::getHost(void)
 {
 	return (this->host);
 }
-int client::n = 0;
+
+std::string	client::addToRequestCheck(std::string buff)
+{
+	std::string rest = "";
+	request += buff;
+	if (request.find("\r\n\r\n") != std::string::npos)
+	{
+		rcv = 1;
+		rest = request.substr(request.find("\r\n\r\n") + 4);
+		request = request.substr(0, request.find("\r\n\r\n") + 4);
+		std::cout << "request : -" << request << "-rest : -" << rest << "-"<< std::endl;
+		parse();
+	}
+	return (rest);
+}

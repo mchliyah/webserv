@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/27 02:05:50 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/27 10:08:46 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,48 +102,60 @@ void server::start()
 		{
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
-				char	buf[1028];
+				char	buf[3];
 				memset(buf, 0, sizeof buf);
 				size_t	r = recv(c->getSocket(), buf, sizeof(buf), 0);
 				std::string s(buf, r);
-				std::cout <<"start----"<< s <<"---end-" << r<< "-" << std::endl;
-				// for(std::string::iterator it = s.begin(); it != s.end(); it++)
-				// 	std::cout << (int)*it;
-				// std::cout << std::endl;
+				std::cout <<"start----"<< s <<"---end-" << r<< "-rcv : " << c->rcv << "-" << std::endl;
 				if (r <= 0)
 				{
-					if (r == 0)
-					{
-						std::cout << "here2" << std::endl;
-						c->setIsSent(0);
-						// c->setRequest(buf, r);//set until r
-						// c->parse();
-						// c->matchHost(this->hosts);
-						// std::cout << c->getError() << std::endl;
-						// std::cout << c->getErrorMessage() << std::endl;
-						// //c->getHost().printServer();
-						// c->printAttr();
-					}
 					close(c->getSocket());
 					FD_CLR(c->getSocket(), &read_fds);
 					FD_CLR(c->getSocket(), &write_fds);
 					clients.erase(c);
 				}
-				else
+				else if (c->rcv != 4)
 				{
-					std::cout << "here1" << std::endl;
 					std::string buff(buf, r);
-					std::ofstream file(c->id);
-					file << buff;
+					if (c->rcv == 0)
+					{
+						std::string rest = c->addToRequestCheck(buff);
+						if (rest.size() > 0)
+						{
+							c->rcv = 2;
+							c->addToBody(rest);
+						}
+					}
+					else
+					{
+						if (c->rcv == 1)
+							c->rcv = 2;
+						if (c->rcv != 4)
+							c->addToBody(buff);
+					}
 				}
 			}
-			if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
+			if (FD_ISSET(c->getSocket(), &write_fds) && c->rcv == 4)
 			{
 				response res(c->getValue("Method"));
 				std::string response;
 				response = res.get_response(hosts);
-				int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
-				c->setIsSent(1);
+				//const char *response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 20\r\n\r\nHello, World!";
+				int bytes = send(c->getSocket(), response.c_str(), response.length(), 0);
+				std::cout << "sent " << std::endl;
+				// c->resetRequest();
+				// close(c->getSocket());
+				// FD_CLR(c->getSocket(), &read_fds);
+				// FD_CLR(c->getSocket(), &write_fds);
+				// clients.erase(c);
+				// std::stringstream stream;
+				// stream << c->getSocket();
+				// const char* filename = std::string("body" + stream.str() + ".txt").c_str();
+				// std::ifstream file(filename);
+				// std::string re;
+				// std::getline(file, re);
+				// std::cout << re << std::endl;
+				// file.close();
 				(void)bytes;
 			}
 		}
