@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 05:58:53 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 09:19:49 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,12 +100,10 @@ void server::start()
 		{
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
-				std::cout << "reading from " << c->getSocket() << std::endl;
-				char	buf[3];
+				char	buf[7];
 				memset(buf, 0, sizeof buf);
 				size_t	r = recv(c->getSocket(), buf, sizeof(buf), 0);
 				std::string s(buf, r);
-				std::cout <<"start----"<< s <<"---end-" << r<< "-rcv : " << c->rcv << "-" << std::endl;
 				if (r <= 0)
 				{
 					std::cout << "closing socket " << c->getSocket() << std::endl;
@@ -118,9 +116,7 @@ void server::start()
 				{
 					std::string buff(buf, r);
 					if (c->rcv == 0)
-					{
 						c->addToRequestCheck(buff);
-					}
 					else
 					{
 						if (c->rcv == 1)
@@ -128,34 +124,22 @@ void server::start()
 						if (c->rcv != 4)
 							c->addToBody(buff);
 					}
-					std::cout << "after handling buffer rcv : " << c->rcv << std::endl;
 				}
 			}
 			if (FD_ISSET(c->getSocket(), &write_fds) && c->rcv == 4)
 			{
-				std::cout << std::endl;
 				std::cout << c->getError();
 				std::cout << c->getErrorMessage();
-				c->printAttr();
+				// c->printAttr();
 				response res(c->getValue("Method"));
 				std::string response;
 				response = res.get_response(hosts);
 				send(c->getSocket(), response.c_str(), response.length(), 0);
 				std::cout << "sent " << std::endl;
 				c->resetClient();
-				// close(c->getSocket());
-				// FD_CLR(c->getSocket(), &read_fds);
-				// FD_CLR(c->getSocket(), &write_fds);
-				// clients.erase(c);
 			}
 		}
 	}
 }
 
-server::~server()
-{
-	for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
-		close(l->first);
-	for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
-		close(c->getSocket());
-}
+server::~server(){}

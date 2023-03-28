@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 06:01:07 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 09:09:41 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ public:
 	void resetClient();
 	int parseRequestLine(std::string first_line);
 	void parseHeader(std::string header);
-	//void parseBody(std::string request);
 	void printAttr() const;
 	void makeError(int err, const std::string& msg);
 	std::string& getValue(const std::string& key);

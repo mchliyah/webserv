@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/21 19:32:45 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/28 08:49:55 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,24 +84,5 @@ std::string response::get_response(std::vector<serverconfig> &servers) {
 	response += content;
 	return response;
 }
-
-
-
-
-					// std::ifstream file("test.txt");
-					// std::string responce;
-					// if (!file.is_open())
-					// 	throw std::runtime_error("cant open file 1");
-					// std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-// response process_request(void) {
-// 	// response resp("GET");
-// 	return response("POST");
-//     // std::string response = "HTTP/1.1 200 OK\r\n";
-//     // response += "Content-Type: text/plain\r\n";
-//     // response += "Content-Length: 41\r\n";
-//     // response += "\r\n";
-//     // response += "Hello, world! will i need to change this?";
-//     // return response;
-// }
 
 response::~response() { }

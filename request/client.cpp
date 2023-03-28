@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 06:09:00 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 09:15:51 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,12 +72,6 @@ int	client::parseRequestLine(std::string first_line)
 
 	last = 0;
 	std::string items[3] = {"Method", "URL"};
-	std::string::iterator new_end = std::unique(first_line.begin(), first_line.end(), BothAreSpaces);
-	first_line.erase(new_end, first_line.end());
-	if (first_line[0] == ' ')
-		first_line.erase(0, 1);
-	if (*first_line.rbegin() == ' ')
-		first_line.pop_back();
 	for (int i = 0; i < 2; i++)
 	{
 		pos = first_line.find(" ", last);
@@ -109,58 +103,86 @@ void client::parseHeader(std::string header)
 }
 void client::addToBody(std::string body)//MAKE IT RETURN 
 {
-	//put body in a file
 	std::stringstream stream;
+	static bool chunking_track = 0;
+	static size_t length = 0;
+	static std::string chunked = "";
 	std::ofstream file;
 	stream << socket_fd;
 	std::string filename = "body" + stream.str() + ".txt";
-	std::cout << "rcv is " << rcv << std::endl;
-	if (rcv == 2)
+	if (rcv == 2)//first time
 	{
-		std::cout << "Nom Im clearing" << std::endl;
-		file.open("body" + stream.str() + ".txt", std::ios::out | std::ios::trunc);
+		file.open(filename, std::ios::out | std::ios::trunc);
 		file.close();
 	}
-	file.open("body" + stream.str() + ".txt", std::ios::app);
-	file.seekp(0, std::ios::end);
-	std::streampos size = file.tellp();
-	// if (!getValue("Transfer-Encoding").empty() && http_request["Transfer-Encoding"] == "chunked")
-	// {
-	// 	size_t pos = 0;
-	// 	size_t old = 0;
-	// 	std::cout << "here" << std::endl;
-	// 	while (old < body.length())
-	// 	{
-	// 		pos = body.find("\r\n", old);
-	// 		std::cout << old << pos << std::endl;
-	// 		std::string length_string = body.substr(old, pos - old);
-	// 		long l = strtol(length_string.c_str(), NULL, 16);
-	// 		if (l == 0)
-	// 			break ;
-	// 		final += body.substr(pos+2, l);
-	// 		old = pos + 4 + l;
-	// 	}
-	// }
-	std::string length = http_request["Content-Length"];
-	std::stringstream l(length);
-	int length_int;
-	l >> length_int;
-	int s = length_int - size;
-	std::cout << "now i'm writing -";
-	for (int i = 0; i < (int)body.length() && i < s; i++)
+	if (http_request["Transfer-Encoding"] == "chunked")
 	{
-		file << body[i];
-		std::cout << body[i];
-	}
-	std::cout << "-" << std::endl;
-	file.seekp(0, std::ios::end);
-	int si = file.tellp();
-	std::cout << "size of file is " << si<< " and content length is " << length_int << std::endl;
-	if (rcv != 4)
+		chunked += body;
+		if (chunked == "")
+			return;
+		size_t found = chunked.find("\r\n");
+		if (found == std::string::npos && chunking_track == 0)
+		{
+			rcv = 3;
+			return;
+		}
+		if (chunking_track == 0)
+		{
+			chunking_track = 1;
+			std::string length_str = chunked.substr(0, found);
+			length = strtol(length_str.c_str(), NULL, 16);
+			if (length == 0)
+			{
+				chunking_track = 0;
+				length = 0;
+				chunked = "";
+				rcv = 4;
+				return;
+			}
+			chunked.erase(0, found + 2);
+		}
+		else
+		{
+			file.open(filename, std::ios::app);
+			size_t l = length;
+			size_t i = 0;
+			for (;i < found  && i < chunked.length() && i < l; i++)
+			{
+				file << chunked[i];
+				length--;
+			}
+			if (found != std::string::npos)
+				i += 2;
+			chunked.erase(0, i + 1);
+			if (length == 0)
+				chunking_track = 0;
+		}
 		rcv = 3;
-	if (si == length_int)
-		rcv = 4;
-	file.close();
+	}
+	else if (http_request["Content-Length"] != "")
+	{
+		file.open("body" + stream.str() + ".txt", std::ios::app);
+		file.seekp(0, std::ios::end);
+		std::streampos size = file.tellp();
+		std::string length = http_request["Content-Length"];
+		std::stringstream l(length);
+		int length_int;
+		l >> length_int;
+		int s = length_int - size;
+		for (int i = 0; i < (int)body.length() && i < s; i++)
+		{
+			file << body[i];
+			std::cout << body[i];
+		}
+		std::cout << "-" << std::endl;
+		file.seekp(0, std::ios::end);
+		int si = file.tellp();
+		if (rcv != 4)
+			rcv = 3;
+		if (si == length_int)
+			rcv = 4;
+		file.close();
+	}
 }
 void client::parse()
 {
@@ -239,10 +261,15 @@ void client::addToRequestCheck(std::string buff)
 		rcv = 1;
 		rest = request.substr(request.find("\r\n\r\n") + 4);
 		request = request.substr(0, request.find("\r\n\r\n") + 4);
-		std::cout << "request : -" << request << "-rest : -" << rest << "-"<< std::endl;
 		parse();
 		if (http_request["Content-Length"] != "" || http_request["Transfer-Encoding"] == "chunked")
 		{
+			if (http_request["Content-Length"] == "0")
+			{
+				rcv = 4;
+				return;
+			}
+			http_request["body"] = "present";
 			if (rest != "")
 			{
 				rcv = 2;
