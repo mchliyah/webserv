@@ -6,18 +6,22 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/27 03:35:42 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/28 08:22:37 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
+# define BUF_SIZE 1024
 #include <map>
 #include <string>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
 #include "config.hpp"
+#include "../includes/response.hpp"
+
+class response;
 
 class client
 {
@@ -28,7 +32,6 @@ private:
 	bool		isSent;
 	int			error;
 	bool		first_time;
-	int			readfds;
 	std::string	err_message;
 	std::map<std::string, std::string> http_request;
 	serverconfig host;
@@ -54,8 +57,8 @@ public:
 	serverconfig& getHost(void);
 	void setFirstTime(bool b);
 	bool& getFirstTime(void);
-	int& getReadfds(void);
-	void setReadfds(int a);
+	bool openFile(response &res, std::string &path);
+	bool readFile(response &res);
 	~client();
 };
 #endif

@@ -20,11 +20,17 @@ std::string response::get_response(client& client) {
 				in_path += "/";
 				std::cout << "in_path "<< in_path << std::endl;
     			status_code = "301";
-    			headers.push_back("Location: " + in_path + "\r\n");
+				header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+				header += "Date: " + date + "\r\n";
+				header += "Location: " + in_path + "\r\n";
+				header += "Content-Type: text/html\r\n";
+				header += "Content-Length: 0\r\n";
+				header += "\r\n";
+				body = "";
 				client.setIsSent(1);
     			return (put_response());
 			}
-			if (!default_index(*this, location, path) && location.getAutoIndex() == "on")
+			if (!default_index(*this, client, location, path) && location.getAutoIndex() == "on")
 			{
 				DIR *dir;
 				struct dirent *ent;
@@ -32,67 +38,50 @@ std::string response::get_response(client& client) {
 					file_path += "/";
 				if ((dir = opendir (file_path.c_str())) != NULL)
 				{
-					content += "<html><head><title>Index of " + path + "</title></head><body bgcolor=\"white\"><h1>Index of " + path + "</h1><hr><pre><a href=\"../\">../</a>";
+					header += "<html><head><title>Index of " + path + "</title></head><body bgcolor=\"white\"><h1>Index of "
+						+ path + "</h1><hr><pre><a href=\"../\">../</a>";
 					while ((ent = readdir (dir)) != NULL)
 					{
 						if (ent->d_name[0] != '.')
-							content += " <a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>";
+							header += " <a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>";
 					}
-					content += "</pre><hr></body></html>";
+					header += "</pre><hr></body></html>";
 					closedir (dir);
 					content_type = "Content-Type: text/html\r\n";
+					client.setIsSent(1);
+					return (put_response());
 				}
 			}
-			else
-			{
-				std::cout << "no permission or autoindex off" << std::endl;
-				status_code = "403";
-				status_message = "Forbidden";
-				content = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
-				body = "<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission or autoindex off</p></body></html>";
-				content_type = "Content-Type: text/html\r\n";
-			}
+			// else
+			// {
+			// 	std::cout << "no permission or autoindex off" << std::endl;
+			// 	status_code = "403";
+			// 	status_message = "Forbidden";
+			// 	content = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+			// 	body = "<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission or autoindex off</p></body></html>";
+			// 	content_type = "Content-Type: text/html\r\n";
+			// 	client.setIsSent(1);
+			// }
 		}
 		else if (is_file(file_path))
 		{
 			std::cout << "file" << std::endl;
-			if (client.getFirstTime())
-			{
-				std::cout << "first time" << std::endl;
-				client.setReadfds(open(file_path.c_str(), O_RDONLY));
-				status_code = "200";
-				content = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
-				content_type = "Content-Type: text/html\r\n";
+			if (client.getFirstTime()) {
+				client.openFile(*this, file_path);
 				client.setFirstTime(false);
 			}
-			else if (client.getReadfds() != -1)
-			{
-				char buf[2048];
-				int ret;
-				ret = read(client.getReadfds(), buf, 2048);
-				if (ret <= 0)
-				{
-					std::cout << "read error" << std::endl;
-					close(client.getReadfds());
-					client.setReadfds(-1);
-					client.setFirstTime(true);
-					client.setIsSent(1);
-				}
-				else
-				{
-					std::cout << "read success" << std::endl;
-					content.append(buf, ret);
-				}
-			}
+			else
+				client.readFile(*this);
 		}
 		else
 		{
 			std::cout << "no permission" << std::endl;
 			status_code = "403";
 			status_message = "Forbidden";
-			content = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+			header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 			body = "<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>";
 			content_type = "Content-Type: text/html\r\n";
+			client.setIsSent(1);
 		}
 	}
 	else
@@ -100,9 +89,10 @@ std::string response::get_response(client& client) {
 		std::cout << "no file or directory" << std::endl;
 		status_code = "404";
 		status_message = "Not Found";
-		content = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+		header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 		body = "<!DOCTYPE html><html><head>404 Not Found</head><body><p>no file or directory</p></body></html>";
 		content_type = "Content-Type: text/html\r\n";
+		client.setIsSent(1);
 	}
 	return put_response();
 }

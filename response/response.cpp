@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/27 05:15:46 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/28 06:28:18 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,16 +35,12 @@ response::response(const std::string& request_type) {
 std::string response::put_response(void)
 {
 	std::string response;
-	response += content;
-	content_length += std::to_string(body.length()) + "\r\n";
-	response += date;
-	response += content_type;
-	response += content_length;
-	std::vector<std::string>::iterator it;
-	for (it = headers.begin(); it != headers.end(); it++)
-		response += *it;
-	response += "\r\n";
+	response += header;
 	response += body;
+	response += "\r\n";
+	std::cout << "==========================================Response: " << std::endl;
+	std::cout << response << std::endl;
+	std::cout << "==========================================" << std::endl;
 	return response;
 }
 
@@ -54,7 +50,7 @@ std::string response::get_status_message() { return status_message; }
 
 std::string response::get_content_type() { return content_type; }
 
-std::string response::get_content() { return content; }
+std::string response::get_content() { return header; }
 
 std::string response::get_content_length() { return content_length; }
 
@@ -62,9 +58,11 @@ std::string response::get_date() { return date; }
 
 std::vector<std::string> response::get_headers() { return headers; }
 
-void response::add_header(std::string header) { headers.push_back(header); }
+std::string response::get_body(void ) const { return body; }
 
-void response::set_content(std::string content) { this->content = content; }
+void response::set_body(std::string body) { this->body = body; }
+
+void response::set_header(std::string content) { this->header = content; }
 
 void response::set_content_type(std::string content_type) { this->content_type = content_type; }
 
@@ -73,5 +71,12 @@ void response::set_content_length(std::string content_length) { this->content_le
 void response::set_status_code(std::string status_code) { this->status_code = status_code; }
 
 void response::set_status_message(std::string status_message) { this->status_message = status_message; }
+
+void response::add_to_header(std::string header) { this->header += header ; }
+
+void response::clear_header(void) { this->header = ""; }
+
+std::string response::get_header(void) const { return (this->header); }
+
 
 response::~response() { }

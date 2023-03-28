@@ -1,0 +1,53 @@
+listening on port 80
+listening on port 1337
+new connection on port 80 : 5
+new connection on port 80 : 6
+frst : /Desktop/data/test/
+frst : /Desktop/data/test
+frst : /Desktop/data
+frst : /Desktop
+location name :/
+file path :/Users/mchliyah/Desktop/data/test/
+First time after index found 
+==========================================Response: 
+HTTP/1.1 200 OK 
+Date: Tue, 28 Mar 2023 01:10:48 +00
+Content-Type: text/html
+Content-Length: 24
+
+
+
+
+==========================================
+frst : /Desktop/data/test/
+frst : /Desktop/data/test
+frst : /Desktop/data
+frst : /Desktop
+location name :/
+file path :/Users/mchliyah/Desktop/data/test/
+read success after index found 
+==========================================Response: 
+helloo hi what arrr you
+
+
+==========================================
+frst : /Desktop/data/test/
+frst : /Desktop/data/test
+frst : /Desktop/data
+frst : /Desktop
+location name :/
+file path :/Users/mchliyah/Desktop/data/test/
+read error after index found 
+==========================================Response: 
+
+
+==========================================
+frst : /favicon.ico
+location name :/
+file path :/Users/mchliyah/favicon.ico
+no file or directory
+==========================================Response: 
+HTTP/1.1 404 Not Found
+<!DOCTYPE html><html><head>404 Not Found</head><body><p>no file or directory</p></body></html>
+
+==========================================

@@ -6,13 +6,13 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/27 03:50:51 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/28 08:34:00 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), first_time(true), readfds(-1), err_message("")
+client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), first_time(true), err_message("")
 {
 	this->parse();
 }
@@ -199,6 +199,51 @@ void client::setFirstTime(bool b) {first_time = b;}
 
 bool& client::getFirstTime() {return first_time;}
 
-int& client::getReadfds() {return readfds;}
+bool client::openFile(response &res, std::string& path)
+{
+	file.open(path.c_str(), std::ios::in);
+	struct stat buf;
+	if (file.is_open() && stat(path.c_str(), &buf) == 0)
+	{
+		res.set_content_length("Content-Length: " + std::to_string(buf.st_size) + "\r\n");
+		res.set_status_code("200");
+		res.set_content_type("Content-Type: text/html \r\n");
+		res.set_header("HTTP/1.1 " + res.get_status_code() + res.get_status_message() + "\r\n"
+			+ res.get_date() +  res.get_content_type() + res.get_content_length() + "\r\n");
+		std::vector<std::string>::iterator it;
+		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
+			res.add_to_header(*it);
+		res.add_to_header("\r\n");
+	}
+	else
+	{
+		res.set_body("<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>");
+		res.set_content_length("Content-Length: " + std::to_string(res.get_body().size()) + "\r\n");
+		res.set_status_code("404");
+		res.set_status_message("Not Found");
+		res.set_content_type("Content-Type: text/html \r\n");
+		res.set_header("HTTP/1.1 " + res.get_status_code() + res.get_status_message() + "\r\n"
+			+ res.get_date() + res.get_content_type() + res.get_content_length() + "\r\n");
+		std::vector<std::string>::iterator it;
+		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
+			res.add_to_header(*it);
+		res.add_to_header("\r\n");
+		isSent = true;
+		return (false);
+	}
+	return (true);
+}
 
-void client::setReadfds(int i) {readfds = i;}
+bool client::readFile(response &res)
+{
+	std::string buff(BUF_SIZE, '\0');
+	res.set_body("");
+	file.read(&buff[0], BUF_SIZE);
+	res.set_body(res.get_body().append(buff, 0, file.gcount()));
+	if (file.eof()) {
+		setFirstTime(true);
+		setIsSent(1);
+		return (false);
+		}
+	return (true);
+}

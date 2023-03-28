@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/27 05:00:55 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/28 00:23:52 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,9 @@ void server::start()
 			}
 			else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
 			{
-				std::cout << "sending response" << std::endl;
+				// std::cout << "sending response" << std::endl;
+				if (c->getValue("Path").find("favicon.ico") != std::string::npos)
+					continue;
 				response res(c->getValue("Method"));
 				std::string response;
 				if (c->getValue("Method") == "GET")
