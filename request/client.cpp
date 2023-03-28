@@ -6,24 +6,30 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/25 04:11:57 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 09:43:27 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), err_message("")
+client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), err_message(""), rcv(0)
 {
-	this->parse();
 }
-client::~client() {}
+client::~client(){}
 //getters & setters
 int client::getSocket() const {return socket_fd;}
 std::string client::getPort() const {return port;}
 bool client::getIsSent() const {return isSent;}
 void client::setIsSent(bool b) {isSent = b;}
-void client::setRequest(char *req) {request = req;}
-
+void client::resetClient()
+{
+	this->request = "";
+	this->error = 200;
+	this->err_message = "";
+	this->http_request.clear();
+	this->isSent = 0;
+	this->rcv = 0;
+}
 void client::makeError(int err, const std::string& msg)
 {
 	error= err;
@@ -65,12 +71,6 @@ int	client::parseRequestLine(std::string first_line)
 
 	last = 0;
 	std::string items[3] = {"Method", "URL"};
-	std::string::iterator new_end = std::unique(first_line.begin(), first_line.end(), BothAreSpaces);
-	first_line.erase(new_end, first_line.end());
-	if (first_line[0] == ' ')
-		first_line.erase(0, 1);
-	if (*first_line.rbegin() == ' ')
-		first_line.pop_back();
 	for (int i = 0; i < 2; i++)
 	{
 		pos = first_line.find(" ", last);
@@ -100,9 +100,88 @@ void client::parseHeader(std::string header)
 	value = header.substr(pos + 1);
 	http_request[key] = value;
 }
-void client::parseBody(std::string body)
+void client::addToBody(std::string body)//MAKE IT RETURN 
 {
-	http_request["Body"] = body;
+	std::stringstream stream;
+	static bool chunking_track = 0;
+	static size_t length = 0;
+	static std::string chunked = "";
+	std::ofstream file;
+	stream << socket_fd;
+	std::string filename = "body" + stream.str() + ".txt";
+	if (rcv == 2)//first time
+	{
+		file.open(filename, std::ios::out | std::ios::trunc);
+		file.close();
+	}
+	if (http_request["Transfer-Encoding"] == "chunked")
+	{
+		chunked += body;
+		if (chunked == "")
+			return;
+		size_t found = chunked.find("\r\n");
+		if (found == std::string::npos && chunking_track == 0)
+		{
+			rcv = 3;
+			return;
+		}
+		if (chunking_track == 0)
+		{
+			chunking_track = 1;
+			std::string length_str = chunked.substr(0, found);
+			length = strtol(length_str.c_str(), NULL, 16);
+			if (length == 0)
+			{
+				chunking_track = 0;
+				length = 0;
+				chunked = "";
+				rcv = 4;
+				return;
+			}
+			chunked.erase(0, found + 2);
+		}
+		else
+		{
+			file.open(filename, std::ios::app);
+			size_t l = length;
+			size_t i = 0;
+			for (;i < found  && i < chunked.length() && i < l; i++)
+			{
+				file << chunked[i];
+				length--;
+			}
+			if (found != std::string::npos)
+				i += 2;
+			chunked.erase(0, i + 1);
+			if (length == 0)
+				chunking_track = 0;
+		}
+		rcv = 3;
+	}
+	else if (http_request["Content-Length"] != "")
+	{
+		file.open("body" + stream.str() + ".txt", std::ios::app);
+		file.seekp(0, std::ios::end);
+		std::streampos size = file.tellp();
+		std::string length = http_request["Content-Length"];
+		std::stringstream l(length);
+		int length_int;
+		l >> length_int;
+		int s = length_int - size;
+		for (int i = 0; i < (int)body.length() && i < s; i++)
+		{
+			file << body[i];
+			std::cout << body[i];
+		}
+		std::cout << "-" << std::endl;
+		file.seekp(0, std::ios::end);
+		int si = file.tellp();
+		if (rcv != 4)
+			rcv = 3;
+		if (si == length_int)
+			rcv = 4;
+		file.close();
+	}
 }
 void client::parse()
 {
@@ -133,10 +212,7 @@ void client::parse()
 		else
 			break ;
 	}
-	if (pos + 2 < request.size())
-		parseBody(request.substr(pos + 2));
-	if (checkMandatoryElements())
-		return ;
+	checkMandatoryElements();
 }
 std::string&	client::getValue(const std::string& key)
 {
@@ -153,13 +229,6 @@ int client::checkMandatoryElements()
 	{
 		makeError(400, "Bad Request: Missing Host!");
 		return (1);
-	}
-	if (!getValue("Content-Length").empty())
-	{
-		std::istringstream iss(getValue("Content-Length"));
-		int num;
-		iss >> num;
-		http_request["Body"] = getValue("Body").erase(num, http_request["Body"].size() - num);
 	}
 	return (0);
 }
@@ -193,4 +262,33 @@ void client::matchHost(std::vector<serverconfig> hosts)
 serverconfig& client::getHost(void)
 {
 	return (this->host);
+}
+
+void client::addToRequestCheck(std::string buff)
+{
+	std::string rest = "";
+	request += buff;
+	if (request.find("\r\n\r\n") != std::string::npos)
+	{
+		rcv = 1;
+		rest = request.substr(request.find("\r\n\r\n") + 4);
+		request = request.substr(0, request.find("\r\n\r\n") + 4);
+		parse();
+		if (http_request["Content-Length"] != "" || http_request["Transfer-Encoding"] == "chunked")
+		{
+			if (http_request["Content-Length"] == "0")
+			{
+				rcv = 4;
+				return;
+			}
+			http_request["body"] = "present";
+			if (rest != "")
+			{
+				rcv = 2;
+				addToBody(rest);
+			}
+		}
+		else
+			rcv = 4;
+	}
 }

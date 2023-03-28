@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/23 03:22:00 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/28 09:42:24 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <cstdio>
 #include "config.hpp"
 
 class client
@@ -31,15 +32,15 @@ private:
 	std::map<std::string, std::string> http_request;
 	serverconfig host;
 public:
+	int	rcv;
 	client(int sock, std::string port_);
 	int			getSocket() const;
 	std::string getPort() const;
 	bool		getIsSent() const;
 	void		setIsSent(bool a);
-	void setRequest(char *req);
+	void resetClient();
 	int parseRequestLine(std::string first_line);
 	void parseHeader(std::string header);
-	void parseBody(std::string request);
 	void printAttr() const;
 	void makeError(int err, const std::string& msg);
 	std::string& getValue(const std::string& key);
@@ -50,6 +51,8 @@ public:
 	int checkMandatoryElements();
 	void matchHost(std::vector<serverconfig> hosts);
 	serverconfig& getHost(void);
+	void addToBody(std::string body);
+	void addToRequestCheck(std::string buff);
 	~client();
 };
 #endif

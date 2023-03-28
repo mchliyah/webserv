@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/25 01:48:18 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 09:44:33 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,7 @@ std::pair<int, std::string> server::createBindListen(std::string port)
 	if (p == NULL)
 		throw std::runtime_error("cant bind it");
 	freeaddrinfo(res);
-	int flags = fcntl(listner, F_GETFL, 0);
-	fcntl(listner, F_SETFL, flags | O_NONBLOCK);
+	fcntl(listner, F_SETFL, O_NONBLOCK);
 	if (listen(listner, 10) == -1)
 		throw std::runtime_error("listen");
 	std::cout << "listening on port " << port << std::endl;
@@ -94,10 +93,8 @@ void server::start()
 					perror("accept failed");
 					continue;
 				}
-				std::cout << "new connection on port " << listner->second << " : " << newSocket << std::endl;
-				// clients.push_back(client(newSocket, listner->second));
-				int flags = fcntl(newSocket, F_GETFL, 0);
-				fcntl(newSocket, F_SETFL, flags | O_NONBLOCK);
+				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
+				fcntl(newSocket, F_SETFL, O_NONBLOCK);
 				client c(newSocket, listner->second);
 				clients.push_back(c);
 			}
@@ -106,35 +103,40 @@ void server::start()
 		{
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
-				char buf[1028];
-				int r = recv(c->getSocket(), buf, sizeof(buf), 0);
+				char	buf[7];
+				memset(buf, 0, sizeof buf);
+				size_t	r = recv(c->getSocket(), buf, sizeof(buf), 0);
+				std::string s(buf, r);
 				if (r <= 0)
 				{
+					std::cout << "closing socket " << c->getSocket() << std::endl;
 					close(c->getSocket());
 					FD_CLR(c->getSocket(), &read_fds);
 					FD_CLR(c->getSocket(), &write_fds);
 					clients.erase(c);
 				}
-				else
+				else if (c->rcv != 4)
 				{
-					c->setIsSent(0);
-					c->setRequest(buf);
-					c->parse();
-					c->matchHost(this->hosts);
-					c->getHost().printServer();
-					// c->printAttr();
+					std::string buff(buf, r);
+					if (c->rcv == 0)
+						c->addToRequestCheck(buff);
+					else
+					{
+						if (c->rcv == 1)
+							c->rcv = 2;
+						if (c->rcv != 4)
+							c->addToBody(buff);
+					}
 				}
 			}
-			else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
+			if (FD_ISSET(c->getSocket(), &write_fds) && c->rcv == 4)
 			{
+				std::cout << c->getError();
+				std::cout << c->getErrorMessage();
+				// c->printAttr();
 				response res(c->getValue("Method"));
 				std::string response;
-				if (c->getValue("Method") == "GET")
-					response = res.get_response(c->getHost(), c->getValue("URL"));
-				else if (c->getValue("Method") == "POST")
-					response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
-				else if (c->getValue("Method") == "DELETE")
-					response = res.delete_response(c->getHost(), c->getValue("Path"));
+				response = res.get_response(hosts);
 				int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
 				c->setIsSent(1);
 				(void)bytes;
@@ -143,10 +145,4 @@ void server::start()
 	}
 }
 
-server::~server()
-{
-	for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
-		close(l->first);
-	for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
-		close(c->getSocket());
-}
+server::~server(){}

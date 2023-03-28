@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/25 02:45:41 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 09:37:50 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ int main(int argc, char **argv)
 	// 		std::cout << " ====================================== "<< std::endl;
 	// 		it++;
 	// 	}
+		
 		std::vector<serverconfig>::iterator it1;
 		for (it1 = servers.begin(); it1 != servers.end(); it1++)
 		{
