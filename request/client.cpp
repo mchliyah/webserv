@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/27 09:50:32 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 06:09:00 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,15 @@ int client::getSocket() const {return socket_fd;}
 std::string client::getPort() const {return port;}
 bool client::getIsSent() const {return isSent;}
 void client::setIsSent(bool b) {isSent = b;}
-void client::resetRequest(){request = "";}
-
+void client::resetClient()
+{
+	this->request = "";
+	this->error = 200;
+	this->err_message = "";
+	this->http_request.clear();
+	this->isSent = 0;
+	this->rcv = 0;
+}
 void client::makeError(int err, const std::string& msg)
 {
 	error= err;
@@ -151,7 +158,7 @@ void client::addToBody(std::string body)//MAKE IT RETURN
 	std::cout << "size of file is " << si<< " and content length is " << length_int << std::endl;
 	if (rcv != 4)
 		rcv = 3;
-	if (size == length_int)
+	if (si == length_int)
 		rcv = 4;
 	file.close();
 }
@@ -184,6 +191,7 @@ void client::parse()
 		else
 			break ;
 	}
+	checkMandatoryElements();
 }
 std::string&	client::getValue(const std::string& key)
 {
@@ -200,13 +208,6 @@ int client::checkMandatoryElements()
 	{
 		makeError(400, "Bad Request: Missing Host!");
 		return (1);
-	}
-	if (!getValue("Content-Length").empty())
-	{
-		std::istringstream iss(getValue("Content-Length"));
-		int num;
-		iss >> num;
-		http_request["Body"] = getValue("Body").erase(num, http_request["Body"].size() - num);
 	}
 	return (0);
 }
@@ -229,7 +230,7 @@ serverconfig client::getHost(void)
 	return (this->host);
 }
 
-std::string	client::addToRequestCheck(std::string buff)
+void client::addToRequestCheck(std::string buff)
 {
 	std::string rest = "";
 	request += buff;
@@ -240,6 +241,15 @@ std::string	client::addToRequestCheck(std::string buff)
 		request = request.substr(0, request.find("\r\n\r\n") + 4);
 		std::cout << "request : -" << request << "-rest : -" << rest << "-"<< std::endl;
 		parse();
+		if (http_request["Content-Length"] != "" || http_request["Transfer-Encoding"] == "chunked")
+		{
+			if (rest != "")
+			{
+				rcv = 2;
+				addToBody(rest);
+			}
+		}
+		else
+			rcv = 4;
 	}
-	return (rest);
 }

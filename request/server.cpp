@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/27 10:08:46 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 05:58:53 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,7 @@ std::pair<int, std::string> server::createBindListen(std::string port)
 	if (p == NULL)
 		throw std::runtime_error("cant bind it");
 	freeaddrinfo(res);
-	int flags = fcntl(listner, F_GETFL, 0);
-	fcntl(listner, F_SETFL, flags | O_NONBLOCK);
+	fcntl(listner, F_SETFL, O_NONBLOCK);
 	if (listen(listner, 10) == -1)
 		throw std::runtime_error("listen");
 	std::cout << "listening on port " << port << std::endl;
@@ -92,8 +91,7 @@ void server::start()
 					continue;
 				}
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
-				int flags = fcntl(newSocket, F_GETFL, 0);
-				fcntl(newSocket, F_SETFL, flags | O_NONBLOCK);
+				fcntl(newSocket, F_SETFL, O_NONBLOCK);
 				client c(newSocket, listner->second);
 				clients.push_back(c);
 			}
@@ -102,6 +100,7 @@ void server::start()
 		{
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
+				std::cout << "reading from " << c->getSocket() << std::endl;
 				char	buf[3];
 				memset(buf, 0, sizeof buf);
 				size_t	r = recv(c->getSocket(), buf, sizeof(buf), 0);
@@ -109,6 +108,7 @@ void server::start()
 				std::cout <<"start----"<< s <<"---end-" << r<< "-rcv : " << c->rcv << "-" << std::endl;
 				if (r <= 0)
 				{
+					std::cout << "closing socket " << c->getSocket() << std::endl;
 					close(c->getSocket());
 					FD_CLR(c->getSocket(), &read_fds);
 					FD_CLR(c->getSocket(), &write_fds);
@@ -119,12 +119,7 @@ void server::start()
 					std::string buff(buf, r);
 					if (c->rcv == 0)
 					{
-						std::string rest = c->addToRequestCheck(buff);
-						if (rest.size() > 0)
-						{
-							c->rcv = 2;
-							c->addToBody(rest);
-						}
+						c->addToRequestCheck(buff);
 					}
 					else
 					{
@@ -133,30 +128,25 @@ void server::start()
 						if (c->rcv != 4)
 							c->addToBody(buff);
 					}
+					std::cout << "after handling buffer rcv : " << c->rcv << std::endl;
 				}
 			}
 			if (FD_ISSET(c->getSocket(), &write_fds) && c->rcv == 4)
 			{
+				std::cout << std::endl;
+				std::cout << c->getError();
+				std::cout << c->getErrorMessage();
+				c->printAttr();
 				response res(c->getValue("Method"));
 				std::string response;
 				response = res.get_response(hosts);
-				//const char *response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 20\r\n\r\nHello, World!";
-				int bytes = send(c->getSocket(), response.c_str(), response.length(), 0);
+				send(c->getSocket(), response.c_str(), response.length(), 0);
 				std::cout << "sent " << std::endl;
-				// c->resetRequest();
+				c->resetClient();
 				// close(c->getSocket());
 				// FD_CLR(c->getSocket(), &read_fds);
 				// FD_CLR(c->getSocket(), &write_fds);
 				// clients.erase(c);
-				// std::stringstream stream;
-				// stream << c->getSocket();
-				// const char* filename = std::string("body" + stream.str() + ".txt").c_str();
-				// std::ifstream file(filename);
-				// std::string re;
-				// std::getline(file, re);
-				// std::cout << re << std::endl;
-				// file.close();
-				(void)bytes;
 			}
 		}
 	}

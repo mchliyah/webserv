@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/27 09:22:20 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 06:01:07 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ public:
 	std::string getPort() const;
 	bool		getIsSent() const;
 	void		setIsSent(bool a);
-	void resetRequest();
+	void resetClient();
 	int parseRequestLine(std::string first_line);
 	void parseHeader(std::string header);
 	//void parseBody(std::string request);
@@ -53,7 +53,7 @@ public:
 	void matchHost(std::vector<serverconfig> hosts);
 	serverconfig getHost(void);
 	void addToBody(std::string body);
-	std::string	addToRequestCheck(std::string buff);
+	void addToRequestCheck(std::string buff);
 	~client();
 };
 #endif
