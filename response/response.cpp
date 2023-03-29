@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/28 09:44:51 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/28 09:51:35 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,23 +145,55 @@ std::string response::get_response(serverconfig &server, std::string &path) {
 	return response;
 }
 
+std::string response::post_response(serverconfig &server, std::string &path, std::string &body) {
+	(void)server;
+	(void)path;
+	(void)body;
+	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+	content += "success";
+	content_length += std::to_string(content.length()) + "\r\n";
+	response += date;
+	response += content_type;
+	response += content_length;
+	std::vector<std::string>::iterator it;
+	for (it = headers.begin(); it != headers.end(); it++)
+		response += *it;
+	response += "\r\n";
+	response += content;
+	return response;
+}
 
+std::string response::delete_response(serverconfig &server, std::string &path) {
+	(void)server;
+	(void)path;
+	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+	content += "success";
+	content_length += std::to_string(content.length()) + "\r\n";
+	response += date;
+	response += content_type;
+	response += content_length;
+	std::vector<std::string>::iterator it;
+	for (it = headers.begin(); it != headers.end(); it++)
+		response += *it;
+	response += "\r\n";
+	response += content;
+	return response;
+}
 
-
-					// std::ifstream file("test.txt");
-					// std::string responce;
-					// if (!file.is_open())
-					// 	throw std::runtime_error("cant open file 1");
-					// std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-// response process_request(void) {
-// 	// response resp("GET");
-// 	return response("POST");
-//     // std::string response = "HTTP/1.1 200 OK\r\n";
-//     // response += "Content-Type: text/plain\r\n";
-//     // response += "Content-Length: 41\r\n";
-//     // response += "\r\n";
-//     // response += "Hello, world! will i need to change this?";
-//     // return response;
-// }
+// std::ifstream file("test.txt");
+// std::string responce;
+// if (!file.is_open())
+// 	throw std::runtime_error("cant open file 1");
+// std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+std::string process_request(void) {
+	// response resp("GET");
+	// return response("POST");
+    std::string response = "HTTP/1.1 200 OK\r\n";
+    response += "Content-Type: text/plain\r\n";
+    response += "Content-Length: 41\r\n";
+    response += "\r\n";
+    response += "Hello, world! will i need to change this?";
+    return response;
+}
 
 response::~response() { }

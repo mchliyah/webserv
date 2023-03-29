@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 09:43:27 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/29 02:46:19 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,11 +169,7 @@ void client::addToBody(std::string body)//MAKE IT RETURN
 		l >> length_int;
 		int s = length_int - size;
 		for (int i = 0; i < (int)body.length() && i < s; i++)
-		{
 			file << body[i];
-			std::cout << body[i];
-		}
-		std::cout << "-" << std::endl;
 		file.seekp(0, std::ios::end);
 		int si = file.tellp();
 		if (rcv != 4)

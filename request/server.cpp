@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 09:44:33 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/29 02:46:35 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,8 +105,10 @@ void server::start()
 			{
 				char	buf[7];
 				memset(buf, 0, sizeof buf);
-				size_t	r = recv(c->getSocket(), buf, sizeof(buf), 0);
+				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
 				std::string s(buf, r);
+				//add a timout here to close the socket if no data is received
+				//add a smaller timout to assume that the request is finished if no data is received and rcv == 1
 				if (r <= 0)
 				{
 					std::cout << "closing socket " << c->getSocket() << std::endl;
@@ -131,14 +133,21 @@ void server::start()
 			}
 			if (FD_ISSET(c->getSocket(), &write_fds) && c->rcv == 4)
 			{
-				std::cout << c->getError();
-				std::cout << c->getErrorMessage();
-				// c->printAttr();
+				c->matchHost(this->hosts);
+				std::cout << c->getError() << std::endl;
+				std::cout << c->getErrorMessage() << std::endl;
+				c->printAttr();
+				// c->getHost().printServer();
 				response res(c->getValue("Method"));
 				std::string response;
-				response = res.get_response(hosts);
+				if (c->getValue("Method") == "GET")
+					response = res.get_response(c->getHost(), c->getValue("URL"));
+				else if (c->getValue("Method") == "POST")
+					response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
+				else if (c->getValue("Method") == "DELETE")
+					response = res.delete_response(c->getHost(), c->getValue("Path"));
 				int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
-				c->setIsSent(1);
+				c->resetClient();
 				(void)bytes;
 			}
 		}
