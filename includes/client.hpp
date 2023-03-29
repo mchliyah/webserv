@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 21:32:55 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/29 06:48:11 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <cstdio>
 #include "config.hpp"
 #include "../includes/response.hpp"
 
@@ -38,6 +39,7 @@ private:
 	std::ifstream file;
 	size_t sent_bytes;
 public:
+	int	rcv;
 	client(int sock, std::string port_);
 	client(const client& other);
 	client& operator=(const client& );
@@ -45,10 +47,9 @@ public:
 	std::string getPort() const;
 	bool		getIsSent() const;
 	void		setIsSent(bool a);
-	void setRequest(char *req);
+	void resetClient();
 	int parseRequestLine(std::string first_line);
 	void parseHeader(std::string header);
-	void parseBody(std::string request);
 	void printAttr() const;
 	void makeError(int err, const std::string& msg);
 	std::string& getValue(const std::string& key);
@@ -65,6 +66,8 @@ public:
 	bool readFile(response &res);
 	size_t getSentBytes() const;
 	void setSentBytes(size_t sentBytes);
+	void addToBody(std::string body);
+	void addToRequestCheck(std::string buff);
 	~client();
 };
 #endif
