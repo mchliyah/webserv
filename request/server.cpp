@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 07:41:29 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/29 11:08:39 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,9 +74,10 @@ void server::start()
 				maxSocket = c->getSocket();
 		}
 		struct timeval timeout;
-		timeout.tv_sec = 1;
+		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, &timeout);
+		std::cout << "activity = " << activity << std::endl;
 		if (activity == -1)
 		{
 			perror("select error");
@@ -96,17 +97,28 @@ void server::start()
 				}
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
 				fcntl(newSocket, F_SETFL, O_NONBLOCK);
+				struct timeval tv;
+				tv.tv_sec = 1;  // 5 seconds timeout
+				tv.tv_usec = 0;
+				setsockopt(newSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 				client c(newSocket, listner->second);
 				clients.push_back(c);
 			}
 		}
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
+			if (activity == 0 && c->rcv < 4 && c->rcv > 0)
+			{
+				std::cout << "timeout" << std::endl;
+				c->rcv = 4;
+			}
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
-				char	buf[7];
+				std::cout << "reading from socket " << c->getSocket() << std::endl;
+				char	buf[1024];
 				memset(buf, 0, sizeof buf);
 				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
+				std::cout << "r = " << r << std::endl;
 				std::string s(buf, r);
 				//add a timout here to close the socket if no data is received
 				//add a smaller timout to assume that the request is finished if no data is received and rcv == 1
@@ -149,17 +161,18 @@ void server::start()
 				std::string response;
 				if (c->getValue("Method") == "GET")
 					response = res.get_response(*c);
-				std::cout << res.get_content_length() << std::endl;
-				std::cout << "header lenght : " << res.get_header().length() << std::endl;
+				// std::cout << res.get_content_length() << std::endl;
+				// std::cout << "header lenght : " << res.get_header().length() << std::endl;
 				// else if (c->getValue("Method") == "POST")
 				// 	response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
 				// else if (c->getValue("Method") == "DELETE")
 				// 	response = res.delete_response(c->getHost(), c->getValue("Path"));
 				int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
-				std::cout << "sent " << bytes << " bytes" << std::endl;
-				std::cout << c->getIsSent() << std::endl;
+				// std::cout << "sent " << bytes << " bytes" << std::endl;
+				// std::cout << c->getIsSent() << std::endl;
 				if (c->getIsSent() == 1)
 					c->resetClient();
+				(void)bytes;
 			}
 		}
 	}

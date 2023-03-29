@@ -8,17 +8,13 @@ std::string response::get_response(client& client) {
 	location = matchlocation(server , in_path);
 	std::string path = in_path.substr(location.getName().length() - 1, in_path.length() - location.getName().length() + 1);
 	std::string file_path = location.getRoot() + path;
-	std::cout << "location name :" << location.getName() << std::endl;
-	std::cout << "file path :" << file_path << std::endl;
 	if (access(file_path.c_str(), F_OK) != -1)
 	{
 		if (is_dir(file_path))
 		{
 			if (file_path[file_path.length() - 1] != '/')
 			{
-				std::cout << "redirect" << std::endl;
 				in_path += "/";
-				std::cout << "in_path "<< in_path << std::endl;
     			status_code = "301";
 				status_message = "OK";
     			headers.push_back("Location: " + in_path + "\r\n");
@@ -77,7 +73,6 @@ std::string response::get_response(client& client) {
 		}
 		else if (is_file(file_path))
 		{
-			std::cout << "file" << std::endl;
 			if (client.getFirstTime()) {
 				client.openFile(*this, file_path);
 				client.setFirstTime(false);
@@ -87,7 +82,6 @@ std::string response::get_response(client& client) {
 		}
 		else
 		{
-			std::cout << "no permission" << std::endl;
 			status_code = "403";
 			status_message = "Forbidden";
 			header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
@@ -98,7 +92,6 @@ std::string response::get_response(client& client) {
 	}
 	else
 	{
-		std::cout << "no file or directory" << std::endl;
 		status_code = "404";
 		status_message = "Not Found";
 		header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
