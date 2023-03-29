@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 08:34:00 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/29 03:35:38 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,16 +199,21 @@ void client::setFirstTime(bool b) {first_time = b;}
 
 bool& client::getFirstTime() {return first_time;}
 
+size_t client::getSentBytes() const {return sent_bytes;}
+
+void client::setSentBytes(size_t sent_bytes) {this->sent_bytes = sent_bytes;}
+
 bool client::openFile(response &res, std::string& path)
 {
-	file.open(path.c_str(), std::ios::in);
+	file.open(path.c_str());
 	struct stat buf;
+	std::cout << "path: " << path << std::endl;
 	if (file.is_open() && stat(path.c_str(), &buf) == 0)
 	{
-		res.set_content_length("Content-Length: " + std::to_string(buf.st_size) + "\r\n");
+		res.set_content_length("Content-Length: " + std::to_string(buf.st_size + 4) + "\r\n");
 		res.set_status_code("200");
 		res.set_content_type("Content-Type: text/html \r\n");
-		res.set_header("HTTP/1.1 " + res.get_status_code() + res.get_status_message() + "\r\n"
+		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
 			+ res.get_date() +  res.get_content_type() + res.get_content_length() + "\r\n");
 		std::vector<std::string>::iterator it;
 		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
@@ -218,17 +223,17 @@ bool client::openFile(response &res, std::string& path)
 	else
 	{
 		res.set_body("<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>");
-		res.set_content_length("Content-Length: " + std::to_string(res.get_body().size()) + "\r\n");
+		res.set_content_length("Content-Length: " + std::to_string(res.get_body().size() + 4) + "\r\n");
 		res.set_status_code("404");
 		res.set_status_message("Not Found");
 		res.set_content_type("Content-Type: text/html \r\n");
-		res.set_header("HTTP/1.1 " + res.get_status_code() + res.get_status_message() + "\r\n"
+		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
 			+ res.get_date() + res.get_content_type() + res.get_content_length() + "\r\n");
 		std::vector<std::string>::iterator it;
 		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
 			res.add_to_header(*it);
 		res.add_to_header("\r\n");
-		isSent = true;
+		isSent = 1;
 		return (false);
 	}
 	return (true);
@@ -236,9 +241,9 @@ bool client::openFile(response &res, std::string& path)
 
 bool client::readFile(response &res)
 {
-	std::string buff(BUF_SIZE, '\0');
+	char buff[BUF_SIZE + 1] = {0};
 	res.set_body("");
-	file.read(&buff[0], BUF_SIZE);
+	file.read(buff, BUF_SIZE);
 	res.set_body(res.get_body().append(buff, 0, file.gcount()));
 	if (file.eof()) {
 		setFirstTime(true);
@@ -246,4 +251,24 @@ bool client::readFile(response &res)
 		return (false);
 		}
 	return (true);
+}
+
+client::client(const client &other) { *this = other; }
+
+client& client::operator=(const client &other)
+{
+	if (this != &other)
+	{
+		this->request = other.request;
+		this->port = other.port;
+		this->socket_fd = other.socket_fd;
+		this->isSent = other.isSent;
+		this->error = other.error;
+		this->first_time = other.first_time;
+		this->err_message = other.err_message;
+		this->http_request = other.http_request;
+		this->host = other.host;
+		this->sent_bytes = other.sent_bytes;
+	}
+	return (*this);
 }

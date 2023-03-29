@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 00:23:52 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/29 03:15:54 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,24 +122,30 @@ void server::start()
 					c->parse();
 					c->matchHost(this->hosts);
 					// c->getHost().printServer();
-					// c->printAttr();
+					c->printAttr();
 				}
 			}
 			else if (FD_ISSET(c->getSocket(), &write_fds) && !c->getIsSent())
 			{
 				// std::cout << "sending response" << std::endl;
 				if (c->getValue("Path").find("favicon.ico") != std::string::npos)
+				{
+					c->setIsSent(1);
 					continue;
+				}
 				response res(c->getValue("Method"));
 				std::string response;
 				if (c->getValue("Method") == "GET")
 					response = res.get_response(*c);
+				std::cout << res.get_content_length() << std::endl;
+				std::cout << "header lenght : " << res.get_header().length() << std::endl;
 				// else if (c->getValue("Method") == "POST")
 				// 	response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
 				// else if (c->getValue("Method") == "DELETE")
 				// 	response = res.delete_response(c->getHost(), c->getValue("Path"));
 				int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
-				// c->setIsSent(1);
+				std::cout << "sent " << bytes << " bytes" << std::endl;
+				std::cout << c->getIsSent() << std::endl;
 				(void)bytes;
 			}
 		}

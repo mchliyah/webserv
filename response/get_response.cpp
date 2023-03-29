@@ -20,15 +20,18 @@ std::string response::get_response(client& client) {
 				in_path += "/";
 				std::cout << "in_path "<< in_path << std::endl;
     			status_code = "301";
-				header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
-				header += "Date: " + date + "\r\n";
-				header += "Location: " + in_path + "\r\n";
-				header += "Content-Type: text/html\r\n";
-				header += "Content-Length: 0\r\n";
-				header += "\r\n";
+				status_message = "OK";
+    			headers.push_back("Location: " + in_path + "\r\n");
 				body = "";
+				content_type = "Content-Type: text/html\r\n";
+				content_length = "Content-Length: " + std::to_string(body.length()) + "\r\n";
+				header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n"
+					+ date + content_type + content_length + "\r\n";
+				for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
+					header += *it;
+				header += "\r\n";
 				client.setIsSent(1);
-    			return (put_response());
+				return (put_response());
 			}
 			if (!default_index(*this, client, location, path) && location.getAutoIndex() == "on")
 			{
@@ -36,18 +39,27 @@ std::string response::get_response(client& client) {
 				struct dirent *ent;
 				if (file_path[file_path.length() - 1] != '/')
 					file_path += "/";
+				status_code = "200";
+				status_message = "OK";
 				if ((dir = opendir (file_path.c_str())) != NULL)
 				{
-					header += "<html><head><title>Index of " + path + "</title></head><body bgcolor=\"white\"><h1>Index of "
+					body += "<html><head><title>Index of " + path + "</title></head><body bgcolor=\"white\"><h1>Index of "
 						+ path + "</h1><hr><pre><a href=\"../\">../</a>";
 					while ((ent = readdir (dir)) != NULL)
 					{
 						if (ent->d_name[0] != '.')
-							header += " <a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>";
+							body += " <a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>";
 					}
-					header += "</pre><hr></body></html>";
+					body += "</pre><hr></body></html>";
 					closedir (dir);
 					content_type = "Content-Type: text/html\r\n";
+					content_length = "Content-Length: " + std::to_string(body.length()) + "\r\n";
+					header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+					header += date +  content_type + content_length + "\r\n";
+					std::vector<std::string>::iterator it;
+					for (it = headers.begin(); it != headers.end(); it++)
+						header += *it;
+					header += "\r\n";
 					client.setIsSent(1);
 					return (put_response());
 				}

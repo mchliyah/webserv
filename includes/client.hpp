@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 08:22:37 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/28 21:32:55 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,12 @@ private:
 	std::string	err_message;
 	std::map<std::string, std::string> http_request;
 	serverconfig host;
+	std::ifstream file;
+	size_t sent_bytes;
 public:
 	client(int sock, std::string port_);
+	client(const client& other);
+	client& operator=(const client& );
 	int			getSocket() const;
 	std::string getPort() const;
 	bool		getIsSent() const;
@@ -59,6 +63,8 @@ public:
 	bool& getFirstTime(void);
 	bool openFile(response &res, std::string &path);
 	bool readFile(response &res);
+	size_t getSentBytes() const;
+	void setSentBytes(size_t sentBytes);
 	~client();
 };
 #endif
