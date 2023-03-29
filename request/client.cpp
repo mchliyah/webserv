@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 06:57:22 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/29 07:42:59 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ void client::makeError(int err, const std::string& msg)
 {
 	error= err;
 	err_message = msg;
+	rcv = 4;
 }
 int	client::checkMethod()
 {

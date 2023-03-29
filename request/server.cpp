@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 06:56:14 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/29 07:41:29 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,14 +68,15 @@ void server::start()
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) // Add client sockets to read_fds and write_fds
 		{
 			FD_SET(c->getSocket(), &read_fds);
-			FD_SET(c->getSocket(), &write_fds);
+			if (c->rcv==4)
+				FD_SET(c->getSocket(), &write_fds);
 			if (c->getSocket() > maxSocket)
 				maxSocket = c->getSocket();
 		}
 		struct timeval timeout;
 		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
-		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, NULL);
+		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, &timeout);
 		if (activity == -1)
 		{
 			perror("select error");
@@ -131,9 +132,9 @@ void server::start()
 					}
 				}
 			}
-			if (FD_ISSET(c->getSocket(), &write_fds) && c->rcv == 4 && c->getIsSent() == 0)
+			if (FD_ISSET(c->getSocket(), &write_fds))
 			{
-				// std::cout << "sending response" << std::endl;
+				std::cout << "sending response" << std::endl;
 				if (c->getValue("Path").find("favicon.ico") != std::string::npos)
 				{
 					c->setIsSent(1);
@@ -158,10 +159,7 @@ void server::start()
 				std::cout << "sent " << bytes << " bytes" << std::endl;
 				std::cout << c->getIsSent() << std::endl;
 				if (c->getIsSent() == 1)
-				{
 					c->resetClient();
-				}
-				(void)bytes;
 			}
 		}
 	}
