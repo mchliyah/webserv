@@ -31,6 +31,7 @@ std::string response::get_response(client& client) {
 					header += *it;
 				header += "\r\n";
 				client.setIsSent(1);
+				client.setSentBytes(header.size());
 				return (put_response());
 			}
 			if (!default_index(*this, client, location, path) && location.getAutoIndex() == "on")
@@ -61,6 +62,7 @@ std::string response::get_response(client& client) {
 					for (it = headers.begin(); it != headers.end(); it++)
 						header += *it;
 					header += "\r\n";
+					client.setSentBytes(body.size() + header.size());
 					client.setIsSent(1);
 				}
 			}
@@ -88,6 +90,7 @@ std::string response::get_response(client& client) {
 			for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
 				header += *it;
 			header += "\r\n";
+			client.setSentBytes(header.size() + body.size());
 			client.setIsSent(1);
 		}
 	}
@@ -104,6 +107,7 @@ std::string response::get_response(client& client) {
 		for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
 			header += *it;
 		header += "\r\n";
+		client.setSentBytes(header.size() + body.size());
 		client.setIsSent(1);
 	}
 	return put_response();

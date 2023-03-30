@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 03:57:39 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/30 10:00:30 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ void server::start()
 			}
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
-				char	buf[BUF_SIZE];
+				char	buf[100000];
 				memset(buf, 0, sizeof buf);
 				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
 				std::string s(buf, r);
@@ -161,13 +161,29 @@ void server::start()
 				// 	response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
 				// else if (c->getValue("Method") == "DELETE")
 				// 	response = res.delete_response(c->getHost(), c->getValue("Path"));
-				toSend = response.size();
+				toSend = c->getSentBytes();
 				std::cout << "to send : " << toSend << std::endl;
-				int bytes = send(c->getSocket(), response.c_str(), toSend, 0);
-				std::cout << "sent " << bytes << " bytes" << std::endl;
+				std::cout << "path target :" << c->getValue("URL") << std::endl;
+				while (toSend > 0)
+				{
+					int bytes = send(c->getSocket(), response.c_str(), toSend, 0);
+					std::cout << "sent " << bytes << " bytes" << std::endl;
+					c->snd += bytes;
+					toSend -= bytes;
+					if (bytes == -1)
+					{
+						std::cout << "error sending response" << std::endl;
+						break;
+					}
+				}
+				c->setSentBytes(0);
 				std::cout << c->getIsSent() << std::endl;
 				if (c->getIsSent() == 1)
+				{
+					std::cout << "sendeed == " << c->snd << std::endl;
 					c->resetClient();
+					c->snd = 0;
+				}
 			}
 		}
 	}

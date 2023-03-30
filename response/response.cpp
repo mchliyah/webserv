@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/30 03:52:53 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/30 08:52:10 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ std::string response::get_date() { return date; }
 
 std::vector<std::string> response::get_headers() { return headers; }
 
-std::string response::get_body(void ) const { return body; }
+std::string& response::get_body(void ) { return body; }
 
 void response::set_body(std::string body) { this->body = body; }
 

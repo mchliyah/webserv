@@ -6,11 +6,12 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 14:33:29 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/30 02:45:32 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/30 10:05:42 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
+#include <unordered_map>
 
 bool default_index(response &res, client &client, locationconfig loc, std::string path)
 {
@@ -91,4 +92,53 @@ locationconfig matchlocation(serverconfig &server, std::string &path)
 	if (!found || path == "/")
 		location = locations.begin()->second;
 	return (location);
+}
+
+std::string get_type(const std::string& path) {
+	if (path.find_last_of('.') == std::string::npos) {
+		return "application/octet-stream";
+	}
+    std::unordered_map<std::string, std::string> extension_to_type ;
+	extension_to_type[".html"] = "text/html";
+	extension_to_type[".txt"] = "text/plain";
+	extension_to_type[".css"] = "text/css";
+	extension_to_type[".js"] = "application/javascript";
+	extension_to_type[".png"] = "image/png";
+	extension_to_type[".jpg"] = "image/jpeg";
+	extension_to_type[".jpeg"] = "image/jpeg";
+	extension_to_type[".gif"] = "image/gif";
+	extension_to_type[".svg"] = "image/svg+xml";
+	extension_to_type[".ico"] = "image/x-icon";
+	extension_to_type[".pdf"] = "application/pdf";
+	extension_to_type[".zip"] = "application/zip";
+	extension_to_type[".gz"] = "application/gzip";
+	extension_to_type[".tar"] = "application/x-tar";
+	extension_to_type[".rar"] = "application/x-rar-compressed";
+	extension_to_type[".7z"] = "application/x-7z-compressed";
+	extension_to_type[".doc"] = "application/msword";
+	extension_to_type[".xls"] = "application/vnd.ms-excel";
+	extension_to_type[".ppt"] = "application/vnd.ms-powerpoint";
+	extension_to_type[".mp3"] = "audio/mpeg";
+	extension_to_type[".wav"] = "audio/x-wav";
+	extension_to_type[".avi"] = "video/x-msvideo";
+	extension_to_type[".mp4"] = "video/mp4";
+	extension_to_type[".mpeg"] = "video/mpeg";
+	extension_to_type[".mpg"] = "video/mpeg";
+	extension_to_type[".mov"] = "video/quicktime";
+	extension_to_type[".wmv"] = "video/x-ms-wmv";
+	extension_to_type[".flv"] = "video/x-flv";
+	extension_to_type[".mkv"] = "video/x-matroska";
+	extension_to_type[".webm"] = "video/webm";
+	extension_to_type[".ogg"] = "video/ogg";
+	extension_to_type[".ogv"] = "video/ogg";
+	extension_to_type[".ogm"] = "video/ogg";
+	extension_to_type[".ogx"] = "application/ogg";
+	extension_to_type[".map"] = "application/json";
+    std::string extension = path.substr(path.find_last_of('.'));
+    std::unordered_map<std::string, std::string>::iterator it = extension_to_type.find(extension);
+    if (it != extension_to_type.end()) {
+        return it->second;
+    } else {
+        return "application/octet-stream";
+    }
 }

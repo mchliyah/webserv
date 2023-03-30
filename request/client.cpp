@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 03:36:28 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/30 09:09:25 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), first_time(true), err_message(""), rcv(0)
 {
+	snd = 0;
 }
 client::~client(){}
 //getters & setters
@@ -211,10 +212,7 @@ void client::parse()
 	}
 	checkMandatoryElements();
 }
-std::string&	client::getValue(const std::string& key)
-{
-	return (http_request[key]);
-}
+std::string&	client::getValue(const std::string& key) { return (http_request[key]); }
 
 int client::getError() const {return error;}
 
@@ -229,6 +227,7 @@ int client::checkMandatoryElements()
 	}
 	return (0);
 }
+
 struct compare
 {
 	std::string name;
@@ -256,10 +255,7 @@ void client::matchHost(std::vector<serverconfig> hosts)
 		host = *(std::find_if(hosts.begin(), hosts.end(), compare("", *this)));
 }
 
-serverconfig& client::getHost(void)
-{
-	return (this->host);
-}
+serverconfig& client::getHost(void) { return (this->host); }
 
 void client::setFirstTime(bool b) {first_time = b;}
 
@@ -269,36 +265,37 @@ size_t client::getSentBytes() const {return sent_bytes;}
 
 void client::setSentBytes(size_t sent_bytes) {this->sent_bytes = sent_bytes;}
 
+
 bool client::openFile(response &res, std::string& path)
 {
 	file.open(path.c_str());
 	struct stat buf;
-	std::cout << "path: " << path << std::endl;
 	if (file.is_open() && stat(path.c_str(), &buf) == 0)
 	{
-		res.set_content_length("Content-Length: " + std::to_string(buf.st_size + 4) + "\r\n");
-		res.set_status_code("200");
-		res.set_content_type("Content-Type: text/html \r\n");
+		res.set_content_length("Content-Length: " + std::to_string(buf.st_size) + "\r\n");
+		res.set_content_type("Content-Type: "+ get_type(path) + " \r\n");
 		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
-			+ res.get_date() +  res.get_content_type() + res.get_content_length() + "\r\n");
+			+ res.get_date() +  res.get_content_type() + res.get_content_length());
 		std::vector<std::string>::iterator it;
 		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
 			res.add_to_header(*it);
 		res.add_to_header("\r\n");
+		sent_bytes = res.get_header().size();
 	}
 	else
 	{
 		res.set_body("<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>");
-		res.set_content_length("Content-Length: " + std::to_string(res.get_body().size() + 4) + "\r\n");
+		res.set_content_length("Content-Length: " + std::to_string(res.get_body().size()) + "\r\n");
 		res.set_status_code("404");
 		res.set_status_message("Not Found");
 		res.set_content_type("Content-Type: text/html \r\n");
 		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
-			+ res.get_date() + res.get_content_type() + res.get_content_length() + "\r\n");
+			+ res.get_date() + res.get_content_type() + res.get_content_length());
 		std::vector<std::string>::iterator it;
 		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
 			res.add_to_header(*it);
 		res.add_to_header("\r\n");
+		sent_bytes = res.get_header().size() + res.get_body().size();
 		isSent = 1;
 		return (false);
 	}
@@ -312,10 +309,11 @@ bool client::readFile(response &res)
 	{
 		res.get_body().clear();
 		file.read(buff, BUF_SIZE);
-		std::cout << " ====================file.gcount(): " << file.gcount() << std::endl;
+		std::cout << "read " << file.gcount() << " bytes" << std::endl;
 		if (file.gcount() == 0)
 			return (false);
 		res.set_body(res.get_body().append(buff, 0, file.gcount()));
+		sent_bytes = file.gcount();
 	}
 	else 
 	{
