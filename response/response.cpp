@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/29 06:53:57 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 03:52:53 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,6 @@ std::string response::put_response(void)
 	std::string response;
 	response += header;
 	response += body;
-	response += "\r\n";
-	std::cout << "==========================================Response: " << std::endl;
-	std::cout << response << std::endl;
-	std::cout << "==========================================" << std::endl;
 	return response;
 }
 
