@@ -6,11 +6,11 @@
 #    By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/03/29 06:55:22 by slahrach         ###   ########.fr        #
+#    Updated: 2023/03/30 10:03:59 by slahrach         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = server
+NAME = WEBSERV
 
 CC = c++
 

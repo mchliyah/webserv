@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 07:23:00 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 08:47:17 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,11 @@ void server::start()
 						if (c->rcv != 4)
 							c->addToBody(buff);
 					}
+				}
+				if (c->rcv == 4)
+				{
+					std::cout << "executing request" << std::endl;
+					c->execute();
 				}
 			}
 			if (FD_ISSET(c->getSocket(), &write_fds))
