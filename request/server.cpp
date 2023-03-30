@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 11:08:39 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/29 12:31:49 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,10 +97,10 @@ void server::start()
 				}
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
 				fcntl(newSocket, F_SETFL, O_NONBLOCK);
-				struct timeval tv;
-				tv.tv_sec = 1;  // 5 seconds timeout
-				tv.tv_usec = 0;
-				setsockopt(newSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+				// struct timeval tv;
+				// tv.tv_sec = 1;  // 5 seconds timeout
+				// tv.tv_usec = 0;
+				// setsockopt(newSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 				client c(newSocket, listner->second);
 				clients.push_back(c);
 			}

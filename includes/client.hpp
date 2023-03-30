@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 06:48:11 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 05:40:20 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ private:
 	bool		first_time;
 	std::string	err_message;
 	std::map<std::string, std::string> http_request;
+	std::vector<std::string> cookies;
+	std::string query;
 	serverconfig host;
 	std::ifstream file;
 	size_t sent_bytes;
@@ -54,7 +56,7 @@ public:
 	void makeError(int err, const std::string& msg);
 	std::string& getValue(const std::string& key);
 	void parse();
-	int checkMethod();
+	int checkMethod_URL();
 	int getError() const;
 	std::string getErrorMessage() const;
 	int checkMandatoryElements();

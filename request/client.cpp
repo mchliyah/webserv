@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 07:42:59 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 05:42:24 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void client::makeError(int err, const std::string& msg)
 	err_message = msg;
 	rcv = 4;
 }
-int	client::checkMethod()
+int	client::checkMethod_URL()
 {
 	bool	found = 0;
 	std::string	methods[3] = {"GET", "POST", "DELETE"};
@@ -48,6 +48,12 @@ int	client::checkMethod()
 	{
 		makeError(405, "Bad Request: Method Not supported");
 		return (1);
+	}
+	size_t pos = getValue("URL").find("?");
+	if (pos != std::string::npos)
+	{
+		http_request["URL"] = getValue("URL").substr(0, pos);
+		query = getValue("URL").substr(pos + 1);
 	}
 	return (0);
 }
@@ -84,7 +90,7 @@ int	client::parseRequestLine(std::string first_line)
 		last = pos + 1;
 	}
 	http_request["version"] = first_line.substr(pos + 1);
-	if (checkMethod())
+	if (checkMethod_URL())
 		return (1);
 	return 0;
 }
@@ -99,7 +105,13 @@ void client::parseHeader(std::string header)
 	if (pos + 1 < header.size() && header[pos + 1] == ' ')
 		pos++;
 	value = header.substr(pos + 1);
-	http_request[key] = value;
+	if (key == "cookie")
+	{
+		cookies.push_back(value);
+		http_request[key] = "present";
+	}
+	else
+		http_request[key] = value;
 }
 void client::addToBody(std::string body)//MAKE IT RETURN 
 {
