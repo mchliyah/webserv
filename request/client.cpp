@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 07:42:59 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 03:36:28 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -308,15 +308,23 @@ bool client::openFile(response &res, std::string& path)
 bool client::readFile(response &res)
 {
 	char buff[BUF_SIZE + 1] = {0};
-	res.set_body("");
-	file.read(buff, BUF_SIZE);
-	res.set_body(res.get_body().append(buff, 0, file.gcount()));
-	if (file.eof()) {
+	if (!file.eof())
+	{
+		res.get_body().clear();
+		file.read(buff, BUF_SIZE);
+		std::cout << " ====================file.gcount(): " << file.gcount() << std::endl;
+		if (file.gcount() == 0)
+			return (false);
+		res.set_body(res.get_body().append(buff, 0, file.gcount()));
+	}
+	else 
+	{
 		setFirstTime(true);
 		setIsSent(1);
 		file.close();
+		res.get_body().clear();
 		return (false);
-		}
+	}
 	return (true);
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 07:41:29 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 03:57:39 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,9 +102,14 @@ void server::start()
 		}
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
+			if (activity == 0 && c->rcv > 0 && c->rcv < 4)
+			{
+				std::cout << "timout "<< std::endl;
+				c->rcv = 4;
+			}
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
-				char	buf[7];
+				char	buf[BUF_SIZE];
 				memset(buf, 0, sizeof buf);
 				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
 				std::string s(buf, r);
@@ -141,21 +146,24 @@ void server::start()
 					continue;
 				}
 				c->matchHost(this->hosts);
-				std::cout << c->getError() << std::endl;
-				std::cout << c->getErrorMessage() << std::endl;
-				c->printAttr();
+				// std::cout << c->getError() << std::endl;
+				// std::cout << c->getErrorMessage() << std::endl;
+				// c->printAttr();
 				// c->getHost().printServer();
 				response res(c->getValue("Method"));
 				std::string response;
+				int toSend = 0;
 				if (c->getValue("Method") == "GET")
 					response = res.get_response(*c);
-				std::cout << res.get_content_length() << std::endl;
-				std::cout << "header lenght : " << res.get_header().length() << std::endl;
+				// std::cout << res.get_content_length() << std::endl;
+				// std::cout << "header lenght : " << res.get_header().length() << std::endl;
 				// else if (c->getValue("Method") == "POST")
 				// 	response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
 				// else if (c->getValue("Method") == "DELETE")
 				// 	response = res.delete_response(c->getHost(), c->getValue("Path"));
-				int bytes = send(c->getSocket(), response.c_str(), response.size(), 0);
+				toSend = response.size();
+				std::cout << "to send : " << toSend << std::endl;
+				int bytes = send(c->getSocket(), response.c_str(), toSend, 0);
 				std::cout << "sent " << bytes << " bytes" << std::endl;
 				std::cout << c->getIsSent() << std::endl;
 				if (c->getIsSent() == 1)
