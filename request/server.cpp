@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 07:41:29 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 07:23:00 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,8 @@ void server::start()
 		}
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
+			if (activity == 0 && c->rcv > 0 && c->rcv < 4)
+				c->rcv = 4;
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
 				char	buf[7];
@@ -144,6 +146,7 @@ void server::start()
 				std::cout << c->getError() << std::endl;
 				std::cout << c->getErrorMessage() << std::endl;
 				c->printAttr();
+				std::cout << "query is -" << c->query  << "-"<< std::endl;
 				// c->getHost().printServer();
 				response res(c->getValue("Method"));
 				std::string response;

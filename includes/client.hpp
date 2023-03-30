@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 06:48:11 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 07:17:23 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ private:
 	size_t sent_bytes;
 public:
 	int	rcv;
+	std::string query;
 	client(int sock, std::string port_);
 	client(const client& other);
 	client& operator=(const client& );
@@ -68,6 +69,7 @@ public:
 	void setSentBytes(size_t sentBytes);
 	void addToBody(std::string body);
 	void addToRequestCheck(std::string buff);
+	std::string getQuery() const;
 	~client();
 };
 #endif
