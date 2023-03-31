@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/30 08:52:10 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/30 10:10:57 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ response::response(const std::string& request_type) {
 	}
 	body = "";
 	content_type = "Content-Type: text/plain\r\n";
-	content_length = "Content-Length: ";
 }
 
 std::string response::put_response(void)

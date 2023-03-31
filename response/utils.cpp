@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 14:33:29 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/30 10:05:42 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/30 10:41:59 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,7 @@ std::string get_type(const std::string& path) {
 	extension_to_type[".ogm"] = "video/ogg";
 	extension_to_type[".ogx"] = "application/ogg";
 	extension_to_type[".map"] = "application/json";
+	extension_to_type[".webm]"] = "video/webm";
     std::string extension = path.substr(path.find_last_of('.'));
     std::unordered_map<std::string, std::string>::iterator it = extension_to_type.find(extension);
     if (it != extension_to_type.end()) {

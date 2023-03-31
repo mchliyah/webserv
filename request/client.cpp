@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 09:09:25 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/30 10:33:00 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,6 +280,7 @@ bool client::openFile(response &res, std::string& path)
 		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
 			res.add_to_header(*it);
 		res.add_to_header("\r\n");
+		std::cout << res.get_content_length() << std::endl;
 		sent_bytes = res.get_header().size();
 	}
 	else
