@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/31 23:25:39 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/31 23:35:21 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,8 @@ public:
 	void setSentBytes(size_t sentBytes);
 	void addToBody(std::string body);
 	void addToRequestCheck(std::string buff);
-	void setres(response& res);
+	void setRes(const response& response);
+	response& getRes(void);
 	~client();
 };
 std::string get_type(const std::string& path);

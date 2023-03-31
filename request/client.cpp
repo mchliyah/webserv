@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/31 21:38:56 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/31 23:37:59 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -377,3 +377,7 @@ void client::addToRequestCheck(std::string buff)
 			rcv = 4;
 	}
 }
+
+void client::setRes(const response &response) { this->res = response; }
+
+response& client::getRes(void) { return (res); }

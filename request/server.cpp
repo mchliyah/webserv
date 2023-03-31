@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/31 23:13:58 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/31 23:42:36 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,6 +184,7 @@ void server::start()
 					c->resetClient();
 					c->snd = 0;
 				}
+				response.clear();
 			}
 		}
 	}
