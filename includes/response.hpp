@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/30 08:52:24 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/31 23:17:57 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,10 @@ class response
     	std::string date;
     	std::vector<std::string> headers;
 	public:
+		response();
 		response(const std::string& request_type);
+		response(const response &src);
+		response &operator=(const response &src);
 		~response();
 		std::string get_status_code();
 		std::string get_status_message();

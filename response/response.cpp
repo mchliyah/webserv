@@ -6,11 +6,14 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/30 10:10:57 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/31 23:19:46 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
+
+response::response() {
+}
 
 response::response(const std::string& request_type) {
 	std::time_t t = std::time(nullptr);
@@ -29,6 +32,24 @@ response::response(const std::string& request_type) {
 	}
 	body = "";
 	content_type = "Content-Type: text/plain\r\n";
+}
+
+response::response(const response &src) {
+	*this = src;
+}
+
+response &response::operator=(const response &src) {
+	if (this != &src) {
+		this->status_code = src.status_code;
+		this->status_message = src.status_message;
+		this->content_type = src.content_type;
+		this->header = src.header;
+		this->body = src.body;
+		this->content_length = src.content_length;
+		this->date = src.date;
+		this->headers = src.headers;
+	}
+	return *this;
 }
 
 std::string response::put_response(void)

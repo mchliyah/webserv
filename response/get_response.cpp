@@ -20,7 +20,7 @@ std::string response::get_response(client& client) {
 				in_path += "/";
 				std::cout << "in_path "<< in_path << std::endl;
     			status_code = "301";
-				status_message = "OK";
+				status_message = "Moved Permanently";
     			headers.push_back("Location: " + in_path + "\r\n");
 				body = "";
 				content_type = "Content-Type: text/html\r\n";

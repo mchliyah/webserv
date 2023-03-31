@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 10:17:59 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/31 23:13:58 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,22 +139,22 @@ void server::start()
 			}
 			if (FD_ISSET(c->getSocket(), &write_fds))
 			{
-				std::cout << "sending response" << std::endl;
-				// if (c->getValue("Path").find("favicon.ico") != std::string::npos)
-				// {
-				// 	c->setIsSent(1);
-				// 	continue;
-				// }
-				c->matchHost(this->hosts);
-				// std::cout << c->getError() << std::endl;
-				// std::cout << c->getErrorMessage() << std::endl;
-				// c->printAttr();
-				// c->getHost().printServer();
+				bool firstime = c->getFirstTime();
+				if (firstime)
+				{
+					c->matchHost(this->hosts);
+					std::cout << "sending response" << std::endl;
+					std::cout << "path target :" << c->getValue("URL") << std::endl;
+				}
 				response res(c->getValue("Method"));
 				std::string response;
 				int toSend = 0;
 				if (c->getValue("Method") == "GET")
 					response = res.get_response(*c);
+				if (firstime)
+				{
+					std::cout << "header size : " << response.size() << std::endl;
+				}
 				// std::cout << res.get_content_length() << std::endl;
 				// std::cout << "header lenght : " << res.get_header().length() << std::endl;
 				// else if (c->getValue("Method") == "POST")
@@ -162,12 +162,11 @@ void server::start()
 				// else if (c->getValue("Method") == "DELETE")
 				// 	response = res.delete_response(c->getHost(), c->getValue("Path"));
 				toSend = c->getSentBytes();
-				std::cout << "to send : " << toSend << std::endl;
-				std::cout << "path target :" << c->getValue("URL") << std::endl;
+				// std::cout << "to send : " << toSend << std::endl;
 				while (toSend > 0)
 				{
 					int bytes = send(c->getSocket(), response.c_str(), toSend, 0);
-					std::cout << "sent " << bytes << " bytes" << std::endl;
+					// std::cout << "sent " << bytes << " bytes" << std::endl;
 					c->snd += bytes;
 					toSend -= bytes;
 					if (bytes == -1)
@@ -177,9 +176,10 @@ void server::start()
 					}
 				}
 				c->setSentBytes(0);
-				std::cout << c->getIsSent() << std::endl;
+				// std::cout << c->getIsSent() << std::endl;
 				if (c->getIsSent() == 1)
 				{
+					std::cout << "target == " << c->getValue("URL") << std::endl;
 					std::cout << "sendeed == " << c->snd << std::endl;
 					c->resetClient();
 					c->snd = 0;

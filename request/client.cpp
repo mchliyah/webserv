@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 10:33:00 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/31 21:38:56 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,11 +268,13 @@ void client::setSentBytes(size_t sent_bytes) {this->sent_bytes = sent_bytes;}
 
 bool client::openFile(response &res, std::string& path)
 {
-	file.open(path.c_str());
+	file.open(path.c_str(), std::ios::in | std::ios::binary);
 	struct stat buf;
+	std::stringstream stream;
 	if (file.is_open() && stat(path.c_str(), &buf) == 0)
 	{
-		res.set_content_length("Content-Length: " + std::to_string(buf.st_size) + "\r\n");
+		stream << buf.st_size;
+		res.set_content_length("Content-Length: " + stream.str() + "\r\n");
 		res.set_content_type("Content-Type: "+ get_type(path) + " \r\n");
 		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
 			+ res.get_date() +  res.get_content_type() + res.get_content_length());
@@ -286,7 +288,8 @@ bool client::openFile(response &res, std::string& path)
 	else
 	{
 		res.set_body("<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>");
-		res.set_content_length("Content-Length: " + std::to_string(res.get_body().size()) + "\r\n");
+		stream << res.get_body().size();
+		res.set_content_length("Content-Length: " + stream.str() + "\r\n");
 		res.set_status_code("404");
 		res.set_status_message("Not Found");
 		res.set_content_type("Content-Type: text/html \r\n");
@@ -305,15 +308,15 @@ bool client::openFile(response &res, std::string& path)
 
 bool client::readFile(response &res)
 {
-	char buff[BUF_SIZE + 1] = {0};
+	std::vector<char> buff(BUF_SIZE);
 	if (!file.eof())
 	{
-		res.get_body().clear();
-		file.read(buff, BUF_SIZE);
-		std::cout << "read " << file.gcount() << " bytes" << std::endl;
+		res.set_body("");
+		file.read(&buff[0], BUF_SIZE);
+		// std::cout << "read " << file.gcount() << " bytes" << std::endl;
 		if (file.gcount() == 0)
 			return (false);
-		res.set_body(res.get_body().append(buff, 0, file.gcount()));
+		res.set_body(std::string(buff.begin(), buff.begin() + file.gcount()));
 		sent_bytes = file.gcount();
 	}
 	else 

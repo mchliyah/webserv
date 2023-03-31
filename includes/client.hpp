@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 09:09:06 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/31 23:25:39 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ private:
 	serverconfig host;
 	std::ifstream file;
 	size_t sent_bytes;
+	response res;
 public:
 	int	rcv;
 	int	snd;
@@ -69,6 +70,7 @@ public:
 	void setSentBytes(size_t sentBytes);
 	void addToBody(std::string body);
 	void addToRequestCheck(std::string buff);
+	void setres(response& res);
 	~client();
 };
 std::string get_type(const std::string& path);
