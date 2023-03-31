@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 14:33:29 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/28 21:19:49 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/03/30 02:45:32 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ locationconfig matchlocation(serverconfig &server, std::string &path)
 	std::string frst = path;
 	while (frst.length() > 1 && !found)
 	{
-		std::cout << "frst : "<< frst << std::endl; 
+		// std::cout << "frst : "<< frst << std::endl; 
 		for (loc = locations.begin() ; loc != locations.end() ; loc++)
 		{
 			if (loc->first.compare(frst + "/") == 0)

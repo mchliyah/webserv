@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 05:42:24 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 06:27:45 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void client::resetClient()
 	this->http_request.clear();
 	this->isSent = 0;
 	this->rcv = 0;
+	this->query = "";
 }
 void client::makeError(int err, const std::string& msg)
 {
@@ -105,11 +106,8 @@ void client::parseHeader(std::string header)
 	if (pos + 1 < header.size() && header[pos + 1] == ' ')
 		pos++;
 	value = header.substr(pos + 1);
-	if (key == "cookie")
-	{
-		cookies.push_back(value);
-		http_request[key] = "present";
-	}
+	if (key == "Cookie" && http_request[key] != "")
+		value = http_request[key] + "; " + value;
 	else
 		http_request[key] = value;
 }
@@ -320,15 +318,23 @@ bool client::openFile(response &res, std::string& path)
 bool client::readFile(response &res)
 {
 	char buff[BUF_SIZE + 1] = {0};
-	res.set_body("");
-	file.read(buff, BUF_SIZE);
-	res.set_body(res.get_body().append(buff, 0, file.gcount()));
-	if (file.eof()) {
+	if (!file.eof())
+	{
+		res.get_body().clear();
+		file.read(buff, BUF_SIZE);
+		std::cout << " ====================file.gcount(): " << file.gcount() << std::endl;
+		if (file.gcount() == 0)
+			return (false);
+		res.set_body(res.get_body().append(buff, 0, file.gcount()));
+	}
+	else 
+	{
 		setFirstTime(true);
 		setIsSent(1);
 		file.close();
+		res.get_body().clear();
 		return (false);
-		}
+	}
 	return (true);
 }
 
@@ -379,3 +385,4 @@ void client::addToRequestCheck(std::string buff)
 			rcv = 4;
 	}
 }
+std::string client::getQuery()const {return query;}

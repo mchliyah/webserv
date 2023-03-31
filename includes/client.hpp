@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 05:40:20 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/03/30 06:20:44 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ private:
 	bool		first_time;
 	std::string	err_message;
 	std::map<std::string, std::string> http_request;
-	std::vector<std::string> cookies;
 	std::string query;
 	serverconfig host;
 	std::ifstream file;
@@ -70,6 +69,7 @@ public:
 	void setSentBytes(size_t sentBytes);
 	void addToBody(std::string body);
 	void addToRequestCheck(std::string buff);
+	std::string getQuery() const;
 	~client();
 };
 #endif
