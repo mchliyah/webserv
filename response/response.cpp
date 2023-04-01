@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/01 04:08:08 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/01 18:06:48 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,11 @@ void response::clear() {
 }
 
 response::response(const std::string& request_type) {
-	std::time_t t = std::time(nullptr);
-	char buffer[128];
-	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
-	this->date = "Date: " + std::string(buffer) + "\r\n";
+	// std::time_t t = std::time(nullptr);
+	// char buffer[128];
+	// std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
+	// this->date = "Date: " + std::string(buffer) + "\r\n";
+	this->date = "";
 	if (request_type == "GET") {
 	    status_code = "200";
 	    status_message = "OK";

@@ -84,7 +84,7 @@ std::string response::get_response(client& client) {
 			status_message = "Forbidden";
 			content_type = "Content-Type: text/html\r\n";
 			body = "<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>";
-			content_length = "Content-Length: " + std::to_string(body.length()) + "\r\n"; 
+			content_length = "Content-Length: " + std::to_string(body.size()) + "\r\n"; 
 			header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 			header += date + content_type + content_length;
 			for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
@@ -101,7 +101,7 @@ std::string response::get_response(client& client) {
 		status_message = "Not Found";
 		content_type = "Content-Type: text/html\r\n";
 		body = "<!DOCTYPE html><html><head>404 Not Found</head><body><p>no file or directory</p></body></html>";
-		content_length = "Content-Length: " + std::to_string(body.length()) + "\r\n";
+		content_length = "Content-Length: " + std::to_string(body.size()) + "\r\n";
 		header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 		header += date + content_type + content_length;
 		for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)

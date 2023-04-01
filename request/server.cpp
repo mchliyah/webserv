@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/01 05:39:11 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/01 18:03:31 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,10 +110,11 @@ void server::start()
 			}
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
-				char	buf[100000];
-				memset(buf, 0, sizeof buf);
-				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
-				std::string s(buf, buf + r);
+				// char	buf[100000];
+				std::vector<char> buf(100000);
+				// memset(buf, 0, sizeof buf);
+				int	r = recv(c->getSocket(), &buf[0], sizeof(buf), 0);
+				std::string s(buf.begin(), buf.begin() + r);
 				//std::cout << "received " << r << " bytes from " << c->getSocket() << " : " << s << std::endl;
 				//add a timout here to close the socket if no data is received
 				//add a smaller timout to assume that the request is finished if no data is received and rcv == 1
@@ -127,7 +128,7 @@ void server::start()
 				}
 				else if (c->rcv != 4)
 				{
-					std::string buff(buf, r);
+					std::string buff(buf.begin(), buf.begin() + r);
 					if (c->rcv == 0)
 						c->addToRequestCheck(buff);
 					else
@@ -165,15 +166,6 @@ void server::start()
 				// 	response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
 				// else if (c->getValue("Method") == "DELETE")
 				// 	response = res.delete_response(c->getHost(), c->getValue("Path"));
-				if (c->getIsSent() == 1)
-				{
-					// std::cout << "target == " << c->getValue("URL") << std::endl;
-					// std::cout << "sendeed == " << c->snd << std::endl;
-					c->resetClient();
-					c->snd = 0;
-					res.clear();
-					continue;
-				}
 				toSend = c->getSentBytes();
 				// std::cout << "to send : " << toSend << std::endl;
 				while (toSend > 0)
@@ -190,6 +182,15 @@ void server::start()
 						// perror("send failed");
 						break;
 					}
+				}
+				if (c->getIsSent() == 1)
+				{
+					// std::cout << "target == " << c->getValue("URL") << std::endl;
+					// std::cout << "sendeed == " << c->snd << std::endl;
+					c->resetClient();
+					c->snd = 0;
+					res.clear();
+					continue;
 				}
 				c->setSentBytes(0);
 				// std::cout << c->getIsSent() << std::endl;
