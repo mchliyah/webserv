@@ -6,13 +6,13 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/31 23:37:59 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/01 05:40:12 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), first_time(true), err_message(""), rcv(0)
+client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), rcv(0)
 {
 	snd = 0;
 }
@@ -30,6 +30,11 @@ void client::resetClient()
 	this->http_request.clear();
 	this->isSent = 0;
 	this->rcv = 0;
+	this->first_time = true;
+	this->snd = 0;
+	this->sent_bytes = 0;
+	if (this->file.is_open())
+		this->file.close();
 }
 void client::makeError(int err, const std::string& msg)
 {
@@ -268,6 +273,8 @@ void client::setSentBytes(size_t sent_bytes) {this->sent_bytes = sent_bytes;}
 
 bool client::openFile(response &res, std::string& path)
 {
+	if (file.is_open())
+		file.close();
 	file.open(path.c_str(), std::ios::in | std::ios::binary);
 	struct stat buf;
 	std::stringstream stream;
@@ -282,7 +289,7 @@ bool client::openFile(response &res, std::string& path)
 		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
 			res.add_to_header(*it);
 		res.add_to_header("\r\n");
-		std::cout << res.get_content_length() << std::endl;
+		// std::cout << res.get_content_length() << std::endl;
 		sent_bytes = res.get_header().size();
 	}
 	else
@@ -309,7 +316,7 @@ bool client::openFile(response &res, std::string& path)
 bool client::readFile(response &res)
 {
 	std::vector<char> buff(BUF_SIZE);
-	if (!file.eof())
+	if (!file.eof() && file.is_open())
 	{
 		res.set_body("");
 		file.read(&buff[0], BUF_SIZE);

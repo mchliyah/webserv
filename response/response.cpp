@@ -6,13 +6,24 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/31 23:19:46 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/01 04:08:08 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
 response::response() {
+}
+
+void response::clear() {
+	status_code = "";
+	status_message = "";
+	content_type = "";
+	header = "";
+	body = "";
+	content_length = "";
+	date = "";
+	headers.clear();
 }
 
 response::response(const std::string& request_type) {
@@ -95,4 +106,6 @@ void response::clear_header(void) { this->header = ""; }
 std::string response::get_header(void) const { return (this->header); }
 
 
-response::~response() { }
+response::~response() { 
+	
+}

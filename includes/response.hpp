@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/31 23:17:57 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/01 03:40:25 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ class response
 		std::string post_response(serverconfig &server, std::string &path, std::string &body);
 		std::string delete_response(serverconfig &server, std::string &path);
 		std::string put_response(void);
+		void clear();
 };
 
 bool is_dir(std::string path);
