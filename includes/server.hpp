@@ -26,6 +26,8 @@ class server
 		std::vector<client> clients;
 	public:
 		server(std::vector<std::string>& ports_, std::vector<serverconfig>& servers);
+		server(const server& other);
+		server& operator=(const server& other);
 		void start();
 		std::pair<int,std::string> createBindListen(std::string port);
 		~server();

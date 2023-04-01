@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 23:58:49 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/28 08:15:15 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/01 21:44:36 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ class locationconfig
 
 	public:
 		locationconfig();
+		locationconfig(const locationconfig& other);
+		locationconfig& operator=(const locationconfig& other);
 		~locationconfig();
 		std::string readlocation(std::ifstream& inputFile, std::string line);
 		void printlocation();
@@ -69,6 +71,8 @@ class serverconfig
 		std::map<int, std::string> errorpages;
 	public:
 	serverconfig();
+	serverconfig(const serverconfig& other);
+	serverconfig& operator=(const serverconfig& other);
 	~serverconfig();
 	std::string readServer(std::ifstream& inputFile, std::string line);
 	void printServer();

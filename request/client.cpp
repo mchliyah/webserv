@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/01 05:40:12 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/01 22:24:43 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,33 @@ client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd
 {
 	snd = 0;
 }
+
+client::client(const client& other)
+{
+	*this = other;
+}
+
+client& client::operator=(const client& other)
+{
+	if (this != &other)
+	{
+		this->request = other.request;
+		this->port = other.port;
+		this->socket_fd = other.socket_fd;
+		this->isSent = other.isSent;
+		this->error = other.error;
+		this->first_time = other.first_time;
+		this->err_message = other.err_message;
+		this->http_request = other.http_request;
+		this->host = other.host;
+		this->sent_bytes = other.sent_bytes;
+		this->res = other.res;
+		this->rcv = other.rcv;
+		this->snd = other.snd;
+	}
+	return (*this);
+}
+
 client::~client(){}
 //getters & setters
 int client::getSocket() const {return socket_fd;}
@@ -337,25 +364,7 @@ bool client::readFile(response &res)
 	return (true);
 }
 
-client::client(const client &other) { *this = other; }
 
-client& client::operator=(const client &other)
-{
-	if (this != &other)
-	{
-		this->request = other.request;
-		this->port = other.port;
-		this->socket_fd = other.socket_fd;
-		this->isSent = other.isSent;
-		this->error = other.error;
-		this->first_time = other.first_time;
-		this->err_message = other.err_message;
-		this->http_request = other.http_request;
-		this->host = other.host;
-		this->sent_bytes = other.sent_bytes;
-	}
-	return (*this);
-}
 void client::addToRequestCheck(std::string buff)
 {
 	std::string rest = "";

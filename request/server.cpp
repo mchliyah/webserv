@@ -6,13 +6,30 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/01 18:03:31 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/01 22:15:14 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
 server::server(std::vector<std::string> &ports_, std::vector<serverconfig> &servers) : ports(ports_), hosts(servers) {}
+
+server::server(const server &other)
+{
+	*this = other;
+}
+
+server &server::operator=(const server &other)
+{
+	if (this != &other)
+	{
+		ports = other.ports;
+		listners = other.listners;
+		hosts = other.hosts;
+		clients = other.clients;
+	}
+	return *this;
+}
 
 std::pair<int, std::string> server::createBindListen(std::string port)
 {
@@ -67,6 +84,7 @@ void server::start()
 		int maxSocket = std::max_element(listners.begin(), listners.end())->first;
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) // Add client sockets to read_fds and write_fds
 		{
+			// std::cout << "client " << c->getSocket() << " rcv " << c->rcv << std::endl;
 			if (c->rcv < 4 && c->rcv >= 0)
 				FD_SET(c->getSocket(), &read_fds);
 			if (c->rcv==4)

@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/01 03:34:20 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/01 22:06:59 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ public:
 	int	snd;
 	client(int sock, std::string port_);
 	client(const client& other);
-	client& operator=(const client& );
+	client& operator=(const client& other);
 	int			getSocket() const;
 	std::string getPort() const;
 	bool		getIsSent() const;
