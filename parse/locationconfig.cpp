@@ -99,7 +99,6 @@ locationconfig &locationconfig::operator=(const locationconfig &other) {
 		this->autoindex = other.autoindex;
 		this->index = other.index;
 		this->allowsmethod = other.allowsmethod;
-
 	}
 	return (*this);
 }

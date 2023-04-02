@@ -20,16 +20,16 @@
 class server
 {
 	private:
-		std::vector<std::string> ports;
+		std::vector<std::string>& ports;
 		std::vector<std::pair<int, std::string> > listners;
-		std::vector<serverconfig> hosts;
+		std::vector<serverconfig>& hosts;
 		std::vector<client> clients;
 	public:
 		server(std::vector<std::string>& ports_, std::vector<serverconfig>& servers);
-		server(const server& other);
-		server& operator=(const server& other);
+		server(server& other);
+		server& operator=(server& other);
 		void start();
-		std::pair<int,std::string> createBindListen(std::string port);
+		std::pair<int,std::string> createBindListen(std::string& port);
 		~server();
 };
 

@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/01 18:06:48 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/02 08:07:02 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 response::response() {
 }
 
-void response::clear() {
+void response::clearall() {
 	status_code = "";
 	status_message = "";
 	content_type = "";
@@ -23,6 +23,12 @@ void response::clear() {
 	body = "";
 	content_length = "";
 	date = "";
+	headers.clear();
+}
+
+void response::clear() {
+	header = "";
+	body = "";
 	headers.clear();
 }
 
@@ -64,13 +70,6 @@ response &response::operator=(const response &src) {
 	return *this;
 }
 
-std::string response::put_response(void)
-{
-	std::string response;
-	response += header;
-	response += body;
-	return response;
-}
 
 std::string response::get_status_code() { return status_code; }
 
@@ -86,7 +85,7 @@ std::string response::get_date() { return date; }
 
 std::vector<std::string> response::get_headers() { return headers; }
 
-std::string& response::get_body(void ) { return body; }
+std::string response::get_body(void ) { return body; }
 
 void response::set_body(std::string body) { this->body = body; }
 

@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 17:08:17 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/23 00:33:00 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/02 04:11:12 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,10 +64,7 @@ std::vector<serverconfig> parse(std::string path){
 		if (line.find("#") != std::string::npos)
 			throw std::runtime_error("Error: comment is not allowed");
 		if (line.find("server") == std::string::npos || line.find("server") != 0)
-		{
-			std::cout << " === line :" <<line << std::endl;
 			throw std::runtime_error("Error: ruller is not at the top of the file");
-		}
 		line = server.readServer(os, line);
 		// server.printServer();
 		// std::cout << " ====================================== "<< std::endl;

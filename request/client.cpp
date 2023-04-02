@@ -6,20 +6,29 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/01 22:24:43 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/02 09:23:05 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), rcv(0)
+client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), rcv(0)
 {
 	snd = 0;
 }
 
-client::client(const client& other)
+client::client(const client& other) : request(other.request), port(other.port), socket_fd(other.socket_fd), isSent(other.isSent), error(other.error), first_time(other.first_time), err_message(other.err_message), http_request(other.http_request), host(other.host), sent_bytes(other.sent_bytes), res(other.res), rcv(other.rcv), snd(other.snd)
 {
-	*this = other;
+}
+
+void client::setBuff(std::string buff_)
+{
+	buff = buff_;
+}
+
+std::string& client::getBuff()
+{
+	return buff;
 }
 
 client& client::operator=(const client& other)
@@ -45,9 +54,9 @@ client& client::operator=(const client& other)
 
 client::~client(){}
 //getters & setters
-int client::getSocket() const {return socket_fd;}
-std::string client::getPort() const {return port;}
-bool client::getIsSent() const {return isSent;}
+int& client::getSocket() {return socket_fd;}
+std::string& client::getPort() {return port;}
+bool& client::getIsSent() {return isSent;}
 void client::setIsSent(bool b) {isSent = b;}
 void client::resetClient()
 {
@@ -62,6 +71,7 @@ void client::resetClient()
 	this->sent_bytes = 0;
 	if (this->file.is_open())
 		this->file.close();
+	res.clearall();
 }
 void client::makeError(int err, const std::string& msg)
 {
@@ -121,7 +131,7 @@ int	client::parseRequestLine(std::string first_line)
 		return (1);
 	return 0;
 }
-void client::parseHeader(std::string header)
+void client::parseHeader(std::string& header)
 {
 	std::string	key = "";
 	std::string	value = "";
@@ -134,7 +144,7 @@ void client::parseHeader(std::string header)
 	value = header.substr(pos + 1);
 	http_request[key] = value;
 }
-void client::addToBody(std::string body)//MAKE IT RETURN 
+void client::addToBody(std::string& body)//MAKE IT RETURN 
 {
 	std::stringstream stream;
 	static bool chunking_track = 0;
@@ -246,9 +256,9 @@ void client::parse()
 }
 std::string&	client::getValue(const std::string& key) { return (http_request[key]); }
 
-int client::getError() const {return error;}
+int& client::getError() {return error;}
 
-std::string client::getErrorMessage() const {return err_message;}
+std::string& client::getErrorMessage() {return err_message;}
 
 int client::checkMandatoryElements()
 {
@@ -263,28 +273,30 @@ int client::checkMandatoryElements()
 struct compare
 {
 	std::string name;
-	client c;
-	compare(std::string my_, client c_): name(my_), c(c_) {}
+	std::string port;
+	compare(std::string my_, std::string port_): name(my_), port(port_) {}
  
-	bool operator()(serverconfig s) {
+	bool operator()(serverconfig& s) {
 		if (name != "")
-			return (s.getServerName() == name && s.getListen() == c.getPort());
+			return (s.getServerName() == name && s.getListen() == port);
 		else
-			return s.getListen() == c.getPort();
+			return s.getListen() == port;
 	}
 };
 
-void client::matchHost(std::vector<serverconfig> hosts)
+void client::matchHost(std::vector<serverconfig>& hosts)
 {
 	std::string name = http_request["Host"];
 	size_t f = name.find(":");
 	if (f != std::string::npos)
 		name = name.substr(0, f);
-	std::vector<serverconfig>::iterator s = std::find_if(hosts.begin(), hosts.end(), compare(name, *this));
+	std::vector<serverconfig>::iterator s = std::find_if(hosts.begin(), hosts.end(), compare(name, port));
 	if (s != hosts.end())
+	{
 		host = *s;
+	}
 	else
-		host = *(std::find_if(hosts.begin(), hosts.end(), compare("", *this)));
+		host = *(std::find_if(hosts.begin(), hosts.end(), compare("", port)));
 }
 
 serverconfig& client::getHost(void) { return (this->host); }
@@ -293,7 +305,7 @@ void client::setFirstTime(bool b) {first_time = b;}
 
 bool& client::getFirstTime() {return first_time;}
 
-size_t client::getSentBytes() const {return sent_bytes;}
+size_t& client::getSentBytes() {return sent_bytes;}
 
 void client::setSentBytes(size_t sent_bytes) {this->sent_bytes = sent_bytes;}
 
@@ -365,7 +377,7 @@ bool client::readFile(response &res)
 }
 
 
-void client::addToRequestCheck(std::string buff)
+void client::addToRequestCheck(std::string& buff)
 {
 	std::string rest = "";
 	request += buff;
@@ -397,3 +409,7 @@ void client::addToRequestCheck(std::string buff)
 void client::setRes(const response &response) { this->res = response; }
 
 response& client::getRes(void) { return (res); }
+std::string& client::getRequest(void) { return (request); }
+std::map<std::string, std::string>& client::getHttpRequest(void) { return (http_request); }
+int& client::getRcv(void) { return (rcv); }
+

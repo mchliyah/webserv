@@ -6,14 +6,14 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 14:33:29 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/31 20:42:42 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/02 09:24:39 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 #include <unordered_map>
 
-bool default_index(response &res, client &client, locationconfig loc, std::string path)
+bool default_index(response &res, client &client, locationconfig& loc, std::string& path)
 {
 	std::vector<std::string> index = loc.getIndex();
 	std::vector<std::string>::iterator it;
@@ -25,7 +25,6 @@ bool default_index(response &res, client &client, locationconfig loc, std::strin
 		{
 			if (client.getFirstTime())
 			{
-				std::cout << "First time after index found " << std::endl;
 				client.openFile(res, file_path);
 				client.setFirstTime(false);
 			}
@@ -34,11 +33,10 @@ bool default_index(response &res, client &client, locationconfig loc, std::strin
 			return true;
 		}
 	}
-	std::cout << "No index found" << std::endl;
 	return false;
 }
 
-bool is_dir(std::string path)
+bool is_dir(std::string& path)
 {
 	struct stat s;
 	if (stat(path.c_str(), &s) == 0)
@@ -51,7 +49,7 @@ bool is_dir(std::string path)
 	return false;
 }
 
-bool is_file(std::string path)
+bool is_file(std::string& path)
 {
 	struct stat s;
 	if (stat(path.c_str(), &s) == 0)

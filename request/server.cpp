@@ -6,32 +6,15 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/01 22:15:14 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/02 09:24:31 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
-server::server(std::vector<std::string> &ports_, std::vector<serverconfig> &servers) : ports(ports_), hosts(servers) {}
+server::server(std::vector<std::string>& ports_, std::vector<serverconfig>& servers) : ports(ports_), hosts(servers) {}
 
-server::server(const server &other)
-{
-	*this = other;
-}
-
-server &server::operator=(const server &other)
-{
-	if (this != &other)
-	{
-		ports = other.ports;
-		listners = other.listners;
-		hosts = other.hosts;
-		clients = other.clients;
-	}
-	return *this;
-}
-
-std::pair<int, std::string> server::createBindListen(std::string port)
+std::pair<int, std::string> server::createBindListen(std::string& port)
 {
 	struct addrinfo hints, *res, *p;
 	int yes = 1;
@@ -84,7 +67,6 @@ void server::start()
 		int maxSocket = std::max_element(listners.begin(), listners.end())->first;
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) // Add client sockets to read_fds and write_fds
 		{
-			// std::cout << "client " << c->getSocket() << " rcv " << c->rcv << std::endl;
 			if (c->rcv < 4 && c->rcv >= 0)
 				FD_SET(c->getSocket(), &read_fds);
 			if (c->rcv==4)
@@ -129,11 +111,9 @@ void server::start()
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
 				// char	buf[100000];
-				std::vector<char> buf(100000);
+				std::vector<char> buf(1024);
 				// memset(buf, 0, sizeof buf);
 				int	r = recv(c->getSocket(), &buf[0], sizeof(buf), 0);
-				std::string s(buf.begin(), buf.begin() + r);
-				//std::cout << "received " << r << " bytes from " << c->getSocket() << " : " << s << std::endl;
 				//add a timout here to close the socket if no data is received
 				//add a smaller timout to assume that the request is finished if no data is received and rcv == 1
 				if (r <= 0)
@@ -143,6 +123,7 @@ void server::start()
 					FD_CLR(c->getSocket(), &read_fds);
 					FD_CLR(c->getSocket(), &write_fds);
 					clients.erase(c);
+					break ;
 				}
 				else if (c->rcv != 4)
 				{
@@ -158,22 +139,21 @@ void server::start()
 					}
 				}
 			}
-			else if (FD_ISSET(c->getSocket(), &write_fds))
+			if (FD_ISSET(c->getSocket(), &write_fds))
 			{
 				bool firstime = c->getFirstTime();
 				if (firstime)
 				{
+					//c->matchHost(this->hosts);
 					c->matchHost(this->hosts);
+					c->setRes(response(c->getValue("Method")));
 					// c->printAttr();
-					// std::cout << "sending response" << std::endl;
 					// std::cout << "error : " << c->getError() << std::endl;
 					// std::cout << "path target :" << c->getValue("URL") << std::endl;
 				}
-				response res(c->getValue("Method"));
-				std::string response;
 				int toSend = 0;
 				if (c->getValue("Method") == "GET")
-					response = res.get_response(*c);
+					c->getRes().get_response(*c);
 				// if (firstime)
 				// {
 				// 	std::cout << "header size : " << response.size() << std::endl;
@@ -190,29 +170,31 @@ void server::start()
 				{
 					// std::cout << "to send : " << toSend << std::endl;
 					// std::cout << "response size : " << response.size() << std::endl;
-					int bytes = send(c->getSocket(), response.c_str(), toSend, 0);
+					int bytes = send(c->getSocket(), c->getBuff().c_str(), toSend, 0);
 					// std::cout << "sent " << bytes << " bytes" << std::endl;
 					c->snd += bytes;
 					toSend -= bytes;
 					// std::cout << "snd " << c->snd << std::endl;
 					if (bytes == -1)
 					{
-						// perror("send failed");
+						//std::cout << "closing socket " << c->getSocket() << std::endl;
+						close(c->getSocket());
+						FD_CLR(c->getSocket(), &read_fds);
+						FD_CLR(c->getSocket(), &write_fds);
+						clients.erase(c);
 						break;
 					}
 				}
 				if (c->getIsSent() == 1)
 				{
 					// std::cout << "target == " << c->getValue("URL") << std::endl;
-					// std::cout << "sendeed == " << c->snd << std::endl;
 					c->resetClient();
 					c->snd = 0;
-					res.clear();
-					continue;
+					break ;
 				}
 				c->setSentBytes(0);
 				// std::cout << c->getIsSent() << std::endl;
-				res.clear();
+				c->getRes().clear();
 			}
 		}
 	}

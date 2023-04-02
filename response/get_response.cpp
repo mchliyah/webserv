@@ -1,7 +1,7 @@
 
 #include "../includes/server.hpp"
 
-std::string response::get_response(client& client) {
+void response::get_response(client& client) {
 	serverconfig server = client.getHost(); 
 	std::string in_path = client.getValue("URL");
 	locationconfig location;
@@ -32,7 +32,8 @@ std::string response::get_response(client& client) {
 				header += "\r\n";
 				client.setIsSent(1);
 				client.setSentBytes(header.size());
-				return (put_response());
+				client.setBuff(header);
+				return ;
 			}
 			if (!default_index(*this, client, location, path) && location.getAutoIndex() == "on")
 			{
@@ -110,5 +111,5 @@ std::string response::get_response(client& client) {
 		client.setSentBytes(header.size() + body.size());
 		client.setIsSent(1);
 	}
-	return put_response();
+	client.setBuff(header + body);
 }
