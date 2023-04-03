@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/02 09:23:05 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 01:46:19 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -324,9 +324,6 @@ bool client::openFile(response &res, std::string& path)
 		res.set_content_type("Content-Type: "+ get_type(path) + " \r\n");
 		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
 			+ res.get_date() +  res.get_content_type() + res.get_content_length());
-		std::vector<std::string>::iterator it;
-		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
-			res.add_to_header(*it);
 		res.add_to_header("\r\n");
 		// std::cout << res.get_content_length() << std::endl;
 		sent_bytes = res.get_header().size();
@@ -341,9 +338,6 @@ bool client::openFile(response &res, std::string& path)
 		res.set_content_type("Content-Type: text/html \r\n");
 		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
 			+ res.get_date() + res.get_content_type() + res.get_content_length());
-		std::vector<std::string>::iterator it;
-		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
-			res.add_to_header(*it);
 		res.add_to_header("\r\n");
 		sent_bytes = res.get_header().size() + res.get_body().size();
 		isSent = 1;

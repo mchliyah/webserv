@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/02 08:07:02 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 01:46:41 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,11 @@ void response::clearall() {
 	body = "";
 	content_length = "";
 	date = "";
-	headers.clear();
 }
 
 void response::clear() {
 	header = "";
 	body = "";
-	headers.clear();
 }
 
 response::response(const std::string& request_type) {
@@ -65,7 +63,6 @@ response &response::operator=(const response &src) {
 		this->body = src.body;
 		this->content_length = src.content_length;
 		this->date = src.date;
-		this->headers = src.headers;
 	}
 	return *this;
 }
@@ -82,8 +79,6 @@ std::string response::get_content() { return header; }
 std::string response::get_content_length() { return content_length; }
 
 std::string response::get_date() { return date; }
-
-std::vector<std::string> response::get_headers() { return headers; }
 
 std::string response::get_body(void ) { return body; }
 

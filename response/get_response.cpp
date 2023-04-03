@@ -21,15 +21,11 @@ void response::get_response(client& client) {
 				std::cout << "in_path "<< in_path << std::endl;
     			status_code = "301";
 				status_message = "Moved Permanently";
-    			headers.push_back("Location: " + in_path + "\r\n");
 				body = "";
 				content_type = "Content-Type: text/html\r\n";
 				content_length = "Content-Length: " + std::to_string(body.length()) + "\r\n";
 				header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n"
-					+ date + content_type + content_length;
-				for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
-					header += *it;
-				header += "\r\n";
+					+ date + content_type + content_length + "Location: " + in_path + "\r\n";
 				client.setIsSent(1);
 				client.setSentBytes(header.size());
 				client.setBuff(header);
@@ -59,9 +55,6 @@ void response::get_response(client& client) {
 					content_length = "Content-Length: " + std::to_string(body.length()) + "\r\n";
 					header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 					header += date +  content_type + content_length;
-					std::vector<std::string>::iterator it;
-					for (it = headers.begin(); it != headers.end(); it++)
-						header += *it;
 					header += "\r\n";
 					client.setSentBytes(body.size() + header.size());
 					client.setIsSent(1);
@@ -88,8 +81,6 @@ void response::get_response(client& client) {
 			content_length = "Content-Length: " + std::to_string(body.size()) + "\r\n"; 
 			header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 			header += date + content_type + content_length;
-			for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
-				header += *it;
 			header += "\r\n";
 			client.setSentBytes(header.size() + body.size());
 			client.setIsSent(1);
@@ -105,8 +96,6 @@ void response::get_response(client& client) {
 		content_length = "Content-Length: " + std::to_string(body.size()) + "\r\n";
 		header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 		header += date + content_type + content_length;
-		for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
-			header += *it;
 		header += "\r\n";
 		client.setSentBytes(header.size() + body.size());
 		client.setIsSent(1);

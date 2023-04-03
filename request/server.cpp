@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/02 09:24:31 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 01:18:13 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,42 +142,39 @@ void server::start()
 			if (FD_ISSET(c->getSocket(), &write_fds))
 			{
 				bool firstime = c->getFirstTime();
-				if (firstime)
+				if (firstime) 
 				{
-					//c->matchHost(this->hosts);
+					//check error code
+					c->getRes().checkError(*c);
 					c->matchHost(this->hosts);
 					c->setRes(response(c->getValue("Method")));
-					// c->printAttr();
-					// std::cout << "error : " << c->getError() << std::endl;
-					// std::cout << "path target :" << c->getValue("URL") << std::endl;
 				}
 				int toSend = 0;
-				if (c->getValue("Method") == "GET")
-					c->getRes().get_response(*c);
-				// if (firstime)
-				// {
-				// 	std::cout << "header size : " << response.size() << std::endl;
-				// }
-				// std::cout << res.get_content_length() << std::endl;
-				// std::cout << "header lenght : " << res.get_header().length() << std::endl;
-				// else if (c->getValue("Method") == "POST")
-				// 	response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
-				// else if (c->getValue("Method") == "DELETE")
-				// 	response = res.delete_response(c->getHost(), c->getValue("Path"));
+				switch (c->getValue("Method")[0])
+				{
+					case 'G':
+						c->getRes().get_response(*c);
+						break;
+					case 'P':
+						c->getRes().post_response(*c);
+						break;
+					case 'D':
+						c->getRes().delete_response(*c);
+						break;
+					default:
+					{
+						std::cout << "Method not supported" << std::endl;
+						break;
+					}
+				}
 				toSend = c->getSentBytes();
-				// std::cout << "to send : " << toSend << std::endl;
 				while (toSend > 0)
 				{
-					// std::cout << "to send : " << toSend << std::endl;
-					// std::cout << "response size : " << response.size() << std::endl;
 					int bytes = send(c->getSocket(), c->getBuff().c_str(), toSend, 0);
-					// std::cout << "sent " << bytes << " bytes" << std::endl;
 					c->snd += bytes;
 					toSend -= bytes;
-					// std::cout << "snd " << c->snd << std::endl;
 					if (bytes == -1)
 					{
-						//std::cout << "closing socket " << c->getSocket() << std::endl;
 						close(c->getSocket());
 						FD_CLR(c->getSocket(), &read_fds);
 						FD_CLR(c->getSocket(), &write_fds);
@@ -187,13 +184,11 @@ void server::start()
 				}
 				if (c->getIsSent() == 1)
 				{
-					// std::cout << "target == " << c->getValue("URL") << std::endl;
 					c->resetClient();
 					c->snd = 0;
 					break ;
 				}
 				c->setSentBytes(0);
-				// std::cout << c->getIsSent() << std::endl;
 				c->getRes().clear();
 			}
 		}

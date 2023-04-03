@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/02 08:15:45 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 01:46:01 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ class response
 		std::string body;
 		std::string content_length;
     	std::string date;
-    	std::vector<std::string> headers;
 	public:
 		response();
 		response(const std::string& request_type);
@@ -58,7 +57,6 @@ class response
 		std::string get_content();
 		std::string get_content_length();
 		std::string get_date();
-		std::vector<std::string> get_headers();
 		void set_header(std::string header);
 		void set_content_type(std::string content_type);
 		void set_content_length(std::string content_length);
@@ -71,8 +69,9 @@ class response
 		void clear_header(void);
 		std::string get_body(void);
 		void get_response(client &client);
-		std::string post_response(serverconfig &server, std::string &path, std::string &body);
-		std::string delete_response(serverconfig &server, std::string &path);
+		void post_response(client& client);
+		void delete_response(client& client);
+		void checkError(client& client);
 		void clear();
 		void clearall();
 };

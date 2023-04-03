@@ -2,20 +2,13 @@
 
 #include "../includes/server.hpp"
 
-std::string response::post_response(serverconfig &server, std::string &path, std::string &body) {
-	(void)server;
-	(void)path;
-	(void)body;
-	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
-	body += "success";
-	content_length += std::to_string(body.length()) + "\r\n";
-	response += date;
-	response += content_type;
-	response += content_length;
-	std::vector<std::string>::iterator it;
-	for (it = headers.begin(); it != headers.end(); it++)
-		response += *it;
-	response += "\r\n";
-	response += body;
-	return response;
+void response::post_response(client& client) {
+
+	header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+	body = "";
+	content_length += std::to_string(body.size()) + "\r\n";
+	header += date + content_type + content_length;
+	client.setIsSent(true);
+	client.setSentBytes(header.size());
+	client.setBuff(header);
 }
