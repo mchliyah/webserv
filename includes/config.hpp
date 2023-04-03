@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 23:58:49 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/02 06:08:06 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 03:21:38 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ class locationconfig
 {
 	std::string loc_name;
 	std::string root;
-	std::string cgipass;
 	std::string cgi_pass;
 	std::string autoindex;
 	std::vector<std::string> index;
@@ -53,8 +52,8 @@ class locationconfig
 		std::string readlocation(std::ifstream& inputFile, std::string line);
 		void printlocation();
 		void setName(std::string name);
-		std::string getRoot() const;
-		std::string getCgiPass() const;
+		std::string& getRoot();
+		std::string& getCgiPass();
 		std::vector<std::string> getIndex() const;
 		std::map<std::string, bool> getAllowsMethod() const;
 		std::string getAutoIndex() const;

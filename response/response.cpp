@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/03 02:30:05 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 05:59:37 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,10 @@ void response::clear() {
 }
 
 response::response(const std::string& request_type) {
-	// std::time_t t = std::time(nullptr);
-	// char buffer[128];
-	// std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
-	// this->date = "Date: " + std::string(buffer) + "\r\n";
-	this->date = "";
+	std::time_t t = std::time(nullptr);
+	char buffer[128];
+	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
+	this->date = "Date: " + std::string(buffer) + "\r\n";
 	if (request_type == "GET") {
 	    status_code = "200";
 	    status_message = "OK";
@@ -47,7 +46,7 @@ response::response(const std::string& request_type) {
 	    status_message = "No Content";
 	}
 	body = "";
-	content_type = "Content-Type: text/plain\r\n";
+	content_type = "Content-Type: text/html\r\n";
 }
 
 response::response(const response &src) {

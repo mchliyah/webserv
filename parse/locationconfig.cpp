@@ -36,7 +36,7 @@ std::string locationconfig::readlocation(std::ifstream& inputFile, std::string l
 			root = value;
 		}
 		else if (key == "cgi_pass") {
-			cgipass = value;
+			cgi_pass = value;
 		}
 		else if (key == "autoindex"){
 			autoindex = value;
@@ -69,7 +69,7 @@ std::string locationconfig::readlocation(std::ifstream& inputFile, std::string l
 
 void locationconfig::printlocation() {
 	std::cout << "	root: " << root << std::endl;
-	std::cout << "	cgi_pass: " << cgipass << std::endl;
+	std::cout << "	cgi_pass: " << cgi_pass << std::endl;
 	std::cout << "	autoindex: " << autoindex << std::endl;
 	std::vector<std::string>::iterator it = index.begin();
 	while (it != index.end())
@@ -94,7 +94,6 @@ locationconfig &locationconfig::operator=(const locationconfig &other) {
 	{
 		this->loc_name = other.loc_name;
 		this->root = other.root;
-		this->cgipass = other.cgipass;
 		this->cgi_pass = other.cgi_pass;
 		this->autoindex = other.autoindex;
 		this->index = other.index;
@@ -106,17 +105,16 @@ locationconfig &locationconfig::operator=(const locationconfig &other) {
 locationconfig::locationconfig() {
 	this->loc_name = "";
 	this->root = "";
-	this->cgipass = "";
 	this->cgi_pass = "";
 	this->autoindex = "";
 }
 
-std::string locationconfig::getRoot() const{
+std::string& locationconfig::getRoot(){
 	return (this->root);
 }
 
-std::string locationconfig::getCgiPass() const{
-	return (this->cgipass);
+std::string& locationconfig::getCgiPass(){
+	return (this->cgi_pass);
 }
 
 std::map<std::string, bool> locationconfig::getAllowsMethod() const{
@@ -142,6 +140,6 @@ locationconfig::~locationconfig() {
 	root.clear();
 	index.clear();
 	allowsmethod.clear();
-	cgipass.clear();
+	cgi_pass.clear();
 	autoindex.clear();
 }

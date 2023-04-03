@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/03 02:29:57 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 06:18:43 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void server::start()
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, &timeout);
-		std::cout << "activity = " << activity << std::endl;
+		// std::cout << "activity = " << activity << std::endl;
 		if (activity == -1)
 		{
 			perror("select error");
@@ -150,9 +150,9 @@ void server::start()
 				if (firstime) 
 				{
 					//check error code
-					c->getRes().checkError(*c);
 					c->matchHost(this->hosts);
 					c->setRes(response(c->getValue("Method")));
+					// c->getRes().checkError(*c);
 				}
 				int toSend = 0;
 				switch (c->getValue("Method")[0])

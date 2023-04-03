@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/03 01:46:01 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 03:23:01 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ class response
 		void post_response(client& client);
 		void delete_response(client& client);
 		void checkError(client& client);
+		void cgi_response(client& client);
 		void clear();
 		void clearall();
 };

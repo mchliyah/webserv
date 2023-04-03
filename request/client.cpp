@@ -6,13 +6,13 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/03 02:29:43 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 06:52:06 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), rcv(0)
+client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), bodyname(""), rcv(0)
 {
 	snd = 0;
 }
@@ -70,6 +70,7 @@ void client::resetClient()
 	this->first_time = true;
 	this->snd = 0;
 	this->sent_bytes = 0;
+	bodyname = "";
 	if (this->file.is_open())
 		this->file.close();
 	res.clearall();
@@ -162,10 +163,10 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 	static std::string chunked = "";
 	std::ofstream file;
 	stream << socket_fd;
-	std::string filename = "body" + stream.str() + ".txt";
+	bodyname = "body" + stream.str();
 	if (rcv == 2)//first time
 	{
-		file.open(filename, std::ios::out | std::ios::trunc);
+		file.open(bodyname, std::ios::out | std::ios::trunc);
 		file.close();
 	}
 	if (http_request["Transfer-Encoding"] == "chunked")
@@ -196,7 +197,7 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 		}
 		else
 		{
-			file.open(filename, std::ios::app);
+			file.open(bodyname, std::ios::app);
 			size_t l = length;
 			size_t i = 0;
 			for (;i < found  && i < chunked.length() && i < l; i++)
@@ -214,7 +215,7 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 	}
 	else if (http_request["Content-Length"] != "")
 	{
-		file.open("body" + stream.str() + ".txt", std::ios::app);
+		file.open("body" + stream.str(), std::ios::app);
 		file.seekp(0, std::ios::end);
 		std::streampos size = file.tellp();
 		std::string length = http_request["Content-Length"];
@@ -417,3 +418,4 @@ response& client::getRes(void) { return (res); }
 std::string& client::getRequest(void) { return (request); }
 std::map<std::string, std::string>& client::getHttpRequest(void) { return (http_request); }
 int& client::getRcv(void) { return (rcv); }
+std::string& client::getBodyname() {return bodyname;}
