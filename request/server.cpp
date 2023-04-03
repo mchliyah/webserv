@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/03 01:18:13 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 02:29:57 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,9 +75,10 @@ void server::start()
 				maxSocket = c->getSocket();
 		}
 		struct timeval timeout;
-		timeout.tv_sec = 1;
+		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, &timeout);
+		std::cout << "activity = " << activity << std::endl;
 		if (activity == -1)
 		{
 			perror("select error");
@@ -97,6 +98,10 @@ void server::start()
 				}
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
 				fcntl(newSocket, F_SETFL, O_NONBLOCK);
+				struct timeval tv;
+				tv.tv_sec = 1;  // 5 seconds timeout
+				tv.tv_usec = 0;
+				setsockopt(newSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 				client c(newSocket, listner->second);
 				clients.push_back(c);
 			}
@@ -110,10 +115,10 @@ void server::start()
 			}
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
-				// char	buf[100000];
-				std::vector<char> buf(1024);
-				// memset(buf, 0, sizeof buf);
-				int	r = recv(c->getSocket(), &buf[0], sizeof(buf), 0);
+				char	buf[100000];
+				//std::vector<char> buf(1024);
+				memset(buf, 0, sizeof buf);
+				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
 				//add a timout here to close the socket if no data is received
 				//add a smaller timout to assume that the request is finished if no data is received and rcv == 1
 				if (r <= 0)
@@ -127,7 +132,7 @@ void server::start()
 				}
 				else if (c->rcv != 4)
 				{
-					std::string buff(buf.begin(), buf.begin() + r);
+					std::string buff(buf, buf + r);
 					if (c->rcv == 0)
 						c->addToRequestCheck(buff);
 					else

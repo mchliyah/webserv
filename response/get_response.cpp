@@ -16,9 +16,7 @@ void response::get_response(client& client) {
 		{
 			if (file_path[file_path.length() - 1] != '/')
 			{
-				std::cout << "redirect" << std::endl;
 				in_path += "/";
-				std::cout << "in_path "<< in_path << std::endl;
     			status_code = "301";
 				status_message = "Moved Permanently";
 				body = "";
@@ -73,7 +71,6 @@ void response::get_response(client& client) {
 		}
 		else
 		{
-			std::cout << "no permission" << std::endl;
 			status_code = "403";
 			status_message = "Forbidden";
 			content_type = "Content-Type: text/html\r\n";
@@ -88,7 +85,6 @@ void response::get_response(client& client) {
 	}
 	else
 	{
-		std::cout << "no file or directory" << std::endl;
 		status_code = "404";
 		status_message = "Not Found";
 		content_type = "Content-Type: text/html\r\n";

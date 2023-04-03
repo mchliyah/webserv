@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/03 01:46:19 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/03 02:29:43 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ void client::resetClient()
 	this->http_request.clear();
 	this->isSent = 0;
 	this->rcv = 0;
+	this->query = "";
 	this->first_time = true;
 	this->snd = 0;
 	this->sent_bytes = 0;
@@ -79,7 +80,7 @@ void client::makeError(int err, const std::string& msg)
 	err_message = msg;
 	rcv = 4;
 }
-int	client::checkMethod()
+int	client::checkMethod_URL()
 {
 	bool	found = 0;
 	std::string	methods[3] = {"GET", "POST", "DELETE"};
@@ -91,6 +92,12 @@ int	client::checkMethod()
 	{
 		makeError(405, "Bad Request: Method Not supported");
 		return (1);
+	}
+	size_t pos = getValue("URL").find("?");
+	if (pos != std::string::npos)
+	{
+		http_request["URL"] = getValue("URL").substr(0, pos);
+		query = getValue("URL").substr(pos + 1);
 	}
 	return (0);
 }
@@ -127,7 +134,7 @@ int	client::parseRequestLine(std::string first_line)
 		last = pos + 1;
 	}
 	http_request["version"] = first_line.substr(pos + 1);
-	if (checkMethod())
+	if (checkMethod_URL())
 		return (1);
 	return 0;
 }
@@ -142,7 +149,10 @@ void client::parseHeader(std::string& header)
 	if (pos + 1 < header.size() && header[pos + 1] == ' ')
 		pos++;
 	value = header.substr(pos + 1);
-	http_request[key] = value;
+	if (key == "Cookie" && http_request[key] != "")
+		value = http_request[key] + "; " + value;
+	else
+		http_request[key] = value;
 }
 void client::addToBody(std::string& body)//MAKE IT RETURN 
 {
@@ -399,6 +409,7 @@ void client::addToRequestCheck(std::string& buff)
 			rcv = 4;
 	}
 }
+std::string client::getQuery()const {return query;}
 
 void client::setRes(const response &response) { this->res = response; }
 
@@ -406,4 +417,3 @@ response& client::getRes(void) { return (res); }
 std::string& client::getRequest(void) { return (request); }
 std::map<std::string, std::string>& client::getHttpRequest(void) { return (http_request); }
 int& client::getRcv(void) { return (rcv); }
-
