@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+         #
+#    By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/03/29 06:55:22 by slahrach         ###   ########.fr        #
+#    Updated: 2023/04/02 08:16:04 by mchliyah         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = server
 
-CC = c++
+CC = g++
 
 CFLAGS = -Wall -Wextra -Werror
 
@@ -31,7 +31,7 @@ OBJECTS = $(FILES:.cpp=.o)
 all : $(NAME)
 
 $(NAME) :  $(OBJECTS)
-	$(CC) $(CFLAGS) $(STDFLAGS) $(OBJECTS) -o $(NAME) #-fsanitize=address 
+	$(CC)   $(OBJECTS) -o $(NAME) #-fsanitize=address 
 
 
 clean :

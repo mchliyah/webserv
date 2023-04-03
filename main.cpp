@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/29 06:54:53 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/02 05:13:42 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 	// 		std::cout << " ====================================== "<< std::endl;
 	// 		it++;
 	// 	}
-		
+		std::cout << std::endl << std::endl;
 		std::vector<serverconfig>::iterator it1;
 		for (it1 = servers.begin(); it1 != servers.end(); it1++)
 		{

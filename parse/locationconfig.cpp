@@ -85,12 +85,30 @@ void locationconfig::printlocation() {
 	}
 }
 
+locationconfig::locationconfig(const locationconfig &other) {
+	*this = other;
+}
+
+locationconfig &locationconfig::operator=(const locationconfig &other) {
+	if (this != &other)
+	{
+		this->loc_name = other.loc_name;
+		this->root = other.root;
+		this->cgipass = other.cgipass;
+		this->cgi_pass = other.cgi_pass;
+		this->autoindex = other.autoindex;
+		this->index = other.index;
+		this->allowsmethod = other.allowsmethod;
+	}
+	return (*this);
+}
+
 locationconfig::locationconfig() {
-	root.clear();
-	index.clear();
-	allowsmethod.clear();
-	cgipass.clear();
-	autoindex.clear();
+	this->loc_name = "";
+	this->root = "";
+	this->cgipass = "";
+	this->cgi_pass = "";
+	this->autoindex = "";
 }
 
 std::string locationconfig::getRoot() const{

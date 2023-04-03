@@ -4,3 +4,5 @@
 server
 .DS_Store
 .vscode
+out
+body*

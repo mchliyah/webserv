@@ -1,7 +1,7 @@
 
 #include "../includes/server.hpp"
 
-std::string response::get_response(client& client) {
+void response::get_response(client& client) {
 	serverconfig server = client.getHost(); 
 	std::string in_path = client.getValue("URL");
 	locationconfig location;
@@ -18,7 +18,7 @@ std::string response::get_response(client& client) {
 			{
 				in_path += "/";
     			status_code = "301";
-				status_message = "OK";
+				status_message = "Moved Permanently";
     			headers.push_back("Location: " + in_path + "\r\n");
 				body = "";
 				content_type = "Content-Type: text/html\r\n";
@@ -29,7 +29,9 @@ std::string response::get_response(client& client) {
 					header += *it;
 				header += "\r\n";
 				client.setIsSent(1);
-				return (put_response());
+				client.setSentBytes(header.size());
+				client.setBuff(header);
+				return ;
 			}
 			if (!default_index(*this, client, location, path) && location.getAutoIndex() == "on")
 			{
@@ -59,6 +61,7 @@ std::string response::get_response(client& client) {
 					for (it = headers.begin(); it != headers.end(); it++)
 						header += *it;
 					header += "\r\n";
+					client.setSentBytes(body.size() + header.size());
 					client.setIsSent(1);
 				}
 			}
@@ -79,12 +82,13 @@ std::string response::get_response(client& client) {
 			status_message = "Forbidden";
 			content_type = "Content-Type: text/html\r\n";
 			body = "<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>";
-			content_length = "Content-Length: " + std::to_string(body.length()) + "\r\n"; 
+			content_length = "Content-Length: " + std::to_string(body.size()) + "\r\n"; 
 			header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 			header += date + content_type + content_length;
 			for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
 				header += *it;
 			header += "\r\n";
+			client.setSentBytes(header.size() + body.size());
 			client.setIsSent(1);
 		}
 	}
@@ -94,13 +98,14 @@ std::string response::get_response(client& client) {
 		status_message = "Not Found";
 		content_type = "Content-Type: text/html\r\n";
 		body = "<!DOCTYPE html><html><head>404 Not Found</head><body><p>no file or directory</p></body></html>";
-		content_length = "Content-Length: " + std::to_string(body.length()) + "\r\n";
+		content_length = "Content-Length: " + std::to_string(body.size()) + "\r\n";
 		header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 		header += date + content_type + content_length;
 		for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
 			header += *it;
 		header += "\r\n";
+		client.setSentBytes(header.size() + body.size());
 		client.setIsSent(1);
 	}
-	return put_response();
+	client.setBuff(header + body);
 }

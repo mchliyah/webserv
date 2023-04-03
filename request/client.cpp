@@ -6,20 +6,57 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/03/30 06:27:45 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/03 02:05:34 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(0), first_time(true), err_message(""), rcv(0)
+client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), rcv(0)
+{
+	snd = 0;
+}
+
+client::client(const client& other) : request(other.request), port(other.port), socket_fd(other.socket_fd), isSent(other.isSent), error(other.error), first_time(other.first_time), err_message(other.err_message), http_request(other.http_request), host(other.host), sent_bytes(other.sent_bytes), res(other.res), rcv(other.rcv), snd(other.snd)
 {
 }
+
+void client::setBuff(std::string buff_)
+{
+	buff = buff_;
+}
+
+std::string& client::getBuff()
+{
+	return buff;
+}
+
+client& client::operator=(const client& other)
+{
+	if (this != &other)
+	{
+		this->request = other.request;
+		this->port = other.port;
+		this->socket_fd = other.socket_fd;
+		this->isSent = other.isSent;
+		this->error = other.error;
+		this->first_time = other.first_time;
+		this->err_message = other.err_message;
+		this->http_request = other.http_request;
+		this->host = other.host;
+		this->sent_bytes = other.sent_bytes;
+		this->res = other.res;
+		this->rcv = other.rcv;
+		this->snd = other.snd;
+	}
+	return (*this);
+}
+
 client::~client(){}
 //getters & setters
-int client::getSocket() const {return socket_fd;}
-std::string client::getPort() const {return port;}
-bool client::getIsSent() const {return isSent;}
+int& client::getSocket() {return socket_fd;}
+std::string& client::getPort() {return port;}
+bool& client::getIsSent() {return isSent;}
 void client::setIsSent(bool b) {isSent = b;}
 void client::resetClient()
 {
@@ -30,6 +67,12 @@ void client::resetClient()
 	this->isSent = 0;
 	this->rcv = 0;
 	this->query = "";
+	this->first_time = true;
+	this->snd = 0;
+	this->sent_bytes = 0;
+	if (this->file.is_open())
+		this->file.close();
+	res.clearall();
 }
 void client::makeError(int err, const std::string& msg)
 {
@@ -95,7 +138,7 @@ int	client::parseRequestLine(std::string first_line)
 		return (1);
 	return 0;
 }
-void client::parseHeader(std::string header)
+void client::parseHeader(std::string& header)
 {
 	std::string	key = "";
 	std::string	value = "";
@@ -111,7 +154,7 @@ void client::parseHeader(std::string header)
 	else
 		http_request[key] = value;
 }
-void client::addToBody(std::string body)//MAKE IT RETURN 
+void client::addToBody(std::string& body)//MAKE IT RETURN 
 {
 	std::stringstream stream;
 	static bool chunking_track = 0;
@@ -221,14 +264,11 @@ void client::parse()
 	}
 	checkMandatoryElements();
 }
-std::string&	client::getValue(const std::string& key)
-{
-	return (http_request[key]);
-}
+std::string&	client::getValue(const std::string& key) { return (http_request[key]); }
 
-int client::getError() const {return error;}
+int& client::getError() {return error;}
 
-std::string client::getErrorMessage() const {return err_message;}
+std::string& client::getErrorMessage() {return err_message;}
 
 int client::checkMandatoryElements()
 {
@@ -239,76 +279,83 @@ int client::checkMandatoryElements()
 	}
 	return (0);
 }
+
 struct compare
 {
 	std::string name;
-	client c;
-	compare(std::string my_, client c_): name(my_), c(c_) {}
+	std::string port;
+	compare(std::string my_, std::string port_): name(my_), port(port_) {}
  
-	bool operator()(serverconfig s) {
+	bool operator()(serverconfig& s) {
 		if (name != "")
-			return (s.getServerName() == name && s.getListen() == c.getPort());
+			return (s.getServerName() == name && s.getListen() == port);
 		else
-			return s.getListen() == c.getPort();
+			return s.getListen() == port;
 	}
 };
 
-void client::matchHost(std::vector<serverconfig> hosts)
+void client::matchHost(std::vector<serverconfig>& hosts)
 {
 	std::string name = http_request["Host"];
 	size_t f = name.find(":");
 	if (f != std::string::npos)
 		name = name.substr(0, f);
-	std::vector<serverconfig>::iterator s = std::find_if(hosts.begin(), hosts.end(), compare(name, *this));
+	std::vector<serverconfig>::iterator s = std::find_if(hosts.begin(), hosts.end(), compare(name, port));
 	if (s != hosts.end())
+	{
 		host = *s;
+	}
 	else
-		host = *(std::find_if(hosts.begin(), hosts.end(), compare("", *this)));
+		host = *(std::find_if(hosts.begin(), hosts.end(), compare("", port)));
 }
 
-serverconfig& client::getHost(void)
-{
-	return (this->host);
-}
+serverconfig& client::getHost(void) { return (this->host); }
 
 void client::setFirstTime(bool b) {first_time = b;}
 
 bool& client::getFirstTime() {return first_time;}
 
-size_t client::getSentBytes() const {return sent_bytes;}
+size_t& client::getSentBytes() {return sent_bytes;}
 
 void client::setSentBytes(size_t sent_bytes) {this->sent_bytes = sent_bytes;}
 
+
 bool client::openFile(response &res, std::string& path)
 {
-	file.open(path.c_str());
+	if (file.is_open())
+		file.close();
+	file.open(path.c_str(), std::ios::in | std::ios::binary);
 	struct stat buf;
-	std::cout << "path: " << path << std::endl;
+	std::stringstream stream;
 	if (file.is_open() && stat(path.c_str(), &buf) == 0)
 	{
-		res.set_content_length("Content-Length: " + std::to_string(buf.st_size + 4) + "\r\n");
-		res.set_status_code("200");
-		res.set_content_type("Content-Type: text/html \r\n");
+		stream << buf.st_size;
+		res.set_content_length("Content-Length: " + stream.str() + "\r\n");
+		res.set_content_type("Content-Type: "+ get_type(path) + " \r\n");
 		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
-			+ res.get_date() +  res.get_content_type() + res.get_content_length() + "\r\n");
+			+ res.get_date() +  res.get_content_type() + res.get_content_length());
 		std::vector<std::string>::iterator it;
 		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
 			res.add_to_header(*it);
 		res.add_to_header("\r\n");
+		// std::cout << res.get_content_length() << std::endl;
+		sent_bytes = res.get_header().size();
 	}
 	else
 	{
 		res.set_body("<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>");
-		res.set_content_length("Content-Length: " + std::to_string(res.get_body().size() + 4) + "\r\n");
+		stream << res.get_body().size();
+		res.set_content_length("Content-Length: " + stream.str() + "\r\n");
 		res.set_status_code("404");
 		res.set_status_message("Not Found");
 		res.set_content_type("Content-Type: text/html \r\n");
 		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
-			+ res.get_date() + res.get_content_type() + res.get_content_length() + "\r\n");
+			+ res.get_date() + res.get_content_type() + res.get_content_length());
 		std::vector<std::string>::iterator it;
 		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
 			res.add_to_header(*it);
 		res.add_to_header("\r\n");
+		sent_bytes = res.get_header().size() + res.get_body().size();
 		isSent = 1;
 		return (false);
 	}
@@ -317,15 +364,16 @@ bool client::openFile(response &res, std::string& path)
 
 bool client::readFile(response &res)
 {
-	char buff[BUF_SIZE + 1] = {0};
-	if (!file.eof())
+	std::vector<char> buff(BUF_SIZE);
+	if (!file.eof() && file.is_open())
 	{
-		res.get_body().clear();
-		file.read(buff, BUF_SIZE);
-		std::cout << " ====================file.gcount(): " << file.gcount() << std::endl;
+		res.set_body("");
+		file.read(&buff[0], BUF_SIZE);
+		// std::cout << "read " << file.gcount() << " bytes" << std::endl;
 		if (file.gcount() == 0)
 			return (false);
-		res.set_body(res.get_body().append(buff, 0, file.gcount()));
+		res.set_body(std::string(buff.begin(), buff.begin() + file.gcount()));
+		sent_bytes = file.gcount();
 	}
 	else 
 	{
@@ -338,26 +386,8 @@ bool client::readFile(response &res)
 	return (true);
 }
 
-client::client(const client &other) { *this = other; }
 
-client& client::operator=(const client &other)
-{
-	if (this != &other)
-	{
-		this->request = other.request;
-		this->port = other.port;
-		this->socket_fd = other.socket_fd;
-		this->isSent = other.isSent;
-		this->error = other.error;
-		this->first_time = other.first_time;
-		this->err_message = other.err_message;
-		this->http_request = other.http_request;
-		this->host = other.host;
-		this->sent_bytes = other.sent_bytes;
-	}
-	return (*this);
-}
-void client::addToRequestCheck(std::string buff)
+void client::addToRequestCheck(std::string& buff)
 {
 	std::string rest = "";
 	request += buff;
@@ -386,3 +416,10 @@ void client::addToRequestCheck(std::string buff)
 	}
 }
 std::string client::getQuery()const {return query;}
+
+void client::setRes(const response &response) { this->res = response; }
+
+response& client::getRes(void) { return (res); }
+std::string& client::getRequest(void) { return (request); }
+std::map<std::string, std::string>& client::getHttpRequest(void) { return (http_request); }
+int& client::getRcv(void) { return (rcv); }

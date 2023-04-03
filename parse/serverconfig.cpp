@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/26 04:15:48 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/02 07:37:20 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,20 @@ std::map<std::string, locationconfig> serverconfig::getLocations() const {
 	return (this->locations);
 }
 
-// serverconfig serverconfig::getServers() const {
-// 	return (*this);
-// }
+serverconfig::serverconfig(const serverconfig &src) {
+	*this = src;
+}
+
+serverconfig &serverconfig::operator=(const serverconfig &src) {
+	if (this == &src)
+		return (*this);
+	this->server_name = src.server_name;
+	this->listen = src.listen;
+	this->maxclientboddysize = src.maxclientboddysize;
+	this->errorpages = src.errorpages;
+	this->locations = src.locations;
+	return (*this);
+}
 
 std::string serverconfig::readServer(std::ifstream& inputFile, std::string line) {
 	std::string key, value;
@@ -134,11 +145,9 @@ void serverconfig::printServer() {
 }
 
 serverconfig::serverconfig() {
-	server_name.clear();
-	listen.clear();
-	maxclientboddysize.clear();
-	errorpages.clear();
-	locations.clear();
+	server_name = "";
+	listen = "";
+	maxclientboddysize = "";
 }
 
 serverconfig::~serverconfig() {

@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/28 08:12:01 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/02 08:15:45 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,10 @@ class response
     	std::string date;
     	std::vector<std::string> headers;
 	public:
+		response();
 		response(const std::string& request_type);
+		response(const response &src);
+		response &operator=(const response &src);
 		~response();
 		std::string get_status_code();
 		std::string get_status_message();
@@ -66,16 +69,17 @@ class response
 		void add_to_header(std::string header);
 		std::string get_header(void) const;
 		void clear_header(void);
-		std::string get_body(void) const;
-		std::string get_response(client &client);
+		std::string get_body(void);
+		void get_response(client &client);
 		std::string post_response(serverconfig &server, std::string &path, std::string &body);
 		std::string delete_response(serverconfig &server, std::string &path);
-		std::string put_response(void);
+		void clear();
+		void clearall();
 };
 
-bool is_dir(std::string path);
-bool is_file(std::string path);
-bool default_index(response &res, client &client, locationconfig loc, std::string path);
+bool is_dir(std::string& path);
+bool is_file(std::string& path);
+bool default_index(response &res, client &client, locationconfig& loc, std::string& path);
 locationconfig matchlocation(serverconfig &server, std::string &path);
 
 #endif

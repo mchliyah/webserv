@@ -6,17 +6,38 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/03/30 06:15:38 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/03 02:11:26 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
+response::response() {
+}
+
+void response::clearall() {
+	status_code = "";
+	status_message = "";
+	content_type = "";
+	header = "";
+	body = "";
+	content_length = "";
+	date = "";
+	headers.clear();
+}
+
+void response::clear() {
+	header = "";
+	body = "";
+	headers.clear();
+}
+
 response::response(const std::string& request_type) {
-	std::time_t t = std::time(nullptr);
-	char buffer[128];
-	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
-	this->date = "Date: " + std::string(buffer) + "\r\n";
+	// std::time_t t = std::time(nullptr);
+	// char buffer[128];
+	// std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
+	// this->date = "Date: " + std::string(buffer) + "\r\n";
+	this->date = "";
 	if (request_type == "GET") {
 	    status_code = "200";
 	    status_message = "OK";
@@ -29,16 +50,26 @@ response::response(const std::string& request_type) {
 	}
 	body = "";
 	content_type = "Content-Type: text/plain\r\n";
-	content_length = "Content-Length: ";
 }
 
-std::string response::put_response(void)
-{
-	std::string response;
-	response += header;
-	response += body;
-	return response;
+response::response(const response &src) {
+	*this = src;
 }
+
+response &response::operator=(const response &src) {
+	if (this != &src) {
+		this->status_code = src.status_code;
+		this->status_message = src.status_message;
+		this->content_type = src.content_type;
+		this->header = src.header;
+		this->body = src.body;
+		this->content_length = src.content_length;
+		this->date = src.date;
+		this->headers = src.headers;
+	}
+	return *this;
+}
+
 
 std::string response::get_status_code() { return status_code; }
 
@@ -54,7 +85,7 @@ std::string response::get_date() { return date; }
 
 std::vector<std::string> response::get_headers() { return headers; }
 
-std::string response::get_body(void ) const { return body; }
+std::string response::get_body(void ) { return body; }
 
 void response::set_body(std::string body) { this->body = body; }
 
@@ -75,4 +106,6 @@ void response::clear_header(void) { this->header = ""; }
 std::string response::get_header(void) const { return (this->header); }
 
 
-response::~response() { }
+response::~response() { 
+	
+}
