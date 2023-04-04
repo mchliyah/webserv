@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 23:58:49 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/03 03:21:38 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/04 04:47:57 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class locationconfig
 	std::string root;
 	std::string cgi_pass;
 	std::string autoindex;
+	std::string upload_store;
 	std::vector<std::string> index;
 	std::map<std::string, bool> allowsmethod;
 
@@ -58,6 +59,7 @@ class locationconfig
 		std::map<std::string, bool> getAllowsMethod() const;
 		std::string getAutoIndex() const;
 		std::string getName() const;
+		std::string getUploadStore() const;
 };
 
 class serverconfig
