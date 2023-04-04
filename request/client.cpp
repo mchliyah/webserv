@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/03 06:52:06 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/04 09:47:53 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -355,6 +355,22 @@ bool client::openFile(response &res, std::string& path)
 		return (false);
 	}
 	return (true);
+	// if (file.is_open() && stat(path.c_str(), &buf) == 0)
+	// {
+	// 	stream << buf.st_size;
+	// 	res.set_content_length("Content-Length: " + stream.str() + "\r\n");
+	// 	res.set_content_type("Content-Type: "+ get_type(path) + " \r\n");
+	// }
+	// else
+	// {
+	// 	res.set_body("<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>");
+	// 	stream << res.get_body().size();
+	// 	res.set_content_length("Content-Length: " + stream.str() + "\r\n");
+	// 	res.set_status_code("404");
+	// 	res.set_status_message("Not Found");
+	// 	res.set_content_type("Content-Type: text/html \r\n");
+	// 	isSent = 1;
+	// }
 }
 
 bool client::readFile(response &res)
@@ -379,6 +395,20 @@ bool client::readFile(response &res)
 		return (false);
 	}
 	return (true);
+	// if (!file.eof() && file.is_open())
+	// {
+	// 	res.set_body("");
+	// 	file.read(&buff[0], BUF_SIZE);
+	// 	res.set_body(std::string(buff.begin(), buff.begin() + file.gcount()));
+	// 	sent_bytes = file.gcount();
+	// }
+	// else 
+	// {
+	// 	setFirstTime(true);
+	// 	setIsSent(1);
+	// 	file.close();
+	// 	res.get_body().clear();
+	// }
 }
 
 

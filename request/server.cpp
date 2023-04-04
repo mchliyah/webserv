@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/04 05:27:19 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/04 09:49:32 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,6 +154,7 @@ void server::start()
 					// c->getRes().checkError(*c);
 				}
 				int toSend = 0;
+				// c->getRes().get_response(*c);
 				switch (c->getValue("Method")[0])
 				{
 					case 'G':
