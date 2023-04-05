@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/03 02:05:34 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/04 07:01:08 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 	static std::string chunked = "";
 	std::ofstream file;
 	stream << socket_fd;
-	std::string filename = "body" + stream.str() + ".txt";
+	std::string filename = "body" + stream.str();
 	if (rcv == 2)//first time
 	{
 		file.open(filename, std::ios::out | std::ios::trunc);
@@ -214,7 +214,7 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 	}
 	else if (http_request["Content-Length"] != "")
 	{
-		file.open("body" + stream.str() + ".txt", std::ios::app);
+		file.open("body" + stream.str(), std::ios::app);
 		file.seekp(0, std::ios::end);
 		std::streampos size = file.tellp();
 		std::string length = http_request["Content-Length"];
