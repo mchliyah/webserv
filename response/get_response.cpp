@@ -11,17 +11,7 @@ void response::get_response(client& client) {
 	std::string file_path = location.getRoot() + path;
 	std::string rederec_header = "";
 	std::stringstream stream;
-	if (client.getValue("body") == "present")
-	{
-		std::remove(client.getBodyname().c_str());
-		status_code = "400";
-		status_message = "Bad Request";
-		content_type = "Content-Type: text/html\r\n";
-		stream << body.length();
-		content_length = "Content-Length: " + stream.str() + "\r\n";
-		client.setIsSent(1);
-	}
-	else if (access(file_path.c_str(), F_OK) != -1)
+	if (access(file_path.c_str(), F_OK) != -1)
 	{
 		if (is_dir(file_path))
 		{
