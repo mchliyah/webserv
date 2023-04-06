@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/03 02:14:54 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/06 05:26:26 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ private:
 	size_t sent_bytes;
 	response res;
 	std::string buff;
+	std::string bodyname;
 public:
 	int	rcv;
 	int	snd;
@@ -80,6 +81,9 @@ public:
 	std::map<std::string, std::string>& getHttpRequest();
 	void setBuff(std::string buff);
 	std::string& getBuff();
+	std::string& getBodyname();
+	void errorResponse(response &res);
+	void defaultResponse(response &res);
 	~client();
 };
 std::string get_type(const std::string& path);

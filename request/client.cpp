@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/03 02:05:34 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/06 00:31:28 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), rcv(0)
+client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), bodyname(""), rcv(0)
 {
 	snd = 0;
 }
@@ -70,6 +70,7 @@ void client::resetClient()
 	this->first_time = true;
 	this->snd = 0;
 	this->sent_bytes = 0;
+	bodyname = "";
 	if (this->file.is_open())
 		this->file.close();
 	res.clearall();
@@ -162,10 +163,10 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 	static std::string chunked = "";
 	std::ofstream file;
 	stream << socket_fd;
-	std::string filename = "body" + stream.str() + ".txt";
+	bodyname = "body" + stream.str();
 	if (rcv == 2)//first time
 	{
-		file.open(filename, std::ios::out | std::ios::trunc);
+		file.open(bodyname, std::ios::out | std::ios::trunc);
 		file.close();
 	}
 	if (http_request["Transfer-Encoding"] == "chunked")
@@ -196,7 +197,7 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 		}
 		else
 		{
-			file.open(filename, std::ios::app);
+			file.open(bodyname, std::ios::app);
 			size_t l = length;
 			size_t i = 0;
 			for (;i < found  && i < chunked.length() && i < l; i++)
@@ -214,7 +215,7 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 	}
 	else if (http_request["Content-Length"] != "")
 	{
-		file.open("body" + stream.str() + ".txt", std::ios::app);
+		file.open("body" + stream.str(), std::ios::app);
 		file.seekp(0, std::ios::end);
 		std::streampos size = file.tellp();
 		std::string length = http_request["Content-Length"];
@@ -319,74 +320,6 @@ size_t& client::getSentBytes() {return sent_bytes;}
 
 void client::setSentBytes(size_t sent_bytes) {this->sent_bytes = sent_bytes;}
 
-
-bool client::openFile(response &res, std::string& path)
-{
-	if (file.is_open())
-		file.close();
-	file.open(path.c_str(), std::ios::in | std::ios::binary);
-	struct stat buf;
-	std::stringstream stream;
-	if (file.is_open() && stat(path.c_str(), &buf) == 0)
-	{
-		stream << buf.st_size;
-		res.set_content_length("Content-Length: " + stream.str() + "\r\n");
-		res.set_content_type("Content-Type: "+ get_type(path) + " \r\n");
-		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
-			+ res.get_date() +  res.get_content_type() + res.get_content_length());
-		std::vector<std::string>::iterator it;
-		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
-			res.add_to_header(*it);
-		res.add_to_header("\r\n");
-		// std::cout << res.get_content_length() << std::endl;
-		sent_bytes = res.get_header().size();
-	}
-	else
-	{
-		res.set_body("<!DOCTYPE html><html><head>403 Forbidden</head><body><p>no permission</p></body></html>");
-		stream << res.get_body().size();
-		res.set_content_length("Content-Length: " + stream.str() + "\r\n");
-		res.set_status_code("404");
-		res.set_status_message("Not Found");
-		res.set_content_type("Content-Type: text/html \r\n");
-		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
-			+ res.get_date() + res.get_content_type() + res.get_content_length());
-		std::vector<std::string>::iterator it;
-		for (it = res.get_headers().begin(); it != res.get_headers().end(); it++)
-			res.add_to_header(*it);
-		res.add_to_header("\r\n");
-		sent_bytes = res.get_header().size() + res.get_body().size();
-		isSent = 1;
-		return (false);
-	}
-	return (true);
-}
-
-bool client::readFile(response &res)
-{
-	std::vector<char> buff(BUF_SIZE);
-	if (!file.eof() && file.is_open())
-	{
-		res.set_body("");
-		file.read(&buff[0], BUF_SIZE);
-		// std::cout << "read " << file.gcount() << " bytes" << std::endl;
-		if (file.gcount() == 0)
-			return (false);
-		res.set_body(std::string(buff.begin(), buff.begin() + file.gcount()));
-		sent_bytes = file.gcount();
-	}
-	else 
-	{
-		setFirstTime(true);
-		setIsSent(1);
-		file.close();
-		res.get_body().clear();
-		return (false);
-	}
-	return (true);
-}
-
-
 void client::addToRequestCheck(std::string& buff)
 {
 	std::string rest = "";
@@ -423,3 +356,4 @@ response& client::getRes(void) { return (res); }
 std::string& client::getRequest(void) { return (request); }
 std::map<std::string, std::string>& client::getHttpRequest(void) { return (http_request); }
 int& client::getRcv(void) { return (rcv); }
+std::string& client::getBodyname() {return bodyname;}

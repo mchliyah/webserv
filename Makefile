@@ -6,7 +6,7 @@
 #    By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/04/02 08:16:04 by mchliyah         ###   ########.fr        #
+#    Updated: 2023/04/06 01:31:29 by mchliyah         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ STDFLAGS = -std=c++98
 FILES = main.cpp \
 	./parse/parse.cpp ./parse/utils.cpp ./parse/locationconfig.cpp ./parse/serverconfig.cpp \
 	./request/server.cpp ./request/client.cpp \
-	./response/response.cpp ./response/get_response.cpp ./response/post_response.cpp ./response/delete_response.cpp response/utils.cpp
+	./response/response.cpp ./response/get_response.cpp ./response/post_response.cpp ./response/delete_response.cpp response/utils.cpp response/client_res.cpp
 
 OBJECTS = $(FILES:.cpp=.o)
 

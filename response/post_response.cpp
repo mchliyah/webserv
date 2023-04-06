@@ -2,20 +2,48 @@
 
 #include "../includes/server.hpp"
 
-std::string response::post_response(serverconfig &server, std::string &path, std::string &body) {
-	(void)server;
-	(void)path;
-	(void)body;
-	std::string response = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
-	body += "success";
-	content_length += std::to_string(body.length()) + "\r\n";
-	response += date;
-	response += content_type;
-	response += content_length;
-	std::vector<std::string>::iterator it;
-	for (it = headers.begin(); it != headers.end(); it++)
-		response += *it;
-	response += "\r\n";
-	response += body;
-	return response;
+void response::post_response(client& client) {
+	serverconfig server = client.getHost();
+	std::string in_path = client.getValue("URL");
+	locationconfig location;
+	location = matchlocation(client.getHost(), in_path);
+	std::string path = location.getUploadStore();
+	std::string full_path;
+	std::string mime_type = client.getValue("Content-Type");
+	if (path != "")
+	{
+		if (path[path.length() - 1] != '/')
+			path += '/';
+		full_path = path + client.getBodyname() + "." + mime_type.substr(mime_type.find_last_of("/") + 1, mime_type.length() - mime_type.find_last_of("/") - 1);
+		std::cout << "full_path : " << full_path << std::endl;
+		size_t pos = path.find_first_of(&path[1], '/');
+		while (pos < path.length())
+		{
+			std::string tmp = path.substr(0, pos);
+			if (access(tmp.c_str(), F_OK) != 0)
+			{
+				std::cout << "mkdir " << tmp << std::endl;
+				mkdir(tmp.c_str(), 0777);
+			}
+			pos = path.find_first_of(&path[pos + 1], '/');
+		}
+		if (access(full_path.c_str(), F_OK) == 0 || std::rename(client.getBodyname().c_str(), full_path.c_str()) != 0)
+		{
+			std::cout << "Error moving file" << std::endl;
+			status_code = "500";
+			status_message = "Internal Server Error";
+			std::remove(client.getBodyname().c_str());
+		}
+		header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
+		content_length = "Content-Length: 0\r\n";
+		header += date + content_type + content_length;
+		if (status_code == "201")
+			header += "Location: " + full_path + "\r\n";
+		header += "\r\n";
+		client.setBuff(header);
+		client.setIsSent(1);
+		client.setSentBytes(header.size());
+	}
+	else
+		get_response(client);
 }
