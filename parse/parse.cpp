@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 17:08:17 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/02 04:11:12 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 07:48:15 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,9 @@ void check_all_set(std::vector<serverconfig>& servers)
 	}
 }
 
-std::vector<serverconfig> parse(std::string path){
+std::vector<serverconfig>& parse(std::vector<serverconfig>& servers, std::string path){
 	std::string line;
     std::ifstream os(path);
-	std::vector<serverconfig> servers;
 
 	if (!os.is_open())
 		throw std::runtime_error("Error: can't open config file");

@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 23:58:49 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/06 04:53:15 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 07:50:42 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ class locationconfig
 		locationconfig(const locationconfig& other);
 		locationconfig& operator=(const locationconfig& other);
 		~locationconfig();
-		std::string readlocation(std::ifstream& inputFile, std::string line);
+		std::string& readlocation(std::ifstream& inputFile, std::string& line);
 		void printlocation();
 		void setName(std::string name);
 		std::string& getRoot();
@@ -76,7 +76,7 @@ class serverconfig
 	serverconfig(const serverconfig& other);
 	serverconfig& operator=(const serverconfig& other);
 	~serverconfig();
-	std::string readServer(std::ifstream& inputFile, std::string line);
+	std::string& readServer(std::ifstream& inputFile, std::string& line);
 	void printServer();
 	std::string& getServerName();
 	std::string& getListen();
@@ -87,7 +87,7 @@ class serverconfig
 	// serverconfig getServers() const;
 };
 
-std::vector<serverconfig> parse(std::string path);
+std::vector<serverconfig>& parse(std::vector<serverconfig>& servers, std::string path);
 bool has_only_spaces(std::string str);
 int tab_count(std::string str);
 #endif
