@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/05 07:14:44 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/05 23:48:26 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ private:
 	response res;
 	std::string buff;
 	std::string bodyname;
+	std::vector<std::string>multipart;
 
 public:
 	int rcv;
@@ -84,6 +85,7 @@ public:
 	std::string &getBuff();
 	std::string &getBodyname();
 	void generateBodyName(void);
+	void handleMultipart(void);
 	~client();
 };
 std::string get_type(const std::string &path);

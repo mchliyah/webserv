@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/05 07:08:06 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/06 07:52:40 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,6 +169,121 @@ void client::parseHeader(std::string& header)
 	else
 		http_request[key] = value;
 }
+// void client::handleMultipart(void)
+// {
+// 	std::string type = http_request["Content-Type"];
+// 	if (type == "")
+// 		return;
+// 	if (type.find("multipart/form-data") != std::string::npos)
+// 	{
+// 		size_t pos = type.find("boundary=");
+// 		if (pos != std::string::npos)
+// 		{
+// 			pos += 9;
+// 			size_t found = type.find(";", pos);
+// 			std::string boundry = type.substr(pos, found -pos);
+// 			http_request["body"] = "multipart";
+// 			std::ifstream file(getBodyname().c_str());
+// 			if (file.is_open())
+// 			{
+// 				char buf[BUF_SIZE];
+// 				std::string buff;
+// 				std::string concat;
+// 				while (file.read(buf, BUF_SIZE))
+// 				{
+// 					buff(buf, buf + file.gcount());
+// 					concat+= buff;
+// 					if (concat.find(boundry + "\r\n") != std::string::npos)
+// 						break;
+// 				}
+// 			}
+// 		}
+// 	}
+// }
+void client::handleMultipart(void)
+{
+	std::string type = http_request["Content-Type"];
+	if (type == "")
+		return;
+	if (type.find("multipart/form-data") != std::string::npos)
+	{
+		std::cout << "type found" << std::endl;
+		size_t pos = type.find("boundary=");
+		if (pos != std::string::npos)
+		{
+			pos += 9;
+			size_t found = type.find(";", pos);
+			std::string boundry = type.substr(pos, found -pos);
+			http_request["body"] = "multipart";
+			std::ifstream file(getBodyname().c_str());
+			if (file.is_open())
+			{
+				std::cout << "input file opened and boundry is |" << boundry << "|" << std::endl;
+				std::string line;
+				while(std::getline(file, line))
+				{
+					std::cout << "ouiiii" << std::endl;
+					std::cout << "line |" << line << "|" << std::endl;
+					if (line == (boundry + "\r"))
+					{
+						std::cout << "headers bdaw" << std::endl;
+						std::vector<std::string> headers;
+						while (std::getline(file, line) && line != "\r")
+						{
+							headers.push_back(line + "\n");
+						}
+						if (line == "\r")
+						{
+							std::cout << "headers collected" << std::endl;
+							std::string newfile = "";
+							for (std::vector<std::string>::iterator it = headers.begin(); it < headers.end(); it++)
+							{
+								size_t found = it->find("filename=");
+								if (found != std::string::npos)
+								{
+									found += 9;
+									size_t vir = it->find(";", found);
+									newfile = it->substr(found, vir);
+								}
+							}
+							if (newfile == "")
+								newfile = generateString(5) + ".txt";
+							this->multipart.push_back(newfile);
+							std::cout << "newfile is |" << newfile << std::endl;
+							std::ofstream output(newfile.c_str(), std::ios::trunc);
+							output.close();
+							output.open(newfile.c_str(), std::ios::app);
+							char buf[BUF_SIZE];
+							std::string rest = "";
+							while (file.read(buf, BUF_SIZE))
+							{
+								std::string buff(buf, buf + file.gcount());
+								buff = rest + buff;
+								size_t found = buff.find("\r\n" + boundry + "\r\r");
+								if (found != std::string::npos)
+								{
+									buff.erase(found, buff.length() - found);
+									output << buff;
+									break ;
+								}
+								else
+								{
+									found = buff.find("\r");
+									if (found != std::string::npos)
+									{
+										std::string to_write = buff.substr(found);
+										buff.erase(found);
+									}
+								}
+								output << buff;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
 void client::generateBodyName(void)
 {
 	std::string depo = http_request["Content-Disposition"];
@@ -199,7 +314,7 @@ void client::generateBodyName(void)
 		std::cout << "type : -" << type << "-" << std::endl;
 		if (type == "text/plain")
 		{
-			std::cout << "body : -" << bodyname << std::endl;
+			std::cout << "body : -" << bodyname << "-"<< std::endl;
 			bodyname += ".txt";
 			return ;
 		}

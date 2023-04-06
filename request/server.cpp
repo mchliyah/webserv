@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/05 06:20:46 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/06 01:42:07 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,8 @@ void server::start()
 				if (c->getFirstTime()) 
 				{
 					//check error code
+					std::cout << "filename-" << c->getBodyname() << "-" << std::endl;
+					c->handleMultipart();
 					c->matchHost(this->hosts);
 					c->setRes(response(c->getValue("Method")));
 					// c->getRes().checkError(*c);
