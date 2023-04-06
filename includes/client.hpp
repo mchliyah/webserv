@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/04 09:46:58 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 05:26:26 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,8 @@ public:
 	void setBuff(std::string buff);
 	std::string& getBuff();
 	std::string& getBodyname();
+	void errorResponse(response &res);
+	void defaultResponse(response &res);
 	~client();
 };
 std::string get_type(const std::string& path);

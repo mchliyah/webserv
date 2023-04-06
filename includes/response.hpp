@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/03 03:23:01 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 05:24:08 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class response
 		std::string body;
 		std::string content_length;
     	std::string date;
+		std::map<std::string, std::string> status_code_map;
 	public:
 		response();
 		response(const std::string& request_type);
@@ -73,6 +74,9 @@ class response
 		void delete_response(client& client);
 		void checkError(client& client);
 		void cgi_response(client& client);
+		std::map<std::string, std::string> get_status_code_map();
+		void redirect(client& client, std::string& in_path);
+		bool list_dir(client& client, std::string& path);
 		void clear();
 		void clearall();
 };

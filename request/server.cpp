@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/04 09:49:32 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 04:04:11 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,7 +150,7 @@ void server::start()
 				{
 					//check error code
 					c->matchHost(this->hosts);
-					c->setRes(response(c->getValue("Method")));
+					c->setRes(response());
 					// c->getRes().checkError(*c);
 				}
 				int toSend = 0;
