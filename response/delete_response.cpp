@@ -12,17 +12,20 @@ bool delete_directory(const std::string& path) {
         std::string file_name = entry->d_name;
         if (file_name != "." && file_name != "..") {
             std::string full_path = path + "/" + file_name;
-            if (is_dir(full_path)) {
-                if (!delete_directory(full_path)) {
-                    closedir(dir);
-                    return false;
-                }
-            } else {
-                if (remove(full_path.c_str()) != 0) {
-                    closedir(dir);
-                    return false;
-                }
-            }
+			if (access(full_path.c_str(), W_OK) != -1)
+			{
+            	if (is_dir(full_path)) {
+            	    if (!delete_directory(full_path)) {
+            	        closedir(dir);
+            	        return false;
+            	    }
+            	} else {
+            	    if (remove(full_path.c_str()) != 0) {
+            	        closedir(dir);
+            	        return false;
+            	    }
+            	}
+			}
         }
         entry = readdir(dir);
     }
@@ -47,18 +50,9 @@ void response::delete_response(client& client) {
 	{
 		if (access(full_path.c_str(), W_OK) != -1)
 		{
-			if (is_dir(full_path))
-			{
-				if (!delete_directory(full_path))
-					{
-						status_code = "500";
-						client.errorResponse(*this);
-						return ;
-					}
-			}
-			else if (is_file(full_path))
-			{
-				if (remove(full_path.c_str()) == 0){
+			if ((is_dir(full_path) && delete_directory(full_path)) ||
+				(is_file(full_path) && remove(full_path.c_str()) == 0))
+				{
 					status_code = "200";
 					status_message = "Deleted";
 					header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
@@ -74,7 +68,6 @@ void response::delete_response(client& client) {
 					status_code = "500";
 					client.errorResponse(*this);
 				}
-			}
 		}
 		else 
 		{
@@ -87,4 +80,5 @@ void response::delete_response(client& client) {
 		status_code = "404";
 		client.errorResponse(*this);
 	}
+	client.setBuff(header + body);
 }
