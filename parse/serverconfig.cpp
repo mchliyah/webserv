@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/06 04:50:09 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 07:53:28 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ serverconfig &serverconfig::operator=(const serverconfig &src) {
 	return (*this);
 }
 
-std::string serverconfig::readServer(std::ifstream& inputFile, std::string line) {
+std::string& serverconfig::readServer(std::ifstream& inputFile, std::string& line) {
 	std::string key, value;
 
 	if (line.find("server") != std::string::npos)
@@ -131,17 +131,13 @@ void serverconfig::printServer() {
 	std::cout << "listen: " << listen << std::endl;
 	std::cout << "max_client_body_size: " << maxclientboddysize << std::endl;
 	std::map<std::string, std::string>::iterator it = errorpages.begin();
-	while (it != errorpages.end())
-	{
+	while (it++ != errorpages.end())
 		std::cout << "error_page: " << it->first << " " << it->second << std::endl;
-		it++;
-	}
 	std::map<std::string, locationconfig>::iterator it2 = locations.begin();
-	while (it2 != locations.end())
+	while (it2++ != locations.end())
 	{
 		std::cout << "location: " << it2->first << std::endl;
 		it2->second.printlocation();
-		it2++;
 	}
 }
 

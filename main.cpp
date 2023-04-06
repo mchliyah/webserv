@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/02 05:13:42 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 07:46:31 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,8 @@ int main(int argc, char **argv)
 	{
 		if (argc != 2)
 			throw std::runtime_error("Usage: ./webserv <config_file>");
-		std::vector<serverconfig> servers = parse(argv[1]);
+		std::vector<serverconfig> servers;
+		servers = parse(servers, argv[1]);
 		std::vector<std::string> v;
 		// std::string s = "    GET     kkk      a     \r\nHost:n\r\nContent-Type:mm\r\n\r\nbodyyyy";
 		// request req(s);

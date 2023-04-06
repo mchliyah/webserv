@@ -12,10 +12,8 @@
 
 #include "../includes/server.hpp"
 
-std::string locationconfig::readlocation(std::ifstream& inputFile, std::string line) {
+std::string& locationconfig::readlocation(std::ifstream& inputFile, std::string& line) {
 	std::string key, value;
-	std::pair<std::string, std::string> pair;
-
 	while (g_tab_count == 2)
 	{
 		if (line.find("#") != std::string::npos)
