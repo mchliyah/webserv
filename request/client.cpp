@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/06 07:52:40 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/07 06:16:30 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ void client::resetClient()
 	if (this->file.is_open())
 		this->file.close();
 	res.clearall();
+	this->multipart.clear();
 }
 void client::makeError(int err, const std::string& msg)
 {
@@ -169,37 +170,6 @@ void client::parseHeader(std::string& header)
 	else
 		http_request[key] = value;
 }
-// void client::handleMultipart(void)
-// {
-// 	std::string type = http_request["Content-Type"];
-// 	if (type == "")
-// 		return;
-// 	if (type.find("multipart/form-data") != std::string::npos)
-// 	{
-// 		size_t pos = type.find("boundary=");
-// 		if (pos != std::string::npos)
-// 		{
-// 			pos += 9;
-// 			size_t found = type.find(";", pos);
-// 			std::string boundry = type.substr(pos, found -pos);
-// 			http_request["body"] = "multipart";
-// 			std::ifstream file(getBodyname().c_str());
-// 			if (file.is_open())
-// 			{
-// 				char buf[BUF_SIZE];
-// 				std::string buff;
-// 				std::string concat;
-// 				while (file.read(buf, BUF_SIZE))
-// 				{
-// 					buff(buf, buf + file.gcount());
-// 					concat+= buff;
-// 					if (concat.find(boundry + "\r\n") != std::string::npos)
-// 						break;
-// 				}
-// 			}
-// 		}
-// 	}
-// }
 void client::handleMultipart(void)
 {
 	std::string type = http_request["Content-Type"];
@@ -207,7 +177,6 @@ void client::handleMultipart(void)
 		return;
 	if (type.find("multipart/form-data") != std::string::npos)
 	{
-		std::cout << "type found" << std::endl;
 		size_t pos = type.find("boundary=");
 		if (pos != std::string::npos)
 		{
@@ -216,69 +185,86 @@ void client::handleMultipart(void)
 			std::string boundry = type.substr(pos, found -pos);
 			http_request["body"] = "multipart";
 			std::ifstream file(getBodyname().c_str());
+			std::ofstream output;
+			int track = 0;
 			if (file.is_open())
 			{
-				std::cout << "input file opened and boundry is |" << boundry << "|" << std::endl;
-				std::string line;
-				while(std::getline(file, line))
+				std::vector<char> buf(1000000);
+				std::string rest;
+				while (1)
 				{
-					std::cout << "ouiiii" << std::endl;
-					std::cout << "line |" << line << "|" << std::endl;
-					if (line == (boundry + "\r"))
+					file.read(&buf[0], 1000000);
+					std::string buff(buf.begin(), buf.begin()+ file.gcount());
+					buff = rest + buff;
+					if (track == 0)
 					{
-						std::cout << "headers bdaw" << std::endl;
-						std::vector<std::string> headers;
-						while (std::getline(file, line) && line != "\r")
+						size_t found = buff.find("--" + boundry + "\r\n");
+						size_t pos = buff.find("\r\n\r\n", found + 4 + boundry.length());
+						if (found == std::string::npos || pos == std::string::npos)
 						{
-							headers.push_back(line + "\n");
+							error = 400;
+							return ;
 						}
-						if (line == "\r")
+						found = found + 4 + boundry.length();
+						std::string headers = buff.substr(found, pos - found);
+						buff = buff.substr(pos + 4);
+						std::string newfile = "";
+						std::string quote(1, '"');
+						size_t f = headers.find("filename=" + quote);
+						if (f != std::string::npos)
 						{
-							std::cout << "headers collected" << std::endl;
-							std::string newfile = "";
-							for (std::vector<std::string>::iterator it = headers.begin(); it < headers.end(); it++)
-							{
-								size_t found = it->find("filename=");
-								if (found != std::string::npos)
-								{
-									found += 9;
-									size_t vir = it->find(";", found);
-									newfile = it->substr(found, vir);
-								}
-							}
-							if (newfile == "")
-								newfile = generateString(5) + ".txt";
-							this->multipart.push_back(newfile);
-							std::cout << "newfile is |" << newfile << std::endl;
-							std::ofstream output(newfile.c_str(), std::ios::trunc);
+							f += 10;
+							size_t q = headers.find(quote, f);
+							if (q != std::string::npos)
+								newfile = headers.substr(f, q - f);
+						}
+						if (newfile == "")
+							newfile = newfile = generateString(5) + ".txt";
+						this->multipart.push_back(newfile);
+						if (output.is_open())
 							output.close();
-							output.open(newfile.c_str(), std::ios::app);
-							char buf[BUF_SIZE];
-							std::string rest = "";
-							while (file.read(buf, BUF_SIZE))
-							{
-								std::string buff(buf, buf + file.gcount());
-								buff = rest + buff;
-								size_t found = buff.find("\r\n" + boundry + "\r\r");
-								if (found != std::string::npos)
-								{
-									buff.erase(found, buff.length() - found);
-									output << buff;
-									break ;
-								}
-								else
-								{
-									found = buff.find("\r");
-									if (found != std::string::npos)
-									{
-										std::string to_write = buff.substr(found);
-										buff.erase(found);
-									}
-								}
-								output << buff;
-							}
+						output.open(newfile.c_str(), std::ios::out | std::ios::trunc);
+						output.close();
+						output.open(newfile.c_str(), std::ios::app);
+						track = 1;
+					}
+					if (track == 1)
+					{
+						size_t b = buff.find("\r\n--" + boundry + "\r\n");
+						if (b != std::string::npos)
+						{
+							std::cout << 1 << std::endl;
+							track = 0;
+							rest = buff.substr(0, b);
+							buff = buff.substr(b + 2);
+							output << rest;
+						}
+						else if (buff.find("\r\n--" + boundry + "--\r\n") != std::string::npos)
+						{
+							b = buff.find("\r\n--" + boundry + "--\r\n");
+							buff = buff.substr(0, b);
+							output << buff;
+							output.close();
+							file.close();
+							remove(getBodyname().c_str());
+							return ;
+						}
+						else if (buff.find("\r") != std::string::npos)
+						{
+							std::cout << 3 << std::endl;
+							b = buff.find("\r");
+							rest = buff.substr(0, b);
+							buff = buff.substr(b);
+							output << rest;
+						}
+						else
+						{
+							std::cout << 3 << std::endl;
+							output << buff;
+							buff = "";
 						}
 					}
+					rest = buff;
 				}
 			}
 		}
