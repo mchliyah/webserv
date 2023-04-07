@@ -68,7 +68,7 @@ void response::delete_response(client& client) {
 					status_code = "500";
 					client.errorResponse(*this);
 				}
-		}
+}
 		else 
 		{
 			status_code = "403";

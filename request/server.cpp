@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/06 04:04:11 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/07 01:37:03 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,10 +148,15 @@ void server::start()
 			{
 				if (c->getFirstTime()) 
 				{
-					//check error code
-					c->matchHost(this->hosts);
+					std::stringstream stream;
+					stream << c->getError();
 					c->setRes(response());
-					// c->getRes().checkError(*c);
+					if (stream.str() != "200")
+					{
+						c->getRes().set_status_code(stream.str());
+						c->errorResponse(c->getRes());
+					}
+					c->matchHost(this->hosts);
 				}
 				int toSend = 0;
 				// c->getRes().get_response(*c);
