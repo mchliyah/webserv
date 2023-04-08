@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/04 06:59:32 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/08 03:33:11 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void server::start()
 		for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
 			FD_SET(l->first, &read_fds);
 		int maxSocket = std::max_element(listners.begin(), listners.end())->first;
-		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) // Add client sockets to read_fds and write_fds
+		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
 			if (c->rcv < 4 && c->rcv >= 0)
 				FD_SET(c->getSocket(), &read_fds);
@@ -98,7 +98,7 @@ void server::start()
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
 				fcntl(newSocket, F_SETFL, O_NONBLOCK);
 				struct timeval tv;
-				tv.tv_sec = 1;  // 5 seconds timeout
+				tv.tv_sec = 1;
 				tv.tv_usec = 0;
 				setsockopt(newSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 				client c(newSocket, listner->second);
@@ -115,11 +115,8 @@ void server::start()
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
 				char	buf[100000];
-				//std::vector<char> buf(1024);
 				memset(buf, 0, sizeof buf);
 				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
-				//add a timout here to close the socket if no data is received
-				//add a smaller timout to assume that the request is finished if no data is received and rcv == 1
 				if (r <= 0)
 				{
 					std::cout << "closing socket " << c->getSocket() << std::endl;
@@ -145,43 +142,38 @@ void server::start()
 			}
 			if (FD_ISSET(c->getSocket(), &write_fds))
 			{
-				bool firstime = c->getFirstTime();
-				if (firstime)
+				if (c->getFirstTime()) 
 				{
-					//c->matchHost(this->hosts);
-					std::cout << "error : " << c->getError() << std::endl;
-					c->printAttr();
+					c->handleMultipart();
 					c->matchHost(this->hosts);
 					c->setRes(response(c->getValue("Method")));
-					// std::cout << "path target :" << c->getValue("URL") << std::endl;
 				}
 				int toSend = 0;
-				if (c->getValue("Method") == "GET")
-					c->getRes().get_response(*c);
-				// if (firstime)
-				// {
-				// 	std::cout << "header size : " << response.size() << std::endl;
-				// }
-				// std::cout << res.get_content_length() << std::endl;
-				// std::cout << "header lenght : " << res.get_header().length() << std::endl;
-				// else if (c->getValue("Method") == "POST")
-				// 	response = res.post_response(c->getHost(), c->getValue("Path"), c->getValue("Body"));
-				// else if (c->getValue("Method") == "DELETE")
-				// 	response = res.delete_response(c->getHost(), c->getValue("Path"));
+				switch (c->getValue("Method")[0])
+				{
+					case 'G':
+						c->getRes().get_response(*c);
+						break;
+					case 'P':
+						c->getRes().post_response(*c);
+						break;
+					case 'D':
+						c->getRes().delete_response(*c);
+						break;
+					default:
+					{
+						std::cout << "Method not supported" << std::endl;
+						break;
+					}
+				}
 				toSend = c->getSentBytes();
-				// std::cout << "to send : " << toSend << std::endl;
 				while (toSend > 0)
 				{
-					// std::cout << "to send : " << toSend << std::endl;
-					// std::cout << "response size : " << response.size() << std::endl;
 					int bytes = send(c->getSocket(), c->getBuff().c_str(), toSend, 0);
-					// std::cout << "sent " << bytes << " bytes" << std::endl;
 					c->snd += bytes;
 					toSend -= bytes;
-					// std::cout << "snd " << c->snd << std::endl;
 					if (bytes == -1)
 					{
-						//std::cout << "closing socket " << c->getSocket() << std::endl;
 						close(c->getSocket());
 						FD_CLR(c->getSocket(), &read_fds);
 						FD_CLR(c->getSocket(), &write_fds);
@@ -191,13 +183,11 @@ void server::start()
 				}
 				if (c->getIsSent() == 1)
 				{
-					// std::cout << "target == " << c->getValue("URL") << std::endl;
 					c->resetClient();
 					c->snd = 0;
 					break ;
 				}
 				c->setSentBytes(0);
-				// std::cout << c->getIsSent() << std::endl;
 				c->getRes().clear();
 			}
 		}
