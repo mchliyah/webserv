@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/06 01:42:07 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/08 03:06:08 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void server::start()
 		for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
 			FD_SET(l->first, &read_fds);
 		int maxSocket = std::max_element(listners.begin(), listners.end())->first;
-		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) // Add client sockets to read_fds and write_fds
+		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
 			if (c->rcv < 4 && c->rcv >= 0)
 				FD_SET(c->getSocket(), &read_fds);
@@ -78,7 +78,6 @@ void server::start()
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, &timeout);
-		// std::cout << "activity = " << activity << std::endl;
 		if (activity == -1)
 		{
 			perror("select error");
@@ -99,7 +98,7 @@ void server::start()
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
 				fcntl(newSocket, F_SETFL, O_NONBLOCK);
 				struct timeval tv;
-				tv.tv_sec = 1;  // 5 seconds timeout
+				tv.tv_sec = 1;
 				tv.tv_usec = 0;
 				setsockopt(newSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 				client c(newSocket, listner->second);
@@ -116,11 +115,8 @@ void server::start()
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
 				char	buf[100000];
-				//std::vector<char> buf(1024);
 				memset(buf, 0, sizeof buf);
 				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
-				//add a timout here to close the socket if no data is received
-				//add a smaller timout to assume that the request is finished if no data is received and rcv == 1
 				if (r <= 0)
 				{
 					std::cout << "closing socket " << c->getSocket() << std::endl;
@@ -148,12 +144,9 @@ void server::start()
 			{
 				if (c->getFirstTime()) 
 				{
-					//check error code
-					std::cout << "filename-" << c->getBodyname() << "-" << std::endl;
 					c->handleMultipart();
 					c->matchHost(this->hosts);
 					c->setRes(response(c->getValue("Method")));
-					// c->getRes().checkError(*c);
 				}
 				int toSend = 0;
 				switch (c->getValue("Method")[0])

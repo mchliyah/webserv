@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/07 06:16:30 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/08 03:07:35 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,7 +233,6 @@ void client::handleMultipart(void)
 						size_t b = buff.find("\r\n--" + boundry + "\r\n");
 						if (b != std::string::npos)
 						{
-							std::cout << 1 << std::endl;
 							track = 0;
 							rest = buff.substr(0, b);
 							buff = buff.substr(b + 2);
@@ -251,7 +250,6 @@ void client::handleMultipart(void)
 						}
 						else if (buff.find("\r") != std::string::npos)
 						{
-							std::cout << 3 << std::endl;
 							b = buff.find("\r");
 							rest = buff.substr(0, b);
 							buff = buff.substr(b);
@@ -259,7 +257,6 @@ void client::handleMultipart(void)
 						}
 						else
 						{
-							std::cout << 3 << std::endl;
 							output << buff;
 							buff = "";
 						}
