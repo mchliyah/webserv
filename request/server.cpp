@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/08 03:33:11 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/08 03:35:42 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,9 +146,11 @@ void server::start()
 				{
 					c->handleMultipart();
 					c->matchHost(this->hosts);
-					c->setRes(response(c->getValue("Method")));
+					c->setRes(response());
+					// c->getRes().checkError(*c);
 				}
 				int toSend = 0;
+				// c->getRes().get_response(*c);
 				switch (c->getValue("Method")[0])
 				{
 					case 'G':

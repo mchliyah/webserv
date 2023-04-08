@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/05 23:48:26 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/08 03:35:21 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,12 @@ public:
 	response &getRes(void);
 	std::map<std::string, std::string> &getHttpRequest();
 	void setBuff(std::string buff);
-	std::string &getBuff();
-	std::string &getBodyname();
 	void generateBodyName(void);
 	void handleMultipart(void);
+	std::string& getBuff();
+	std::string& getBodyname();
+	void errorResponse(response &res);
+	void defaultResponse(response &res);
 	~client();
 };
 std::string get_type(const std::string &path);

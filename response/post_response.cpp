@@ -35,9 +35,10 @@ void response::post_response(client& client) {
 		}
 		header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 		content_length = "Content-Length: 0\r\n";
-		header += date + content_type + content_length + "\r\n";
-		// if (status_code == "201")
-		// 	header += "Location: " + full_path + "\r\n";
+		header += date + content_type + content_length;
+		if (status_code == "201")
+			header += "Location: " + full_path + "\r\n";
+		header += "\r\n";
 		client.setBuff(header);
 		client.setIsSent(1);
 		client.setSentBytes(header.size());

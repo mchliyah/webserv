@@ -6,29 +6,29 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/02 07:37:20 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 07:53:28 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
-std::string serverconfig::getServerName() const{
+std::string& serverconfig::getServerName(){
 	return (this->server_name);
 }
 
-std::string serverconfig::getListen() const {
+std::string& serverconfig::getListen() {
 	return (this->listen);
 }
 
-std::string serverconfig::getMaxClientBodySize() const {
+std::string& serverconfig::getMaxClientBodySize() {
 	return (this->maxclientboddysize);
 }
 
-std::map<int, std::string> serverconfig::getErrorPages() const {
+std::map<std::string, std::string>& serverconfig::getErrorPages() {
 	return (this->errorpages);
 }
 
-std::map<std::string, locationconfig> serverconfig::getLocations() const {
+std::map<std::string, locationconfig>& serverconfig::getLocations(){
 	return (this->locations);
 }
 
@@ -44,10 +44,11 @@ serverconfig &serverconfig::operator=(const serverconfig &src) {
 	this->maxclientboddysize = src.maxclientboddysize;
 	this->errorpages = src.errorpages;
 	this->locations = src.locations;
+	this->default_page = src.default_page;
 	return (*this);
 }
 
-std::string serverconfig::readServer(std::ifstream& inputFile, std::string line) {
+std::string& serverconfig::readServer(std::ifstream& inputFile, std::string& line) {
 	std::string key, value;
 
 	if (line.find("server") != std::string::npos)
@@ -106,7 +107,7 @@ std::string serverconfig::readServer(std::ifstream& inputFile, std::string line)
 				iss  >> errorpage;
 				if (value.empty() || errorpage.empty())
 					throw std::runtime_error("Error: error_page has less than 2 arguments");
-				errorpages.insert(std::make_pair(atoi(value.c_str()), errorpage));
+				errorpages.insert(std::make_pair(value, errorpage));
 			}
 			value.clear();
 			iss >> value;
@@ -129,18 +130,14 @@ void serverconfig::printServer() {
 	std::cout << "server_name: " << server_name << std::endl;
 	std::cout << "listen: " << listen << std::endl;
 	std::cout << "max_client_body_size: " << maxclientboddysize << std::endl;
-	std::map<int, std::string>::iterator it = errorpages.begin();
-	while (it != errorpages.end())
-	{
+	std::map<std::string, std::string>::iterator it = errorpages.begin();
+	while (it++ != errorpages.end())
 		std::cout << "error_page: " << it->first << " " << it->second << std::endl;
-		it++;
-	}
 	std::map<std::string, locationconfig>::iterator it2 = locations.begin();
-	while (it2 != locations.end())
+	while (it2++ != locations.end())
 	{
 		std::cout << "location: " << it2->first << std::endl;
 		it2->second.printlocation();
-		it2++;
 	}
 }
 
@@ -148,6 +145,50 @@ serverconfig::serverconfig() {
 	server_name = "";
 	listen = "";
 	maxclientboddysize = "";
+	default_page["404"] ="<html><head><title>404 Page Not Found</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }"
+						"</style></head><body><div class='box'><h1>404</h1><p>Page not found</p>"
+						"</div></body></html>";
+	default_page["405"] ="<html><head><title>405 Method Not Allowed</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>405</h1><p>Method not allowed</p>"
+						"</div></body></html>";
+	default_page["400"] ="<html><head><title>400 Bad Request</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>400</h1><p>Bad request</p>"
+						"</div></body></html>";
+	default_page["413"] ="<html><head><title>413 Request Entity Too Large</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>413</h1><p>Request entity too large</p>"
+						"</div></body></html>";
+	default_page["403"] ="<html><head><title>403 Forbidden</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>403</h1><p>Forbidden</p>"
+						"</div></body></html>";
+	default_page["500"] ="<html><head><title>500 Internal Server Error</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>500</h1><p>Internal server error</p>"
+						"</div></body></html>";
+	default_page["501"] ="<html><head><title>501 Not Implemented</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>501</h1><p>Not implemented</p>"
+						"</div></body></html>";
+	default_page["503"] ="<html><head><title>503 Service Unavailable</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>503</h1><p>Service unavailable</p>"
+						"</div></body></html>";
+	default_page["504"] ="<html><head><title>504 Gateway Timeout</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>504</h1><p>Gateway timeout</p>"
+						"</div></body></html>";
+	default_page["505"] ="<html><head><title>505 HTTP Version Not Supported</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>505</h1><p>HTTP version not supported</p>"
+						"</div></body></html>";
+}
+
+std::map<std::string, std::string>& serverconfig::getDefaultPage() {
+	return default_page;
 }
 
 serverconfig::~serverconfig() {

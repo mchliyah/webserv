@@ -12,10 +12,8 @@
 
 #include "../includes/server.hpp"
 
-std::string locationconfig::readlocation(std::ifstream& inputFile, std::string line) {
+std::string& locationconfig::readlocation(std::ifstream& inputFile, std::string& line) {
 	std::string key, value;
-	std::pair<std::string, std::string> pair;
-
 	while (g_tab_count == 2)
 	{
 		if (line.find("#") != std::string::npos)
@@ -125,25 +123,25 @@ std::string& locationconfig::getCgiPass(){
 	return (this->cgi_pass);
 }
 
-std::map<std::string, bool> locationconfig::getAllowsMethod() const{
+std::map<std::string, bool>& locationconfig::getAllowsMethod(){
 	return (this->allowsmethod);
 }
 
-std::vector<std::string> locationconfig::getIndex() const{
+std::vector<std::string>& locationconfig::getIndex(){
 	return (this->index);
 }
 
-std::string locationconfig::getAutoIndex() const{
+std::string& locationconfig::getAutoIndex(){
 	return (this->autoindex);
 }
-std::string locationconfig::getName() const{
+std::string& locationconfig::getName(){
 	return (this->loc_name);
 }
 void locationconfig::setName(std::string name){
 	this->loc_name = name;
 }
 
-std::string locationconfig::getUploadStore() const{
+std::string& locationconfig::getUploadStore(){
 	return (this->upload_store);
 }
 
