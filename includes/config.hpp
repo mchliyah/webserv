@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 23:58:49 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/06 07:50:42 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/08 02:12:29 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,11 @@ class locationconfig
 		std::string& getAutoIndex() ;
 		std::string& getName() ;
 		std::string& getUploadStore() ;
+		void setRoot(std::string name);
+		void setCgiPass(std::string name);
+		void setIndex(std::vector<std::string>& name);
+		void setAllowsMethod(std::map<std::string, bool>& name);
+		void setAutoIndex(std::string name);
 };
 
 class serverconfig
@@ -84,6 +89,9 @@ class serverconfig
 	std::map<std::string, std::string>& getErrorPages();
 	std::map<std::string, locationconfig>& getLocations();
 	std::map<std::string, std::string>& getDefaultPage();
+	void setServerName(std::string name);
+	void setListen(std::string name);
+	void setLocations(std::map<std::string, locationconfig>& loc);
 	// serverconfig getServers() const;
 };
 

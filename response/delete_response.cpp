@@ -37,11 +37,15 @@ bool delete_directory(const std::string& path) {
 }
 
 void response::delete_response(client& client) {
-
 	serverconfig server = client.getHost();
 	locationconfig location;
 	std::string in_path = client.getValue("URL");
 	location = matchlocation(server , in_path);
+	if (location.getAllowsMethod()["DELETE"] == false) {
+		status_code = "405";
+		client.errorResponse(*this);
+		return ;
+	}
 	std::string path = in_path.substr(location.getName().length() - 1, in_path.length() - location.getName().length() + 1);
 	std::string full_path = location.getRoot() + path;
 	if (full_path[full_path.length() - 1] == '/')

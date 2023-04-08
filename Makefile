@@ -6,7 +6,7 @@
 #    By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/04/06 01:31:29 by mchliyah         ###   ########.fr        #
+#    Updated: 2023/04/08 02:18:32 by mchliyah         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ OBJECTS = $(FILES:.cpp=.o)
 all : $(NAME)
 
 $(NAME) :  $(OBJECTS)
-	$(CC)   $(OBJECTS) -o $(NAME) #-fsanitize=address 
+	$(CC)   $(OBJECTS) -o $(NAME) -fsanitize=address 
 
 
 clean :

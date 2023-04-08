@@ -7,6 +7,11 @@ void response::post_response(client& client) {
 	std::string in_path = client.getValue("URL");
 	locationconfig location;
 	location = matchlocation(client.getHost(), in_path);
+	if (location.getAllowsMethod()["POST"] == false) {
+		status_code = "405";
+		client.errorResponse(*this);
+		return ;
+	}
 	std::string path = location.getUploadStore();
 	std::string full_path;
 	std::string mime_type = client.getValue("Content-Type");
@@ -29,7 +34,6 @@ void response::post_response(client& client) {
 		}
 		if (access(full_path.c_str(), F_OK) == 0 || std::rename(client.getBodyname().c_str(), full_path.c_str()) != 0)
 		{
-			std::cout << "Error moving file" << std::endl;
 			status_code = "500";
 			status_message = "Internal Server Error";
 			std::remove(client.getBodyname().c_str());
