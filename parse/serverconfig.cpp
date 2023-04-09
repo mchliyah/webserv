@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/08 02:56:33 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 07:53:28 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ std::string& serverconfig::readServer(std::ifstream& inputFile, std::string& lin
 				iss  >> errorpage;
 				if (value.empty() || errorpage.empty())
 					throw std::runtime_error("Error: error_page has less than 2 arguments");
-				errorpages[value] = errorpage;
+				errorpages.insert(std::make_pair(value, errorpage));
 			}
 			value.clear();
 			iss >> value;
@@ -130,13 +130,11 @@ void serverconfig::printServer() {
 	std::cout << "server_name: " << server_name << std::endl;
 	std::cout << "listen: " << listen << std::endl;
 	std::cout << "max_client_body_size: " << maxclientboddysize << std::endl;
-	std::map<std::string, std::string>::iterator it;
-	for (it  = getErrorPages().begin(); it != errorpages.end(); it++)
-	{
+	std::map<std::string, std::string>::iterator it = errorpages.begin();
+	while (it++ != errorpages.end())
 		std::cout << "error_page: " << it->first << " " << it->second << std::endl;
-	}
-	std::map<std::string, locationconfig>::iterator it2;
-	for (it2 = locations.begin(); it2 != locations.end(); it2++)
+	std::map<std::string, locationconfig>::iterator it2 = locations.begin();
+	while (it2++ != locations.end())
 	{
 		std::cout << "location: " << it2->first << std::endl;
 		it2->second.printlocation();
@@ -191,18 +189,6 @@ serverconfig::serverconfig() {
 
 std::map<std::string, std::string>& serverconfig::getDefaultPage() {
 	return default_page;
-}
-
-void serverconfig::setServerName(std::string name) {
-	server_name = name;
-}
-
-void serverconfig::setListen(std::string listen) {
-	this->listen = listen;
-}
-
-void serverconfig::setLocations(std::map<std::string, locationconfig>& loc) {
-	locations = loc;
 }
 
 serverconfig::~serverconfig() {

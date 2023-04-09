@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/08 01:24:28 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/09 05:55:55 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,20 +24,6 @@ struct compare
     }
 };
  
-// int main()
-// {
-//     std::vector<int> v = { 4, 7, 5, 2, 6, 9 };
-//     int key = 6;
- 
-//     if (std::find_if(v.begin(), v.end(), compare(key)) != v.end()) {
-//         std::cout << "Element found";
-//     }
-//     else {
-//         std::cout << "Element not found";
-//     }
- 
-//     return 0;
-// }
 int main(int argc, char **argv)
 {
 	try
@@ -47,18 +33,6 @@ int main(int argc, char **argv)
 		std::vector<serverconfig> servers;
 		servers = parse(servers, argv[1]);
 		std::vector<std::string> v;
-		// std::string s = "    GET     kkk      a     \r\nHost:n\r\nContent-Type:mm\r\n\r\nbodyyyy";
-		// request req(s);
-		// std::cout << req.getError() << "   " << req.getErrorMessage() << std::endl;
-		// req.printAttr();
-	// std::vector<serverconfig>::iterator it = servers.begin();
-	// 	while (it != servers.end())
-	// 	{
-	// 		it->printServer();
-	// 		std::cout << " ====================================== "<< std::endl;
-	// 		it++;
-	// 	}
-		std::cout << std::endl << std::endl;
 		std::vector<serverconfig>::iterator it1;
 		for (it1 = servers.begin(); it1 != servers.end(); it1++)
 		{

@@ -11,49 +11,46 @@ void response::get_response(client& client) {
 	std::string file_path = location.getRoot() + path;
 	std::string rederec_header = "";
 	std::stringstream stream;
-	if (location.getAllowsMethod()["GET"] == false) {
-		status_code = "405";
-		client.errorResponse(*this);
-		return ;
-	}
-	if (access(file_path.c_str(), F_OK) != -1) {
-		if (access(file_path.c_str(), R_OK) != -1) {
-			if (is_dir(file_path)) {
-				std::cout << "is_dir" << std::endl;
+	if (access(file_path.c_str(), F_OK) != -1)
+	{
+		if (access(file_path.c_str(), R_OK) != -1)
+		{
+			if (is_dir(file_path))
+			{
 				if (in_path[in_path.length() - 1] != '/')
-				{
-					std::cout << "redirect" << std::endl;
 					return redirect(client, in_path);
-				}
-				if (!default_index(*this, client, location, path) && location.getAutoIndex() == "on")
+				if (!default_index(*this, client, location, path))
 				{
-					if (!list_dir(client, file_path)) {
+					if (location.getAutoIndex() == "off") 
+					{
+						status_code = "403";
+						client.errorResponse(*this);
+					}
+					else if (!list_dir(client, file_path)) {
 						status_code = "500";
 						client.errorResponse(*this);
 					}
 				}
-				else {
-					status_code = "403";
-					client.errorResponse(*this);
-				}
-			} 
-			else if (is_file(file_path)) {
-				// if (location.getCgiPass() == "on") {
-				// 	std::cout << "cgi" << std::endl;
-				// 	execute();
-				// 	return ;
-				// }
-				if (client.getFirstTime()) {
+			}
+			else if (is_file(file_path))
+			{
+				if (client.getFirstTime())
+				{
 					client.openFile(*this, file_path);
 					client.setFirstTime(false);
-				} else client.readFile(*this);
+				} 
+				else
+					client.readFile(*this);
 			}
-		} 
-		else {
+		}
+		else
+		{
 			status_code = "403";
 			client.errorResponse(*this);
 		}
-	} else {
+	}
+	else
+	{
 		status_code = "404";
 		client.errorResponse(*this);
 	}
@@ -83,7 +80,6 @@ bool response::list_dir(client &client, std::string &path) {
 		path += "/";
 	status_code = "200";
 	status_message = "OK";
-	std::cout << "path: " << path << std::endl;
 	if ((dir = opendir (path.c_str())) != NULL) {
 		body += "<html><head><title>Index of " + path + "</title></head><body bgcolor=\"white\"><h1>Index of "
 				+ path + "</h1><hr><ul><li><a href=\"../\">../</a></li>";

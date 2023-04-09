@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:45 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/07 01:36:53 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/06 05:24:08 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ class response
 		void set_content_length(std::string content_length);
 		void set_status_code(std::string status_code);
 		void set_status_message(std::string status_message);
+		void set_date(std::string date);
 		void set_body(std::string body);
 		void add_to_header(std::string header);
 		std::string get_header(void) const;
@@ -71,6 +72,7 @@ class response
 		void get_response(client &client);
 		void post_response(client& client);
 		void delete_response(client& client);
+		void checkError(client& client);
 		void cgi_response(client& client);
 		std::map<std::string, std::string> get_status_code_map();
 		void redirect(client& client, std::string& in_path);

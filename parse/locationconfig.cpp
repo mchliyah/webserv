@@ -145,26 +145,6 @@ std::string& locationconfig::getUploadStore(){
 	return (this->upload_store);
 }
 
-void locationconfig::setRoot(std::string root){
-	this->root = root;
-}
-
-void locationconfig::setCgiPass(std::string cgi_pass){
-	this->cgi_pass = cgi_pass;
-}
-
-void locationconfig::setAllowsMethod(std::map<std::string, bool>& allowsmethod){
-	this->allowsmethod = allowsmethod;
-}
-
-void locationconfig::setIndex(std::vector<std::string>& index){
-	this->index = index;
-}
-
-void locationconfig::setAutoIndex(std::string autoindex){
-	this->autoindex = autoindex;
-}
-
 locationconfig::~locationconfig() {
 	loc_name.clear();
 	root.clear();

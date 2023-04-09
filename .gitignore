@@ -1,8 +1,19 @@
 
 *.o
-*/.o
+**/*.o
 server
 .DS_Store
 .vscode
 out
 body*
+*.mp4
+*.mp3
+*.avi
+*.mov
+
+#check for connection = close
+#check for max bodysize
+#check error codes
+#check infinite loop in cgi
+#merge the timout
+#test siege

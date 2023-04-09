@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/07 01:37:03 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/09 07:34:12 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void server::start()
 		for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
 			FD_SET(l->first, &read_fds);
 		int maxSocket = std::max_element(listners.begin(), listners.end())->first;
-		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++) // Add client sockets to read_fds and write_fds
+		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
 			if (c->rcv < 4 && c->rcv >= 0)
 				FD_SET(c->getSocket(), &read_fds);
@@ -78,7 +78,6 @@ void server::start()
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, &timeout);
-		// std::cout << "activity = " << activity << std::endl;
 		if (activity == -1)
 		{
 			perror("select error");
@@ -99,7 +98,7 @@ void server::start()
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
 				fcntl(newSocket, F_SETFL, O_NONBLOCK);
 				struct timeval tv;
-				tv.tv_sec = 1;  // 5 seconds timeout
+				tv.tv_sec = 1;
 				tv.tv_usec = 0;
 				setsockopt(newSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 				client c(newSocket, listner->second);
@@ -108,22 +107,21 @@ void server::start()
 		}
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
-			if (activity == 0 && c->rcv > 0 && c->rcv < 4)
+			if ((activity == 0 && c->rcv > 0 && c->rcv < 4))
 			{
 				std::cout << "timout "<< std::endl;
 				c->rcv = 4;
+				c->setError(408);
 			}
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
 				char	buf[100000];
-				//std::vector<char> buf(1024);
 				memset(buf, 0, sizeof buf);
 				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
-				//add a timout here to close the socket if no data is received
-				//add a smaller timout to assume that the request is finished if no data is received and rcv == 1
+				c->last_rcv = std::clock();
 				if (r <= 0)
 				{
-					std::cout << "closing socket " << c->getSocket() << std::endl;
+					std::cout << "closing socket" << c->getSocket() << std::endl;
 					close(c->getSocket());
 					FD_CLR(c->getSocket(), &read_fds);
 					FD_CLR(c->getSocket(), &write_fds);
@@ -148,15 +146,10 @@ void server::start()
 			{
 				if (c->getFirstTime()) 
 				{
-					std::stringstream stream;
-					stream << c->getError();
-					c->setRes(response());
-					if (stream.str() != "200")
-					{
-						c->getRes().set_status_code(stream.str());
-						c->errorResponse(c->getRes());
-					}
+					c->handleMultipart();
 					c->matchHost(this->hosts);
+					c->setRes(response());
+					// c->getRes().checkError(*c);
 				}
 				int toSend = 0;
 				// c->getRes().get_response(*c);
@@ -194,6 +187,14 @@ void server::start()
 				}
 				if (c->getIsSent() == 1)
 				{
+					if (c->getValue("Connection") == "close")
+					{
+						close(c->getSocket());
+						FD_CLR(c->getSocket(), &read_fds);
+						FD_CLR(c->getSocket(), &write_fds);
+						clients.erase(c);
+						break;
+					}
 					c->resetClient();
 					c->snd = 0;
 					break ;
@@ -201,6 +202,18 @@ void server::start()
 				c->setSentBytes(0);
 				c->getRes().clear();
 			}
+			// std::clock_t newtime = std::clock();
+			// double time = (double)(newtime - c->last_rcv);
+			// std::cout << newtime << "    "<< c->last_rcv << "     "<<  std::endl;
+			// if (c->rcv == 0 && time > 1)
+			// {
+			// 	std::cout << "timout in here"<< std::endl;
+			// 	close(c->getSocket());
+			// 	FD_CLR(c->getSocket(), &read_fds);
+			// 	FD_CLR(c->getSocket(), &write_fds);
+			// 	clients.erase(c);
+			// 	break ;
+			// }
 		}
 	}
 }

@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/06 00:31:28 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/09 02:00:28 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), bodyname(""), rcv(0)
+client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), bodyname(""), rcv(0), last_rcv(std::clock())
 {
 	snd = 0;
 }
@@ -54,6 +54,20 @@ client& client::operator=(const client& other)
 
 client::~client(){}
 //getters & setters
+std::string generateString(int length) {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    std::string str;
+    srand(time(0));
+    for (int i = 0; i < length; ++i) {
+        str += alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+    return str;
+}
+
 int& client::getSocket() {return socket_fd;}
 std::string& client::getPort() {return port;}
 bool& client::getIsSent() {return isSent;}
@@ -70,10 +84,12 @@ void client::resetClient()
 	this->first_time = true;
 	this->snd = 0;
 	this->sent_bytes = 0;
-	bodyname = "";
+	this->bodyname = "";
 	if (this->file.is_open())
 		this->file.close();
 	res.clearall();
+	this->multipart.clear();
+	this->last_rcv = std::clock();
 }
 void client::makeError(int err, const std::string& msg)
 {
@@ -155,18 +171,152 @@ void client::parseHeader(std::string& header)
 	else
 		http_request[key] = value;
 }
+void client::handleMultipart(void)
+{
+	std::string type = http_request["Content-Type"];
+	if (type == "")
+		return;
+	if (type.find("multipart/form-data") != std::string::npos)
+	{
+		size_t pos = type.find("boundary=");
+		if (pos != std::string::npos)
+		{
+			pos += 9;
+			size_t found = type.find(";", pos);
+			std::string boundry = type.substr(pos, found -pos);
+			http_request["body"] = "multipart";
+			std::ifstream file(getBodyname().c_str());
+			std::ofstream output;
+			int track = 0;
+			if (file.is_open())
+			{
+				char	buf[2000];
+				std::string rest;
+				while (1)
+				{
+					file.read(buf, 2000);
+					std::string buff(buf, buf + file.gcount());
+					buff = rest + buff;
+					if (track == 0)
+					{
+						size_t found = buff.find("--" + boundry + "\r\n");
+						size_t pos = buff.find("\r\n\r\n", found + 4 + boundry.length());
+						if (found == std::string::npos || pos == std::string::npos)
+						{
+							error = 400;
+							return ;
+						}
+						found = found + 4 + boundry.length();
+						std::string headers = buff.substr(found, pos - found);
+						buff = buff.substr(pos + 4);
+						std::string newfile = "";
+						std::string quote(1, '"');
+						size_t f = headers.find("filename=" + quote);
+						if (f != std::string::npos)
+						{
+							f += 10;
+							size_t q = headers.find(quote, f);
+							if (q != std::string::npos)
+								newfile = headers.substr(f, q - f);
+						}
+						if (newfile == "")
+							newfile = newfile = generateString(5) + ".txt";
+						this->multipart.push_back(newfile);
+						if (output.is_open())
+							output.close();
+						output.open(newfile.c_str(), std::ios::out | std::ios::trunc);
+						output.close();
+						output.open(newfile.c_str(), std::ios::app);
+						track = 1;
+					}
+					if (track == 1)
+					{
+						size_t b = buff.find("\r\n--" + boundry + "\r\n");
+						if (b != std::string::npos)
+						{
+							track = 0;
+							rest = buff.substr(0, b);
+							buff = buff.substr(b + 2);
+							output << rest;
+						}
+						else if (buff.find("\r\n--" + boundry + "--\r\n") != std::string::npos)
+						{
+							b = buff.find("\r\n--" + boundry + "--\r\n");
+							buff = buff.substr(0, b);
+							output << buff;
+							output.close();
+							file.close();
+							remove(getBodyname().c_str());
+							return ;
+						}
+						else if (buff.find("\r") != std::string::npos)
+						{
+							b = buff.find("\r");
+							rest = buff.substr(0, b);
+							buff = buff.substr(b);
+							output << rest;
+						}
+						else
+						{
+							output << buff;
+							buff = "";
+						}
+					}
+					rest = buff;
+				}
+			}
+		}
+	}
+}
+void client::generateBodyName(void)
+{
+	std::string depo = http_request["Content-Disposition"];
+	if (depo != "")
+	{
+		size_t f = depo.find("filename=");
+		size_t pos = depo.find(";");
+		if (pos== std::string::npos)
+			pos = depo.length();
+		if (f != std::string::npos)
+		{
+			f += 9;
+			if (f < depo.length() && depo[f] == '"')
+				f++;
+			bodyname = depo.substr(f, pos - f);
+			if (bodyname.back() == '"')
+				bodyname.pop_back();
+			return ;
+		}
+	}
+	bodyname = generateString(5);
+	std::string type = http_request["Content-Type"];
+	if (type != "")
+	{
+		size_t p = type.find(";");
+		if (p != std::string::npos)
+			type.erase(p, type.length() - p);
+		std::cout << "type : -" << type << "-" << std::endl;
+		if (type == "text/plain")
+		{
+			std::cout << "body : -" << bodyname << "-"<< std::endl;
+			bodyname += ".txt";
+			return ;
+		}
+		size_t slash = type.find("/");
+		if (slash != std::string::npos)
+			bodyname = bodyname + "." + type.substr(slash + 1);
+	}
+}
 void client::addToBody(std::string& body)//MAKE IT RETURN 
 {
-	std::stringstream stream;
+	std::ofstream file;
 	static bool chunking_track = 0;
 	static size_t length = 0;
 	static std::string chunked = "";
-	std::ofstream file;
-	stream << socket_fd;
-	bodyname = "body" + stream.str();
 	if (rcv == 2)//first time
 	{
-		file.open(bodyname, std::ios::out | std::ios::trunc);
+		generateBodyName();
+		file.open(bodyname.c_str(), std::ios::out | std::ios::trunc);
 		file.close();
 	}
 	if (http_request["Transfer-Encoding"] == "chunked")
@@ -197,7 +347,7 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 		}
 		else
 		{
-			file.open(bodyname, std::ios::app);
+			file.open(bodyname.c_str(), std::ios::app);
 			size_t l = length;
 			size_t i = 0;
 			for (;i < found  && i < chunked.length() && i < l; i++)
@@ -215,7 +365,7 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 	}
 	else if (http_request["Content-Length"] != "")
 	{
-		file.open("body" + stream.str(), std::ios::app);
+		file.open(bodyname.c_str(), std::ios::app);
 		file.seekp(0, std::ios::end);
 		std::streampos size = file.tellp();
 		std::string length = http_request["Content-Length"];
@@ -357,3 +507,4 @@ std::string& client::getRequest(void) { return (request); }
 std::map<std::string, std::string>& client::getHttpRequest(void) { return (http_request); }
 int& client::getRcv(void) { return (rcv); }
 std::string& client::getBodyname() {return bodyname;}
+void client::setError(int code){this->error = code;}
