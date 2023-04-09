@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 01:24:24 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/09 04:49:54 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ public:
 	size_t &getSentBytes();
 	void setSentBytes(size_t sentBytes);
 	std::string getQuery() const;
-	void addToBody(std::string &body);
+	void addToBody(std::string body);
 	void addToRequestCheck(std::string &buff);
 	void setRes(const response &response);
 	int &getRcv();

@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 02:00:28 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/09 06:33:35 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,11 +190,11 @@ void client::handleMultipart(void)
 			int track = 0;
 			if (file.is_open())
 			{
-				char	buf[2000];
+				char	buf[1000000];
 				std::string rest;
 				while (1)
 				{
-					file.read(buf, 2000);
+					file.read(buf, 1000000);
 					std::string buff(buf, buf + file.gcount());
 					buff = rest + buff;
 					if (track == 0)
@@ -307,7 +307,7 @@ void client::generateBodyName(void)
 			bodyname = bodyname + "." + type.substr(slash + 1);
 	}
 }
-void client::addToBody(std::string& body)//MAKE IT RETURN 
+void client::addToBody(std::string body)
 {
 	std::ofstream file;
 	static bool chunking_track = 0;
@@ -317,55 +317,67 @@ void client::addToBody(std::string& body)//MAKE IT RETURN
 	{
 		generateBodyName();
 		file.open(bodyname.c_str(), std::ios::out | std::ios::trunc);
-		file.close();
+		if (file.is_open())
+		{
+			std::cout << "opened " << bodyname << std::endl;
+			file.close();
+		}
 	}
+	file.open(bodyname.c_str(), std::ios::app);
 	if (http_request["Transfer-Encoding"] == "chunked")
 	{
 		chunked += body;
-		if (chunked == "")
-			return;
-		size_t found = chunked.find("\r\n");
-		if (found == std::string::npos && chunking_track == 0)
+		while (chunked != "")
 		{
-			rcv = 3;
-			return;
-		}
-		if (chunking_track == 0)
-		{
-			chunking_track = 1;
-			std::string length_str = chunked.substr(0, found);
-			length = strtol(length_str.c_str(), NULL, 16);
-			if (length == 0)
+			if (chunking_track == 0)
 			{
-				chunking_track = 0;
-				length = 0;
-				chunked = "";
-				rcv = 4;
-				return;
+				int start = 0;
+				size_t found = chunked.find("\r\n");
+				if (found == 0)
+				{
+					found = chunked.find("\r\n");
+					start = 2;
+				}
+				if (found == std::string::npos)
+				{
+					rcv = 3;
+					return;
+				}
+				std::string length_str = chunked.substr(start, found);
+				length = strtol(length_str.c_str(), NULL, 16);
+				if (length == 0)
+				{
+					chunking_track = 0;
+					length = 0;
+					chunked = "";
+					rcv = 4;
+					file.close();
+					return;
+				}
+				chunked.erase(start, found + 2);
+				chunking_track = 1;
 			}
-			chunked.erase(0, found + 2);
-		}
-		else
-		{
-			file.open(bodyname.c_str(), std::ios::app);
-			size_t l = length;
-			size_t i = 0;
-			for (;i < found  && i < chunked.length() && i < l; i++)
+			if (chunking_track == 1)
 			{
-				file << chunked[i];
-				length--;
+				size_t l = length;
+				size_t i = 0;
+				for (; i < chunked.length() && i < l; i++)
+				{
+					file << chunked[i];
+					length--;
+				}
+				if (length == 0)
+				{
+					chunking_track = 0;
+					i += 2;
+				}
+				chunked.erase(0, i);
 			}
-			if (found != std::string::npos)
-				i += 2;
-			chunked.erase(0, i + 1);
-			if (length == 0)
-				chunking_track = 0;
 		}
 		rcv = 3;
 	}
 	else if (http_request["Content-Length"] != "")
 	{
-		file.open(bodyname.c_str(), std::ios::app);
 		file.seekp(0, std::ios::end);
 		std::streampos size = file.tellp();
 		std::string length = http_request["Content-Length"];

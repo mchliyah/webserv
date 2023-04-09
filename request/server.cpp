@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 01:48:10 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/09 06:23:20 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,9 +115,8 @@ void server::start()
 			}
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
-				char	buf[100000];
-				memset(buf, 0, sizeof buf);
-				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
+				char buf[1000000];
+				int	r = recv(c->getSocket(), buf, 1000000, 0);
 				c->last_rcv = std::clock();
 				if (r <= 0)
 				{
