@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/08 03:35:21 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/09 01:24:24 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstdio>
+#include <ctime>
 #include "config.hpp"
 #include "../includes/response.hpp"
 
@@ -47,10 +48,12 @@ private:
 public:
 	int rcv;
 	int snd;
+	std::clock_t last_rcv;
 	client(int sock, std::string &port_);
 	client(const client &other);
 	client &operator=(const client &other);
 	int &getSocket();
+	void setError(int code);
 	std::string &getPort();
 	bool &getIsSent();
 	void setIsSent(bool a);

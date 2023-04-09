@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 01:15:38 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/09 01:48:10 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,16 +107,18 @@ void server::start()
 		}
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
-			if (activity == 0 && c->rcv > 0 && c->rcv < 4)
+			if ((activity == 0 && c->rcv > 0 && c->rcv < 4))
 			{
 				std::cout << "timout "<< std::endl;
 				c->rcv = 4;
+				c->setError(408);
 			}
 			if (FD_ISSET(c->getSocket(), &read_fds))
 			{
 				char	buf[100000];
 				memset(buf, 0, sizeof buf);
 				int	r = recv(c->getSocket(), buf, sizeof(buf), 0);
+				c->last_rcv = std::clock();
 				if (r <= 0)
 				{
 					std::cout << "closing socket " << c->getSocket() << std::endl;
@@ -200,6 +202,18 @@ void server::start()
 				c->setSentBytes(0);
 				c->getRes().clear();
 			}
+			// std::clock_t newtime = std::clock();
+			// double time = (double)(newtime - c->last_rcv);
+			// std::cout << newtime << "    "<< c->last_rcv << "     "<<  std::endl;
+			// if (c->rcv == 0 && time > 1)
+			// {
+			// 	std::cout << "timout in here"<< std::endl;
+			// 	close(c->getSocket());
+			// 	FD_CLR(c->getSocket(), &read_fds);
+			// 	FD_CLR(c->getSocket(), &write_fds);
+			// 	clients.erase(c);
+			// 	break ;
+			// }
 		}
 	}
 }

@@ -6,13 +6,13 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/08 03:35:29 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/09 02:00:28 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), bodyname(""), rcv(0)
+client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), bodyname(""), rcv(0), last_rcv(std::clock())
 {
 	snd = 0;
 }
@@ -89,6 +89,7 @@ void client::resetClient()
 		this->file.close();
 	res.clearall();
 	this->multipart.clear();
+	this->last_rcv = std::clock();
 }
 void client::makeError(int err, const std::string& msg)
 {
@@ -189,12 +190,12 @@ void client::handleMultipart(void)
 			int track = 0;
 			if (file.is_open())
 			{
-				std::vector<char> buf(1000000);
+				char	buf[2000];
 				std::string rest;
 				while (1)
 				{
-					file.read(&buf[0], 1000000);
-					std::string buff(buf.begin(), buf.begin()+ file.gcount());
+					file.read(buf, 2000);
+					std::string buff(buf, buf + file.gcount());
 					buff = rest + buff;
 					if (track == 0)
 					{
@@ -506,3 +507,4 @@ std::string& client::getRequest(void) { return (request); }
 std::map<std::string, std::string>& client::getHttpRequest(void) { return (http_request); }
 int& client::getRcv(void) { return (rcv); }
 std::string& client::getBodyname() {return bodyname;}
+void client::setError(int code){this->error = code;}
