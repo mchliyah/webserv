@@ -11,7 +11,11 @@ void response::get_response(client& client) {
 	std::string file_path = location.getRoot() + path;
 	std::string rederec_header = "";
 	std::stringstream stream;
-	if (access(file_path.c_str(), F_OK) != -1)
+	if (location.getAllowsMethod()["GET"] == false) {
+		status_code = "405";
+		client.errorResponse(*this);
+	}
+	else if (access(file_path.c_str(), F_OK) != -1)
 	{
 		if (access(file_path.c_str(), R_OK) != -1)
 		{

@@ -46,7 +46,11 @@ void response::delete_response(client& client) {
 	std::string full_path = location.getRoot() + path;
 	if (full_path[full_path.length() - 1] == '/')
 		full_path = full_path.substr(0, full_path.length() - 1);
-	if (access(full_path.c_str(), F_OK) != -1)
+	if (location.getAllowsMethod()["DELETE"] == false) {
+		status_code = "405";
+		client.errorResponse(*this);
+	}
+	else if (access(full_path.c_str(), F_OK) != -1)
 	{
 		if (access(full_path.c_str(), W_OK) != -1)
 		{

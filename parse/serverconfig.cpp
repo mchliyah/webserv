@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/06 07:53:28 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/09 08:45:16 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,9 @@ std::string& serverconfig::readServer(std::ifstream& inputFile, std::string& lin
 	while (g_tab_count == 1) 
 	{
 		if (has_only_spaces(line) || line.empty())
-			throw std::runtime_error("Error: empty line inside server block\n \t or two or more empty lines");
-		if (line.find("#") != std::string::npos)
-			throw std::runtime_error("Error: comment is not allowed");
+			throw std::runtime_error("Error: empty line inside server block\n \t or line with only spaces");
+		if (line.find("#") != std::string::npos || line.find(";") != std::string::npos)
+			throw std::runtime_error("Error: invalid caracter in the file");
 		if (line.find("location") != std::string::npos)
 		{
 			locationconfig location;
@@ -130,14 +130,12 @@ void serverconfig::printServer() {
 	std::cout << "server_name: " << server_name << std::endl;
 	std::cout << "listen: " << listen << std::endl;
 	std::cout << "max_client_body_size: " << maxclientboddysize << std::endl;
-	std::map<std::string, std::string>::iterator it = errorpages.begin();
-	while (it++ != errorpages.end())
+	for (std::map<std::string, std::string>::iterator it = errorpages.begin(); it != errorpages.end(); it++)
 		std::cout << "error_page: " << it->first << " " << it->second << std::endl;
-	std::map<std::string, locationconfig>::iterator it2 = locations.begin();
-	while (it2++ != locations.end())
+	for (std::map<std::string, locationconfig>::iterator it = locations.begin(); it != locations.end(); it++)
 	{
-		std::cout << "location: " << it2->first << std::endl;
-		it2->second.printlocation();
+		std::cout << "location: " << it->first << std::endl;
+		it->second.printlocation();
 	}
 }
 
@@ -189,6 +187,18 @@ serverconfig::serverconfig() {
 
 std::map<std::string, std::string>& serverconfig::getDefaultPage() {
 	return default_page;
+}
+
+void serverconfig::setServerName(std::string name) {
+	server_name = name;
+}
+
+void serverconfig::setListen(std::string listen) {
+	this->listen = listen;
+}
+
+void serverconfig::setLocations(std::map<std::string, locationconfig>& loc) {
+	locations = loc;
 }
 
 serverconfig::~serverconfig() {

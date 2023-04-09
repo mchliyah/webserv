@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/06 03:29:03 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/09 09:16:10 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ response::response() {
 	status_code_map["404"] = "Not Found";
 	status_code_map["405"] = "Method Not Allowed";
 	status_code_map["413"] = "Payload Too Large";
+	status_code_map["412"] = "Precondition Failed";
 	status_code_map["414"] = "URI Too Long";
 	status_code_map["415"] = "Unsupported Media Type";
 	status_code_map["500"] = "Internal Server Error";
