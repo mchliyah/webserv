@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/08 03:35:42 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/09 01:15:38 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,6 +185,14 @@ void server::start()
 				}
 				if (c->getIsSent() == 1)
 				{
+					if (c->getValue("Connection") == "close")
+					{
+						close(c->getSocket());
+						FD_CLR(c->getSocket(), &read_fds);
+						FD_CLR(c->getSocket(), &write_fds);
+						clients.erase(c);
+						break;
+					}
 					c->resetClient();
 					c->snd = 0;
 					break ;
