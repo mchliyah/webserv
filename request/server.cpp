@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 06:23:20 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/09 07:44:28 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,17 @@ void server::start()
 		}
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
+			std::clock_t newtime = std::clock();
+			double time = (double)(newtime - c->last_rcv);
+			if (c->rcv == 0 && time > 1000)
+			{
+				std::cout << "timout in here"<< std::endl;
+				close(c->getSocket());
+				FD_CLR(c->getSocket(), &read_fds);
+				FD_CLR(c->getSocket(), &write_fds);
+				clients.erase(c);
+				break ;
+			}
 			if ((activity == 0 && c->rcv > 0 && c->rcv < 4))
 			{
 				std::cout << "timout "<< std::endl;
@@ -186,33 +197,20 @@ void server::start()
 				}
 				if (c->getIsSent() == 1)
 				{
-					if (c->getValue("Connection") == "close")
+					if (c->getValue("Connection") == "keep-alive")
+						c->resetClient();
+					else
 					{
 						close(c->getSocket());
 						FD_CLR(c->getSocket(), &read_fds);
 						FD_CLR(c->getSocket(), &write_fds);
 						clients.erase(c);
-						break;
 					}
-					c->resetClient();
-					c->snd = 0;
 					break ;
 				}
 				c->setSentBytes(0);
 				c->getRes().clear();
 			}
-			// std::clock_t newtime = std::clock();
-			// double time = (double)(newtime - c->last_rcv);
-			// std::cout << newtime << "    "<< c->last_rcv << "     "<<  std::endl;
-			// if (c->rcv == 0 && time > 1)
-			// {
-			// 	std::cout << "timout in here"<< std::endl;
-			// 	close(c->getSocket());
-			// 	FD_CLR(c->getSocket(), &read_fds);
-			// 	FD_CLR(c->getSocket(), &write_fds);
-			// 	clients.erase(c);
-			// 	break ;
-			// }
 		}
 	}
 }
