@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/09 09:16:10 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/10 06:20:15 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ response::response() {
 	char buffer[128];
 	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
 	this->date = "Date: " + std::string(buffer) + "\r\n";
+	status_code = "200";
+	status_message = "OK";
 	status_code_map["200"] = "OK";
 	status_code_map["201"] = "Created";
 	status_code_map["204"] = "No Content";

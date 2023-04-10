@@ -25,7 +25,7 @@ void response::get_response(client& client) {
 					return redirect(client, in_path);
 				if (!default_index(*this, client, location, path))
 				{
-					if (location.getAutoIndex() == "off") 
+					if (location.getAutoIndex() == "off" || client.getValue("Method") == "POST")
 					{
 						status_code = "403";
 						client.errorResponse(*this);
@@ -38,13 +38,24 @@ void response::get_response(client& client) {
 			}
 			else if (is_file(file_path))
 			{
-				if (client.getFirstTime())
+				std::string extension = file_path.substr(file_path.find_last_of('.'));
+				if ((extension == ".php" || extension == ".py") && location.getCgiPass() == "on")
+					client.cgi_response(*this, file_path, extension == ".php");
+				if (client.getValue("Method") == "POST")
 				{
-					client.openFile(*this, file_path);
-					client.setFirstTime(false);
-				} 
+					status_code = "403";
+					client.errorResponse(*this);
+				}
 				else
-					client.readFile(*this);
+				{
+					if (client.getFirstTime())
+					{
+						client.openFile(*this, file_path);
+						client.setFirstTime(false);
+					} 
+					else
+						client.readFile(*this);
+				}
 			}
 		}
 		else

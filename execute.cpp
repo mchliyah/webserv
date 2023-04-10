@@ -3,17 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   execute.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 01:13:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 01:13:35 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/10 02:01:07 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "includes/server.hpp"
 
-void client::execute()
+void client::execute(response &res, std::string& file_path)
 {
-	std::string script = std::string("/Users/slahrach/Desktop/after/script.cgi");
+	std::string script = ("/Users/slahrach/Desktop/after/script.cgi");
 	std::string script_name = std::string("SCRIPT_NAME=") + script;
 	std::string q = std::string ("QUERY_STRING=") + query;
 	std::string cookie = std::string ("HTTP_COOKIE=") + getValue("Cookie");
@@ -29,7 +30,7 @@ void client::execute()
 	char *const env[] = {(char *)script_name.c_str(), (char *)q.c_str(), (char *)cookie.c_str(), (char *)method.c_str(), (char *)script_filename.c_str(),
 		(char *)protocol.c_str(), (char *)software.c_str(), (char *)redirect.c_str(), (char *)uri.c_str(), (char *)host.c_str(), (char *)port.c_str(),(char *)gateway.c_str(), NULL};
 	char *const args[] = {(char *)script.c_str(), nullptr};
-	int fd = open("output.txt", O_RDWR | O_CREAT | O_TRUNC, 0666);
+	int fd = open("output", O_RDWR | O_CREAT | O_TRUNC, 0666);
 	int pid = fork();
 	if (pid == 0)
 	{

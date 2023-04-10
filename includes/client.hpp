@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 01:24:24 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/10 10:09:23 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,8 +89,10 @@ public:
 	void handleMultipart(void);
 	std::string& getBuff();
 	std::string& getBodyname();
+	std::vector<std::string>& getMultipart();
 	void errorResponse(response &res);
 	void defaultResponse(response &res);
+	void cgi_response(response &res, std::string& file_path, bool php);
 	~client();
 };
 std::string get_type(const std::string &path);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 02:00:28 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/10 10:10:04 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -508,3 +508,4 @@ std::map<std::string, std::string>& client::getHttpRequest(void) { return (http_
 int& client::getRcv(void) { return (rcv); }
 std::string& client::getBodyname() {return bodyname;}
 void client::setError(int code){this->error = code;}
+std::vector<std::string>& client::getMultipart() {return multipart;}

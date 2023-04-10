@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 09:17:42 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/10 09:32:36 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,6 @@ void server::start()
 					c->setRes(response());
 					if (stream.str() != "200")
 					{
-						std::cout << "error " << stream.str() << std::endl;
 						error = 1;
 						c->getRes().set_status_code(stream.str());
 						c->errorResponse(c->getRes());
@@ -176,12 +175,6 @@ void server::start()
 							break;
 						case 'D':
 							c->getRes().delete_response(*c);
-							break;
-						default:
-						{
-							std::cout << "Method not supported" << std::endl;
-							break;
-						}
 					}
 				}
 				toSend = c->getSentBytes();

@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 17:08:17 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/09 08:51:57 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/10 02:03:35 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ void check_all_set(std::vector<serverconfig>& servers)
 			it->setListen("80");
 		if (it->getLocations().empty() || it->getLocations().find("/") == it->getLocations().end())
 		{
-			std::cout << "here" << std::endl;
 			locationconfig loc;
 			loc.setRoot(std::getenv("PWD"));
 			loc.setName("/");
