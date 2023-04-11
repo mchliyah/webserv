@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/10 09:32:36 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/11 12:02:08 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,9 +178,12 @@ void server::start()
 					}
 				}
 				toSend = c->getSentBytes();
+				std::cout << "to send : " << toSend << std::endl;
+				std::cout << "buffer to send :\n" << c->getBuff() << std::endl;
 				while (toSend > 0)
 				{
 					int bytes = send(c->getSocket(), c->getBuff().c_str(), toSend, 0);
+					std::cout << "bytes sent : " << bytes << std::endl;
 					c->snd += bytes;
 					toSend -= bytes;
 					if (bytes == -1)
@@ -194,6 +197,7 @@ void server::start()
 				}
 				if (c->getIsSent() == 1)
 				{
+					std::cout << "sendeed :" << c->snd << std::endl;
 					if (c->getValue("Connection") == "close")
 					{
 						close(c->getSocket());

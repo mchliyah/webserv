@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 03:23:26 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/10 09:31:39 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/11 12:02:39 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 				res.set_status_code("200");
 				if (file.is_open())
 					file.close();
-				file.open("output.html", std::ios::in);
+				file.open("output.html");
 				struct stat buf;
 				std::stringstream stream;
 				if (!file.is_open() || stat("output.html", &buf) == -1)
@@ -85,6 +85,7 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 				header = "";
 				if (php)
 				{
+					std::cout << "is php" << std::endl;
 					std::string line;
 					std::getline(file, line);
 					while (line != "\r")
@@ -95,13 +96,22 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 					stream << buf.st_size - header.size() - 2;
 				}
 				else
+				{
+					std::cout << "is python" << std::endl;
+					res.set_content_type("Content-Type: text/html\r\n");
 					stream << buf.st_size;
+				}
 				res.set_content_length("Content-Length: " + stream.str() + "\r\n");
-				res.set_header("HTTP/1.1 200 OK\r\n" + res.get_date() + res.get_content_length() + header + "\r\n");
+				res.set_header("HTTP/1.1 200 OK\r\n" + res.get_date() + res.get_content_type() + res.get_content_length() + header + "\r\n");
+				std::cout << "heder size : " << res.get_header().size() << std::endl;
 				sent_bytes = res.get_header().size();
+				// std::cout << "wa safi 3afaak :\n" << res.get_header() << std::endl;
 			}
 		}
 	}
 	else
+	{
+		std::cout << "second time" << std::endl;
 		readFile(res);
+	}
 }

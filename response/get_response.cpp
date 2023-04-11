@@ -39,13 +39,13 @@ void response::get_response(client& client) {
 			else if (is_file(file_path))
 			{
 				std::string extension = file_path.substr(file_path.find_last_of('.'));
-				if ((extension == ".php" || extension == ".py") && location.getCgiPass() == "on")
-					client.cgi_response(*this, file_path, extension == ".php");
 				if (client.getValue("Method") == "POST")
 				{
 					status_code = "403";
 					client.errorResponse(*this);
 				}
+				if ((extension == ".php" || extension == ".py") && location.getCgiPass() == "on")
+					client.cgi_response(*this, file_path, extension == ".php");
 				else
 				{
 					if (client.getFirstTime())
@@ -70,6 +70,10 @@ void response::get_response(client& client) {
 		client.errorResponse(*this);
 	}
 	client.setBuff(header + body);
+	// std::cout << "header size : " << header.size() << std::endl;
+	// std::cout << "header: " << header << std::endl;
+	// std::cout << "body: " << body << std::endl;
+
 }
 
 void response::redirect(client &client, std::string &in_path) {
