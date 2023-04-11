@@ -16,8 +16,8 @@ std::string& locationconfig::readlocation(std::ifstream& inputFile, std::string&
 	std::string key, value;
 	while (g_tab_count == 2)
 	{
-		if (line.find("#") != std::string::npos)
-			throw std::runtime_error("Error: comment is not allowed");
+		if (line.find("#") != std::string::npos || line.find(";") != std::string::npos)
+			throw std::runtime_error("Error: invalid caracter in the file");
 		if (has_only_spaces(line) || line.empty())
 			continue;
 		if (line.find("location") != std::string::npos || (line.find("server") != std::string::npos && line.length() == 6))
@@ -70,18 +70,10 @@ void locationconfig::printlocation() {
 	std::cout << "	cgi_pass: " << cgi_pass << std::endl;
 	std::cout << "	autoindex: " << autoindex << std::endl;
 	std::cout << "	upload_store: " << upload_store << std::endl;
-	std::vector<std::string>::iterator it = index.begin();
-	while (it != index.end())
-	{
+	for (std::vector<std::string>::iterator it = index.begin(); it != index.end() ; it++)
 		std::cout << "	index: " << *it << std::endl;
-		it++;
-	}
-	std::map<std::string, bool>::iterator it2 = allowsmethod.begin();
-	while (it2 != allowsmethod.end())
-	{
-		std::cout << "	allow_method: " << it2->first << " " << it2->second << std::endl;
-		it2++;
-	}
+	for (std::map<std::string, bool>::iterator it = allowsmethod.begin(); it != allowsmethod.end(); it++)
+		std::cout << "	allow_method: " << it->first << " " << it->second << std::endl;
 	std::cout << "========= " << std::endl;
 }
 
@@ -143,6 +135,25 @@ void locationconfig::setName(std::string name){
 
 std::string& locationconfig::getUploadStore(){
 	return (this->upload_store);
+}
+void locationconfig::setRoot(std::string root){
+	this->root = root;
+}
+
+void locationconfig::setCgiPass(std::string cgi_pass){
+	this->cgi_pass = cgi_pass;
+}
+
+void locationconfig::setAllowsMethod(std::map<std::string, bool>& allowsmethod){
+	this->allowsmethod = allowsmethod;
+}
+
+void locationconfig::setIndex(std::vector<std::string>& index){
+	this->index = index;
+}
+
+void locationconfig::setAutoIndex(std::string autoindex){
+	this->autoindex = autoindex;
 }
 
 locationconfig::~locationconfig() {

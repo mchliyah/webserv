@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/08 03:36:04 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/11 13:03:20 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ int main(int argc, char **argv)
 		std::vector<serverconfig> servers;
 		servers = parse(servers, argv[1]);
 		std::vector<std::string> v;
-		std::cout << std::endl << std::endl;
 		std::vector<serverconfig>::iterator it1;
 		for (it1 = servers.begin(); it1 != servers.end(); it1++)
 		{
@@ -41,6 +40,7 @@ int main(int argc, char **argv)
 				v.push_back(it1->getListen());
 		}
 		server my(v, servers);
+		srand(time(0));
 		my.start();
 	}
 	catch(const std::exception& e)

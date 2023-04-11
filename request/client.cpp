@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 07:22:54 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/11 14:18:43 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ std::string generateString(int length) {
         "abcdefghijklmnopqrstuvwxyz";
 
     std::string str;
-    srand(time(0));
     for (int i = 0; i < length; ++i) {
         str += alphanum[rand() % (sizeof(alphanum) - 1)];
     }
@@ -97,6 +96,49 @@ void client::makeError(int err, const std::string& msg)
 	err_message = msg;
 	rcv = 4;
 }
+int client::fileSize(std::string filename)
+{
+    std::ifstream file;
+    struct stat st;
+    int size;
+	std::cout << filename << std::endl;
+    file.open(filename.c_str());
+    if (stat(filename.c_str(), &st) != -1)
+    {
+        size = st.st_size;
+        std::cout << size << std::endl;
+        file.close();
+        return (size);
+    }
+    file.close();
+    return (-1);
+}
+void client::checkBodySize(void)
+{
+    if (error == 200)
+    {
+        std::string max = getHost().getMaxClientBodySize();
+		if (max == "")
+			return ;
+        std::stringstream size(max);
+        int maxBodySize;
+        size >> maxBodySize;
+        std::cout << "maaaax " << maxBodySize << std::endl;
+        if (size == 0)
+            return ;
+        int sz = 0;
+        if (http_request["body"] == "present")
+            sz = fileSize(getBodyname());
+        else if (http_request["body"] == "multipart")
+        {
+            for (std::vector<std::string>::iterator it = multipart.begin(); it != multipart.end(); it++)
+                sz += fileSize(*it);
+        }
+        std::cout <<"sz   " << sz << std::endl;
+        if (sz < 0 || sz > maxBodySize)
+            error = 413;
+    }
+}
 int	client::checkMethod_URL()
 {
 	bool	found = 0;
@@ -113,8 +155,8 @@ int	client::checkMethod_URL()
 	size_t pos = getValue("URL").find("?");
 	if (pos != std::string::npos)
 	{
-		http_request["URL"] = getValue("URL").substr(0, pos);
 		query = getValue("URL").substr(pos + 1);
+		http_request["URL"] = getValue("URL").substr(0, pos);
 	}
 	return (0);
 }
@@ -220,7 +262,8 @@ void client::handleMultipart(void)
 								newfile = headers.substr(f, q - f);
 						}
 						if (newfile == "")
-							newfile = newfile = generateString(5) + ".txt";
+							newfile = generateString(5) + ".txt";
+						std::cout << "newfile is : " << newfile << std::endl;
 						this->multipart.push_back(newfile);
 						if (output.is_open())
 							output.close();
@@ -520,3 +563,4 @@ std::map<std::string, std::string>& client::getHttpRequest(void) { return (http_
 int& client::getRcv(void) { return (rcv); }
 std::string& client::getBodyname() {return bodyname;}
 void client::setError(int code){this->error = code;}
+std::vector<std::string>& client::getMultipart() {return multipart;}

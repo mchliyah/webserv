@@ -6,6 +6,11 @@ server
 .vscode
 out
 body*
+*.mp4
+*.mp3
+*.avi
+*.mov
+
 #check for connection = close
 #check for max bodysize
 #check error codes

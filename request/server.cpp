@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 07:44:28 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/11 14:19:53 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void server::start()
 				c->last_rcv = std::clock();
 				if (r <= 0)
 				{
-					std::cout << "closing socket " << c->getSocket() << std::endl;
+					std::cout << "closing socket" << c->getSocket() << std::endl;
 					close(c->getSocket());
 					FD_CLR(c->getSocket(), &read_fds);
 					FD_CLR(c->getSocket(), &write_fds);
@@ -154,30 +154,36 @@ void server::start()
 			}
 			if (FD_ISSET(c->getSocket(), &write_fds))
 			{
+				std::stringstream stream;
+				int error = 0;
 				if (c->getFirstTime()) 
 				{
 					c->handleMultipart();
 					c->matchHost(this->hosts);
+					c->checkBodySize();
+					stream << c->getError();
 					c->setRes(response());
-					// c->getRes().checkError(*c);
+					if (stream.str() != "200")
+					{
+						error = 1;
+						c->getRes().set_status_code(stream.str());
+						c->errorResponse(c->getRes());
+						c->setBuff(c->getRes().get_header() + c->getRes().get_body());
+					}
 				}
 				int toSend = 0;
-				// c->getRes().get_response(*c);
-				switch (c->getValue("Method")[0])
+				if (!error)
 				{
-					case 'G':
-						c->getRes().get_response(*c);
-						break;
-					case 'P':
-						c->getRes().post_response(*c);
-						break;
-					case 'D':
-						c->getRes().delete_response(*c);
-						break;
-					default:
+					switch (c->getValue("Method")[0])
 					{
-						std::cout << "Method not supported" << std::endl;
-						break;
+						case 'G':
+							c->getRes().get_response(*c);
+							break;
+						case 'P':
+							c->getRes().post_response(*c);
+							break;
+						case 'D':
+							c->getRes().delete_response(*c);
 					}
 				}
 				toSend = c->getSentBytes();
@@ -197,6 +203,7 @@ void server::start()
 				}
 				if (c->getIsSent() == 1)
 				{
+					std::cout << "sendeed :" << c->snd << std::endl;
 					if (c->getValue("Connection") == "keep-alive")
 						c->resetClient();
 					else

@@ -11,31 +11,66 @@ void response::get_response(client& client) {
 	std::string file_path = location.getRoot() + path;
 	std::string rederec_header = "";
 	std::stringstream stream;
-	if (access(file_path.c_str(), F_OK) != -1) {
-		if (access(file_path.c_str(), R_OK) != -1) {
-			if (is_dir(file_path)) {
+	if (location.getAllowsMethod()["GET"] == false) {
+		status_code = "405";
+		client.errorResponse(*this);
+	}
+	else if (access(file_path.c_str(), F_OK) != -1)
+	{
+		if (access(file_path.c_str(), R_OK) != -1)
+		{
+			if (is_dir(file_path))
+			{
 				if (in_path[in_path.length() - 1] != '/')
 					return redirect(client, in_path);
-				if (!default_index(*this, client, location, path) && location.getAutoIndex() == "on")
-					if (!list_dir(client, file_path)) {
+				if (!default_index(*this, client, location, path))
+				{
+					if (location.getAutoIndex() == "off" || client.getValue("Method") == "POST")
+					{
+						status_code = "403";
+						client.errorResponse(*this);
+					}
+					else if (!list_dir(client, file_path)) {
 						status_code = "500";
 						client.errorResponse(*this);
 					}
-			} else if (is_file(file_path)) {
-				if (client.getFirstTime()) {
-					client.openFile(*this, file_path);
-					client.setFirstTime(false);
-				} else client.readFile(*this);
+				}
 			}
-		} else {
+			else if (is_file(file_path))
+			{
+				std::string extension = file_path.substr(file_path.find_last_of('.'));
+				if (client.getValue("Method") == "POST")
+				{
+					status_code = "403";
+					client.errorResponse(*this);
+				}
+				if ((extension == ".php" || extension == ".py") && location.getCgiPass() == "on")
+					client.cgi_response(*this, file_path, extension == ".php");
+				else
+				{
+					if (client.getFirstTime())
+					{
+						client.openFile(*this, file_path);
+						client.setFirstTime(false);
+					} 
+					else
+						client.readFile(*this);
+				}
+			}
+		}
+		else
+		{
 			status_code = "403";
 			client.errorResponse(*this);
 		}
-	} else {
+	}
+	else
+	{
 		status_code = "404";
 		client.errorResponse(*this);
 	}
 	client.setBuff(header + body);
+
 }
 
 void response::redirect(client &client, std::string &in_path) {

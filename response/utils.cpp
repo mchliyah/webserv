@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 14:33:29 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/05 06:17:10 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/11 12:50:50 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,22 @@ bool default_index(response &res, client &client, locationconfig& loc, std::stri
 		std::string file_path = loc.getRoot() + path + *it;
 		if (access(file_path.c_str(), F_OK) != -1)
 		{
-			if (client.getFirstTime())
+			if (access(file_path.c_str(), R_OK) == -1 || client.getValue("Method") == "POST")
 			{
-				client.openFile(res, file_path);
-				client.setFirstTime(false);
+				res.set_status_code("403");
+				client.errorResponse(res);
+				return true;
 			}
 			else 
-				client.readFile(res);
+			{
+				if (client.getFirstTime())
+				{
+					client.openFile(res, file_path);
+					client.setFirstTime(false);
+				}
+				else 
+					client.readFile(res);
+			}
 			return true;
 		}
 	}
