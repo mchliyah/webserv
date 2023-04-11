@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/11 12:02:08 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/11 13:38:35 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,7 +150,7 @@ void server::start()
 				{
 					c->handleMultipart();
 					c->matchHost(this->hosts);
-					// c->getRes().checkError(*c);
+					c->checkBodySize();
 					stream << c->getError();
 					c->setRes(response());
 					if (stream.str() != "200")
@@ -162,7 +162,6 @@ void server::start()
 					}
 				}
 				int toSend = 0;
-				// c->getRes().get_response(*c);
 				if (!error)
 				{
 					switch (c->getValue("Method")[0])
@@ -178,12 +177,9 @@ void server::start()
 					}
 				}
 				toSend = c->getSentBytes();
-				std::cout << "to send : " << toSend << std::endl;
-				std::cout << "buffer to send :\n" << c->getBuff() << std::endl;
 				while (toSend > 0)
 				{
 					int bytes = send(c->getSocket(), c->getBuff().c_str(), toSend, 0);
-					std::cout << "bytes sent : " << bytes << std::endl;
 					c->snd += bytes;
 					toSend -= bytes;
 					if (bytes == -1)

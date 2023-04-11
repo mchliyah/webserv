@@ -70,9 +70,6 @@ void response::get_response(client& client) {
 		client.errorResponse(*this);
 	}
 	client.setBuff(header + body);
-	// std::cout << "header size : " << header.size() << std::endl;
-	// std::cout << "header: " << header << std::endl;
-	// std::cout << "body: " << body << std::endl;
 
 }
 

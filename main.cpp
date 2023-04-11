@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/09 05:55:55 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/11 13:03:20 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ int main(int argc, char **argv)
 				v.push_back(it1->getListen());
 		}
 		server my(v, servers);
+		srand(time(0));
 		my.start();
 	}
 	catch(const std::exception& e)

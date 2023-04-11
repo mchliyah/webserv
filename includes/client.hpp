@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/10 10:09:23 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/11 13:16:55 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,8 @@ public:
 	std::map<std::string, std::string> &getHttpRequest();
 	void setBuff(std::string buff);
 	void generateBodyName(void);
+	int fileSize(std::string filename);
+	void checkBodySize(void);
 	void handleMultipart(void);
 	std::string& getBuff();
 	std::string& getBodyname();
