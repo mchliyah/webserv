@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+         #
+#    By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/25 05:11:56 by slahrach          #+#    #+#              #
-#    Updated: 2023/04/09 23:03:04 by mchliyah         ###   ########.fr        #
+#    Updated: 2023/04/11 15:56:18 by slahrach         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,19 +26,19 @@ FILES = main.cpp \
 OBJECTS = $(FILES:.cpp=.o)
 
 %.o: %.cpp
-	$(CC) $(CFLAGS)  $(STDFLAGS) -c -o $@ $<
+	@$(CC) $(CFLAGS)  $(STDFLAGS) -c -o $@ $<
 
 all : $(NAME)
 
 $(NAME) :  $(OBJECTS)
-	$(CC)   $(OBJECTS) -o $(NAME) #-fsanitize=address 
+	@$(CC)   $(OBJECTS) -o $(NAME) #-fsanitize=address 
 
 
 clean :
-	$(RM) $(OBJECTS)
+	@$(RM) $(OBJECTS)
 
 fclean : clean
-	$(RM) $(NAME)
+	@$(RM) $(NAME)
 
 re : fclean all
 

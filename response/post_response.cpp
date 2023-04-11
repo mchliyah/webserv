@@ -9,8 +9,7 @@ void response::post_response(client& client) {
 	location = matchlocation(server, in_path);
 	std::string path = location.getUploadStore();
 	std::string full_path;
-	if (path[path.length() - 1] != '/')
-			path += '/';
+	std::cout<< "upload path " << path << std::endl;
 	if (location.getAllowsMethod()["POST"] == false) {
 		status_code = "405";
 		client.errorResponse(*this);
@@ -19,15 +18,15 @@ void response::post_response(client& client) {
 	{
 		std::cout << "not multipart" << std::endl;
 		std::cout << "path : " << path << std::endl;
+		if (path[path.length() - 1] != '/')
+			path += '/';
 		full_path = path + client.getBodyname();
 		size_t pos = path.find_first_of(&path[1], '/');
 		while (pos < path.length())
 		{
 			std::string tmp = path.substr(0, pos);
 			if (access(tmp.c_str(), F_OK) != 0)
-			{
 				mkdir(tmp.c_str(), 0777);
-			}
 			pos = path.find_first_of(&path[pos + 1], '/');
 		}
 		if (std::rename(client.getBodyname().c_str(), full_path.c_str()) != 0)
@@ -52,6 +51,8 @@ void response::post_response(client& client) {
 		std::cout << "multipart" << std::endl;
 		std::vector<std::string>::iterator it;
 		std::string ext_header;
+		if (path[path.length() - 1] != '/')
+			path += '/';
 		for (it = client.getMultipart().begin(); it != client.getMultipart().end(); it++)
 		{
 			full_path = path + *it;
