@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/10 06:20:15 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/11 14:02:38 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ response::response() {
 	status_code_map["403"] = "Forbidden";
 	status_code_map["404"] = "Not Found";
 	status_code_map["405"] = "Method Not Allowed";
+	status_code_map["406"] = "Not Acceptable";
+	status_code_map["408"] = "Request Timeout";
 	status_code_map["413"] = "Payload Too Large";
 	status_code_map["412"] = "Precondition Failed";
 	status_code_map["414"] = "URI Too Long";

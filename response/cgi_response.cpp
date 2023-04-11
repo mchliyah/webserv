@@ -6,11 +6,13 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 03:23:26 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/11 12:06:18 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/11 14:08:54 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
+#include <sys/wait.h>
+#include <signal.h>
 
 void client::cgi_response(response &res, std::string& file_path, bool php)
 {
@@ -54,9 +56,27 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 		}
 		else
 		{
+			int count = 0;
 			int status;
+			while (1)
+			{
+				int result = waitpid(pid, &status, WNOHANG);
+				if (result != 0 && WIFEXITED(status))
+					break;
+				if (count > 5)
+				{
+					res.set_status_code("408");//modify later
+					kill(pid, SIGKILL);//we should exit the child process
+					errorResponse(res);
+					dup2(STDIN_FILENO, 0);
+					dup2(STDOUT_FILENO, 1);
+					close(fd);
+					return;
+				}
+				count++;
+				sleep(1);
+			}
 			std::istringstream stream;
-			waitpid(pid, &status, 0);
 			dup2(STDIN_FILENO, 0);
 			dup2(STDOUT_FILENO, 1);
 			close(fd);
