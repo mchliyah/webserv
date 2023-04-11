@@ -17,6 +17,8 @@ void response::post_response(client& client) {
 	}
 	else if (path != "" && client.getValue("body") != "multipart")
 	{
+		std::cout << "not multipart" << std::endl;
+		std::cout << "path : " << path << std::endl;
 		full_path = path + client.getBodyname();
 		size_t pos = path.find_first_of(&path[1], '/');
 		while (pos < path.length())
@@ -32,6 +34,7 @@ void response::post_response(client& client) {
 		{
 			status_code = "500";
 			status_message = "Internal Server Error";
+			std::cout << "rename error" << std::endl;
 			std::remove(client.getBodyname().c_str());
 		}
 		header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
@@ -46,10 +49,13 @@ void response::post_response(client& client) {
 	}
 	else if (path != "" && client.getValue("body") == "multipart")
 	{
+		std::cout << "multipart" << std::endl;
 		std::vector<std::string>::iterator it;
+		std::string ext_header;
 		for (it = client.getMultipart().begin(); it != client.getMultipart().end(); it++)
 		{
 			full_path = path + *it;
+			std::cout << "full_path : " << full_path << std::endl;
 			size_t pos = path.find_first_of(&path[1], '/');
 			while (pos < path.length())
 			{
@@ -64,15 +70,17 @@ void response::post_response(client& client) {
 			{
 				status_code = "500";
 				status_message = "Internal Server Error";
+				std::cout << "rename error multipart " << std::endl;
 				std::remove((*it).c_str());
 				break;
 			}
+			ext_header += "Location: " + full_path + "\r\n";
 		}
 		header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 		content_length = "Content-Length: 0\r\n";
 		header += date + content_type + content_length;
 		if (status_code == "201")
-			header += "Location: " + full_path + "\r\n";
+			header += ext_header;
 		header += "\r\n";
 		client.setBuff(header);
 		client.setIsSent(1);
