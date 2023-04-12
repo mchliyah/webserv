@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/12 03:44:35 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/12 07:11:24 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,12 +101,10 @@ int client::fileSize(std::string filename)
     std::ifstream file;
     struct stat st;
     int size;
-	std::cout << filename << std::endl;
     file.open(filename.c_str());
     if (stat(filename.c_str(), &st) != -1)
     {
         size = st.st_size;
-        std::cout << size << std::endl;
         file.close();
         return (size);
     }
@@ -123,9 +121,6 @@ void client::checkBodySize(void)
         std::stringstream size(max);
         int maxBodySize;
         size >> maxBodySize;
-        std::cout << "maaaax " << maxBodySize << std::endl;
-        if (size == 0)
-            return ;
         int sz = 0;
         if (http_request["body"] == "present")
             sz = fileSize(getBodyname());
@@ -134,8 +129,7 @@ void client::checkBodySize(void)
             for (std::vector<std::string>::iterator it = multipart.begin(); it != multipart.end(); it++)
                 sz += fileSize(*it);
         }
-        std::cout <<"sz   " << sz << std::endl;
-        if (sz < 0 || sz > maxBodySize)
+        if (sz <= 0 || sz > maxBodySize)
             error = 413;
     }
 }
@@ -265,7 +259,6 @@ void client::handleMultipart(void)
 						}
 						if (newfile == "")
 							newfile = generateString(5) + ".txt";
-						std::cout << "newfile is : " << newfile << std::endl;
 						this->multipart.push_back(newfile);
 						if (output.is_open())
 							output.close();
@@ -340,10 +333,8 @@ void client::generateBodyName(void)
 		size_t p = type.find(";");
 		if (p != std::string::npos)
 			type.erase(p, type.length() - p);
-		std::cout << "type : -" << type << "-" << std::endl;
 		if (type == "text/plain")
 		{
-			std::cout << "body : -" << bodyname << "-"<< std::endl;
 			bodyname += ".txt";
 			return ;
 		}
@@ -363,10 +354,7 @@ void client::addToBody(std::string body)
 		generateBodyName();
 		file.open(bodyname.c_str(), std::ios::out | std::ios::trunc);
 		if (file.is_open())
-		{
-			std::cout << "opened " << bodyname << std::endl;
 			file.close();
-		}
 	}
 	file.open(bodyname.c_str(), std::ios::app);
 	if (http_request["Transfer-Encoding"] == "chunked")
@@ -566,3 +554,12 @@ int& client::getRcv(void) { return (rcv); }
 std::string& client::getBodyname() {return bodyname;}
 void client::setError(int code){this->error = code;}
 std::vector<std::string>& client::getMultipart() {return multipart;}
+void client::removeFiles()
+{
+	for (std::vector<std::string>::iterator it = multipart.begin(); it != multipart.end(); it++)
+	{
+		std::string file = *it;
+		remove(file.c_str());
+	}
+	remove(bodyname.c_str());
+}

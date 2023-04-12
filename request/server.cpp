@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/12 04:05:00 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/12 06:59:12 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,8 +80,8 @@ void server::start()
 		int activity = select(maxSocket + 1, &read_fds, &write_fds, NULL, &timeout);
 		if (activity == -1)
 		{
-			perror("select error");
-			break;
+			std::cout << "select error" << std::endl;
+			continue;
 		}
 		for (std::vector<std::pair<int, std::string> >::iterator listner = listners.begin(); listner < listners.end(); listner++)
 		{
@@ -92,15 +92,11 @@ void server::start()
 				int newSocket = accept(listner->first, reinterpret_cast<sockaddr *>(&addr), &len);
 				if (newSocket == -1)
 				{
-					perror("accept failed");
+					std::cout << "accept failed" << std::endl;
 					continue;
 				}
 				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
 				fcntl(newSocket, F_SETFL, O_NONBLOCK);
-				struct timeval tv;
-				tv.tv_sec = 1;
-				tv.tv_usec = 0;
-				setsockopt(newSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 				client c(newSocket, listner->second);
 				clients.push_back(c);
 			}
@@ -120,7 +116,7 @@ void server::start()
 			// }
 			if ((activity == 0 && c->rcv > 0 && c->rcv < 4))
 			{
-				std::cout << "timout "<< std::endl;
+				std::cout << "timout"<< std::endl;
 				c->rcv = 4;
 				c->setError(408);
 			}
@@ -158,11 +154,9 @@ void server::start()
 				int error = 0;
 				if (c->getFirstTime()) 
 				{
-					c->handleMultipart();
 					c->matchHost(this->hosts);
 					c->checkBodySize();
 					stream << c->getError();
-					// c->printAttr();
 					c->setRes(response());
 					if (stream.str() != "200")
 					{
@@ -204,6 +198,7 @@ void server::start()
 				}
 				if (c->getIsSent() == 1)
 				{
+					c->removeFiles();
 					if (c->getValue("Connection") == "keep-alive")
 						c->resetClient();
 					else
