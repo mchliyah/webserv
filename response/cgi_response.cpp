@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 03:23:26 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/12 06:05:46 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/12 07:28:43 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,11 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 	{
 		first_time = false;
 		std::string outFile = getName();
+		std::cout << outFile << std::endl;
 		int fd = open(outFile.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0666);
-		int fd1 = open(getBodyname().c_str(), O_RDONLY);
+		int fd1 = 0;
+		if (getValue("Method") == "POST")
+			fd1 = open(getBodyname().c_str(), O_RDONLY);
 		int pid = fork();
 		if (pid < 0)
 		{
