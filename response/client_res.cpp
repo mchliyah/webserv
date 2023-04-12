@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 00:19:53 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/10 02:25:15 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/12 04:00:09 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ bool client::openFile(response &res, std::string& path)
 		res.set_content_type("Content-Type: "+ get_type(path) + " \r\n");
 		res.set_header("HTTP/1.1 " + res.get_status_code() + " " + res.get_status_message() + "\r\n"
 			+ res.get_date() +  res.get_content_type() + res.get_content_length() + "\r\n");
-		// std::cout << res.get_content_length() << std::endl;
 		sent_bytes = res.get_header().size();
 	} else
 		return (false);

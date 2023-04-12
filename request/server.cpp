@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/11 14:19:53 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/12 04:05:00 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,17 +107,17 @@ void server::start()
 		}
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
-			std::clock_t newtime = std::clock();
-			double time = (double)(newtime - c->last_rcv);
-			if (c->rcv == 0 && time > 1000)
-			{
-				std::cout << "timout in here"<< std::endl;
-				close(c->getSocket());
-				FD_CLR(c->getSocket(), &read_fds);
-				FD_CLR(c->getSocket(), &write_fds);
-				clients.erase(c);
-				break ;
-			}
+			// std::clock_t newtime = std::clock();
+			// double time = (double)(newtime - c->last_rcv);
+			// if (c->rcv == 0 && time > 1000)
+			// {
+			// 	std::cout << "timout in here"<< std::endl;
+			// 	close(c->getSocket());
+			// 	FD_CLR(c->getSocket(), &read_fds);
+			// 	FD_CLR(c->getSocket(), &write_fds);
+			// 	clients.erase(c);
+			// 	break ;
+			// }
 			if ((activity == 0 && c->rcv > 0 && c->rcv < 4))
 			{
 				std::cout << "timout "<< std::endl;
@@ -162,6 +162,7 @@ void server::start()
 					c->matchHost(this->hosts);
 					c->checkBodySize();
 					stream << c->getError();
+					// c->printAttr();
 					c->setRes(response());
 					if (stream.str() != "200")
 					{
@@ -203,7 +204,6 @@ void server::start()
 				}
 				if (c->getIsSent() == 1)
 				{
-					std::cout << "sendeed :" << c->snd << std::endl;
 					if (c->getValue("Connection") == "keep-alive")
 						c->resetClient();
 					else
