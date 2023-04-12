@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/12 09:37:52 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/12 10:15:11 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,35 +16,21 @@ server::server(std::vector<std::string>& ports_, std::vector<serverconfig>& serv
 
 std::pair<int, std::string> server::createBindListen(std::string& port)
 {
-	struct addrinfo hints, *res, *p;
-	int yes = 1;
-	int listner;
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE; // assign the adress of my localhost for me
-	if (getaddrinfo(NULL, port.c_str(), &hints, &res) != 0)
-		throw std::runtime_error("gai_strerror()");
-	for (p = res; p != NULL; p = p->ai_next)
-	{
-		listner = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-		if (listner < 0)
-			continue;
-		setsockopt(listner, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-		if (bind(listner, p->ai_addr, p->ai_addrlen) < 0)
-		{
-			close(listner);
-			continue;
-		}
-		break;
-	}
+	int listner = socket(AF_INET, SOCK_STREAM, 0);
+	if (listner == -1)
+		throw std::runtime_error("webserver (socket)");
+	struct sockaddr_in host_addr;
+	int host_addrlen = sizeof(host_addr);
 
-	if (p == NULL)
-		throw std::runtime_error("cant bind it");
-	freeaddrinfo(res);
+	host_addr.sin_family = AF_INET;
+	host_addr.sin_port = htons(atoi(port.c_str()));
+	host_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	if (bind(listner, (struct sockaddr *)&host_addr, host_addrlen) != 0)
+		throw std::runtime_error("webserver (bind)");
 	fcntl(listner, F_SETFL, O_NONBLOCK);
-	if (listen(listner, 100) == -1)
-		throw std::runtime_error("listen");
+	if (listen(listner, 128) != 0)
+		throw std::runtime_error("webserver (listen)");
 	std::cout << "listening on port " << port << std::endl;
 	std::pair<int, std::string> r(listner, port);
 	return (r);
