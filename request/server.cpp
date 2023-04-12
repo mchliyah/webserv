@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/12 06:59:12 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/12 09:37:52 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ std::pair<int, std::string> server::createBindListen(std::string& port)
 		throw std::runtime_error("cant bind it");
 	freeaddrinfo(res);
 	fcntl(listner, F_SETFL, O_NONBLOCK);
-	if (listen(listner, 10) == -1)
+	if (listen(listner, 100) == -1)
 		throw std::runtime_error("listen");
 	std::cout << "listening on port " << port << std::endl;
 	std::pair<int, std::string> r(listner, port);
@@ -103,17 +103,6 @@ void server::start()
 		}
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
 		{
-			// std::clock_t newtime = std::clock();
-			// double time = (double)(newtime - c->last_rcv);
-			// if (c->rcv == 0 && time > 1000)
-			// {
-			// 	std::cout << "timout in here"<< std::endl;
-			// 	close(c->getSocket());
-			// 	FD_CLR(c->getSocket(), &read_fds);
-			// 	FD_CLR(c->getSocket(), &write_fds);
-			// 	clients.erase(c);
-			// 	break ;
-			// }
 			if ((activity == 0 && c->rcv > 0 && c->rcv < 4))
 			{
 				std::cout << "timout"<< std::endl;

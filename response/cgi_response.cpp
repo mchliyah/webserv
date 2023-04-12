@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi_response.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 03:23:26 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/12 07:28:43 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/12 09:47:28 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,8 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 	{
 		first_time = false;
 		std::string outFile = getName();
-		std::cout << outFile << std::endl;
 		int fd = open(outFile.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0666);
-		int fd1 = 0;
-		if (getValue("Method") == "POST")
-			fd1 = open(getBodyname().c_str(), O_RDONLY);
+		int fd1 = open(getBodyname().c_str(), O_RDONLY);
 		int pid = fork();
 		if (pid < 0)
 		{
@@ -70,6 +67,9 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 			close(socket_fd);
 			dup2(fd, 1);
 			dup2(fd1, 0);
+			dup2(fd, 2);
+			close(fd);
+			close(fd1);
 			execve(args[0], args, env);
 			exit(500);
 		}
@@ -89,8 +89,8 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 					std::cout << "timeout" << std::endl;
 					close(fd);
 					close(fd1);
-					kill(pid, SIGKILL);//we should exit the child process
-					res.set_status_code("408");//modify later
+					kill(pid, SIGKILL);
+					res.set_status_code("408");
 					errorResponse(res);
 					return;
 				}
@@ -98,10 +98,11 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 				sleep(1);
 			}
 			std::istringstream stream;
-			dup2(STDIN_FILENO, 0);
-			dup2(STDOUT_FILENO, 1);
 			close(fd);
 			close(fd1);
+			dup2(STDIN_FILENO, 0);
+			dup2(STDOUT_FILENO, 1);
+			dup2(STDERR_FILENO, 2);
 			status = WEXITSTATUS(status);
 			if (status == 500)
 			{
