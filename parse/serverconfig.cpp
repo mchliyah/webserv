@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/09 08:45:16 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/12 06:09:58 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,10 @@ serverconfig::serverconfig() {
 	default_page["505"] ="<html><head><title>505 HTTP Version Not Supported</title><style>"
 						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
 						"</head><body><div class='box'><h1>505</h1><p>HTTP version not supported</p>"
+						"</div></body></html>";
+	default_page["408"] ="<html><head><title>408 Request Timeout</title><style>"
+						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+						"</head><body><div class='box'><h1>408</h1><p>Request timeout</p>"
 						"</div></body></html>";
 }
 

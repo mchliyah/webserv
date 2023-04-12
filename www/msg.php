@@ -1,4 +1,3 @@
 <?php
-echo "string";
-    while (1);
+echo "basic_string";
 ?>

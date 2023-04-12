@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 06:23:43 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/11 14:18:33 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/12 05:44:46 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ public:
 	void errorResponse(response &res);
 	void defaultResponse(response &res);
 	void cgi_response(response &res, std::string& file_path, bool php);
+	void removeFiles();
 	~client();
 };
 std::string get_type(const std::string &path);
