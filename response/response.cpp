@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 16:51:42 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/11 14:02:38 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 01:49:25 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,21 +36,16 @@ response::response() {
 	status_message = "OK";
 	status_code_map["200"] = "OK";
 	status_code_map["201"] = "Created";
-	status_code_map["204"] = "No Content";
 	status_code_map["400"] = "Bad Request";
-	status_code_map["401"] = "Unauthorized";
 	status_code_map["403"] = "Forbidden";
 	status_code_map["404"] = "Not Found";
 	status_code_map["405"] = "Method Not Allowed";
-	status_code_map["406"] = "Not Acceptable";
 	status_code_map["408"] = "Request Timeout";
 	status_code_map["413"] = "Payload Too Large";
-	status_code_map["412"] = "Precondition Failed";
 	status_code_map["414"] = "URI Too Long";
-	status_code_map["415"] = "Unsupported Media Type";
 	status_code_map["500"] = "Internal Server Error";
-	status_code_map["501"] = "Not Implemented";
 	status_code_map["505"] = "HTTP Version Not Supported";
+	status_code_map["508"] = "Loop Detected";
 }
 
 response::response(const response &src) {

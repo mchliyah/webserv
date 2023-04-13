@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/12 07:11:24 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 02:44:48 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,11 @@ int	client::checkMethod_URL()
 		makeError(405, "Bad Request: Method Not supported");
 		return (1);
 	}
+	if (getValue("URL").length() > 1000)
+	{
+		makeError(414, "Bad Request: URL too long");
+		return (1);
+	}
 	size_t pos = getValue("URL").find("?");
 	if (pos != std::string::npos)
 	{
@@ -187,6 +192,11 @@ int	client::parseRequestLine(std::string first_line)
 		last = pos + 1;
 	}
 	http_request["version"] = first_line.substr(pos + 1);
+	if (http_request["version"] != "HTTP/1.1" && http_request["version"] != "HTTP/1.0")
+	{
+		makeError(505, "HTTP Version Not Supported");
+		return (1);
+	}
 	if (checkMethod_URL())
 		return (1);
 	return 0;
@@ -223,7 +233,6 @@ void client::handleMultipart(void)
 			http_request["body"] = "multipart";
 			std::ifstream file(getBodyname().c_str());
 			std::ofstream output;
-			std::ofstream outputt("eee.txt");
 			int track = 0;
 			if (file.is_open())
 			{
@@ -233,7 +242,6 @@ void client::handleMultipart(void)
 				{
 					file.read(buf, 1000000);
 					std::string buff(buf, buf + file.gcount());
-					outputt << buff;
 					buff = rest + buff;
 					if (track == 0)
 					{
