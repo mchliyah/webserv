@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 03:23:26 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/13 01:54:58 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 04:06:09 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 		type = std::string("CONTENT_TYPE=") + getValue("Content-Type");
 	}
 	std::string script_name = std::string("SCRIPT_NAME=") + script;
+	std::string path = std::string("PATH_INFO=") + getValue("URL");
 	std::string q = std::string ("QUERY_STRING=") + query;
 	std::string cookie = std::string ("HTTP_COOKIE=") + getValue("Cookie");
 	std::string method = std::string ("REQUEST_METHOD=") + getValue("Method");
@@ -47,7 +48,7 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 	std::string port = std::string("SERVER_PORT=") + getPort();
 	std::string gateway = std::string("GATEWAY_INTERFACE=CGI/1.1");
 	char *const env[] = {(char *)script_name.c_str(), (char *)q.c_str(), (char *)cookie.c_str(), (char *)method.c_str(), (char *)script_filename.c_str(),
-		(char *)protocol.c_str(), (char *)software.c_str(), (char *)redirect.c_str(), (char *)uri.c_str(), (char *)host.c_str(), (char *)port.c_str(),(char *)gateway.c_str(),(char*)type.c_str(), (char*)length.c_str(), NULL};
+		(char *)protocol.c_str(), (char *)software.c_str(), (char *)redirect.c_str(), (char *)uri.c_str(), (char *)host.c_str(), (char *)port.c_str(),(char *)gateway.c_str(),(char*)type.c_str(), (char*)length.c_str(), (char*)path.c_str(), NULL};
 	char *const args[] = {(char *)script.c_str(), (char *)file_path.c_str(), NULL};
 	if (first_time)
 	{
@@ -58,7 +59,7 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 		int pid = fork();
 		if (pid < 0)
 		{
-			res.set_status_code("508");
+			res.set_status_code("500");
 			errorResponse(res);
 			return;
 		}
@@ -86,11 +87,12 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 				{
 					dup2(STDIN_FILENO, 0);
 					dup2(STDOUT_FILENO, 1);
+					dup2(STDERR_FILENO, 2);
 					std::cout << "timeout" << std::endl;
 					close(fd);
 					close(fd1);
 					kill(pid, SIGKILL);
-					res.set_status_code("408");
+					res.set_status_code("508");
 					errorResponse(res);
 					return;
 				}
