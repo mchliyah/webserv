@@ -6,12 +6,21 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 17:08:17 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/10 02:03:35 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 00:38:33 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
+struct compare
+{
+    serverconfig my;
+    compare(serverconfig mine): my(mine) {}
+ 
+    bool operator()(serverconfig s) {
+        return (s.getListen() == my.getListen() && s.getServerName() == my.getServerName());
+    }
+};
 
 void check_all_set(std::vector<serverconfig>& servers)
 {
@@ -45,6 +54,8 @@ void check_all_set(std::vector<serverconfig>& servers)
 		}
 		for (it2 = it->getLocations().begin(); it2 != it->getLocations().end(); it2++)
 		{
+			if (it2->second.getName()[it2->second.getName().size() - 1] != '/')
+				throw std::runtime_error("Error: location name must end with '/'");
 			if (it2->second.getRoot().empty())
 				it2->second.setRoot(std::getenv("PWD"));
 			if (it2->second.getAllowsMethod().empty())
@@ -62,7 +73,6 @@ void check_all_set(std::vector<serverconfig>& servers)
 			if (it2->second.getAutoIndex().empty())
 				it2->second.setAutoIndex("on");
 		}
-		// it->printServer();
 	}
 }
 
@@ -84,7 +94,11 @@ std::vector<serverconfig>& parse(std::vector<serverconfig>& servers, std::string
 		if (line.find("server") == std::string::npos || line.find("server") != 0)
 			throw std::runtime_error("Error: ruller is not at the top of the file");
 		line = server.readServer(os, line);
-		servers.push_back(server);
+		if (std::find_if(servers.begin(), servers.end(), compare(server)) == servers.end())
+				servers.push_back(server);
+		else
+			throw std::runtime_error("Error: server name and listen must be unique");
+		
 	}
 	check_all_set(servers);
 	return (servers);
