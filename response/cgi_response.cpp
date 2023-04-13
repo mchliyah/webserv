@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi_response.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 03:23:26 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/12 09:47:28 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/13 01:54:58 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 		int pid = fork();
 		if (pid < 0)
 		{
-			res.set_status_code("500");
+			res.set_status_code("508");
 			errorResponse(res);
 			return;
 		}
