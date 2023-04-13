@@ -32,6 +32,9 @@
 #include <sstream>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <cstring>
+#include <sys/wait.h>
+#include <signal.h>
 
 extern int g_tab_count;
 

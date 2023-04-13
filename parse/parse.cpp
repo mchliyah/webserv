@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: codespace <mchliyah@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 17:08:17 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/13 02:35:09 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 21:56:17 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 struct compare
 {
     serverconfig my;
-    compare(serverconfig mine): my(mine) {}
+    compare(serverconfig& mine): my(mine) {}
  
-    bool operator()(serverconfig s) {
+    bool operator()(serverconfig& s) {
         return (s.getListen() == my.getListen() && s.getServerName() == my.getServerName());
     }
 };
@@ -33,6 +33,46 @@ void check_all_set(std::vector<serverconfig>& servers)
 	}
 	for (it = servers.begin(); it != servers.end(); it++)
 	{
+		it->getDefaultPage()["404"] ="<html><head><title>404 Page Not Found</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }"
+							"</style></head><body><div class='box'><h1>404</h1><p>Page not found</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["405"] ="<html><head><title>405 Method Not Allowed</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>405</h1><p>Method not allowed</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["400"] ="<html><head><title>400 Bad Request</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>400</h1><p>Bad request</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["413"] ="<html><head><title>413 Request Entity Too Large</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>413</h1><p>Request entity too large</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["403"] ="<html><head><title>403 Forbidden</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>403</h1><p>Forbidden</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["500"] ="<html><head><title>500 Internal Server Error</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>500</h1><p>Internal server error</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["505"] ="<html><head><title>505 HTTP Version Not Supported</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>505</h1><p>HTTP version not supported</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["408"] ="<html><head><title>408 Request Timeout</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>408</h1><p>Request timeout</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["414"] ="<html><head><title>414 Request-URI Too Long</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>414</h1><p>Request-URI too long</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["508"] ="<html><head><title>508 Loop Detected</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>508</h1><p>Loop detected</p>"
+							"</div></body></html>";
 		if (it->getServerName().empty())
 			it->setServerName("localhost");
 		if (it->getListen().empty())
@@ -78,7 +118,7 @@ void check_all_set(std::vector<serverconfig>& servers)
 
 std::vector<serverconfig>& parse(std::vector<serverconfig>& servers, std::string path){
 	std::string line;
-    std::ifstream os(path);
+    std::ifstream os(path.c_str());
 
 	if (!os.is_open())
 		throw std::runtime_error("Error: can't open config file");
@@ -94,10 +134,10 @@ std::vector<serverconfig>& parse(std::vector<serverconfig>& servers, std::string
 		if (line.find("server") == std::string::npos || line.find("server") != 0)
 			throw std::runtime_error("Error: ruller is not at the top of the file");
 		line = server.readServer(os, line);
-		if (std::find_if(servers.begin(), servers.end(), compare(server)) == servers.end())
+		// if (std::find_if(servers.begin(), servers.end(), compare(server)) == servers.end())
 			servers.push_back(server);
-		else
-			throw std::runtime_error("Error: server name and listen must be unique");
+		// else
+		// 	throw std::runtime_error("Error: server name and listen must be unique");
 		// server.printServer();
 	}
 	check_all_set(servers);

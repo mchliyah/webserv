@@ -28,7 +28,7 @@ void response::clear() {
 }
 
 response::response() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	char buffer[128];
 	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
 	this->date = "Date: " + std::string(buffer) + "\r\n";

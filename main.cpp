@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: codespace <mchliyah@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/13 02:35:42 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 22:21:27 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ int main(int argc, char **argv)
 {
 	try
 	{
+		std::vector<serverconfig> servers;
 		if (argc != 2)
 			throw std::runtime_error("Usage: ./webserv <config_file>");
-		std::vector<serverconfig> servers;
 		servers = parse(servers, argv[1]);
 		std::vector<std::string> v;
 		std::vector<serverconfig>::iterator it1;
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cerr << "main cached exeption " << '\n';
 	}
 	return (0);
 }

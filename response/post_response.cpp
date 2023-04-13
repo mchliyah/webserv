@@ -3,6 +3,7 @@
 #include "../includes/server.hpp"
 
 void response::post_response(client& client) {
+	try{
 	serverconfig server = client.getHost();
 	std::string in_path = client.getValue("URL");
 	locationconfig location;
@@ -92,4 +93,9 @@ void response::post_response(client& client) {
 	}
 	else
 		get_response(client);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "error exception in post " << '\n';
+	}
 }

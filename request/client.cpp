@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: codespace <mchliyah@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/13 02:44:48 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 22:39:59 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -329,8 +329,8 @@ void client::generateBodyName(void)
 			if (f < depo.length() && depo[f] == '"')
 				f++;
 			bodyname = depo.substr(f, pos - f);
-			if (bodyname.back() == '"')
-				bodyname.pop_back();
+			if (bodyname[bodyname.length() - 1] == '"')
+				bodyname.erase(bodyname.end() - 1);
 			return ;
 		}
 	}
@@ -488,8 +488,7 @@ struct compare
 {
 	std::string name;
 	std::string port;
-	compare(std::string my_, std::string port_): name(my_), port(port_) {}
- 
+	compare(std::string& my_, std::string& port_): name(my_), port(port_) {}
 	bool operator()(serverconfig& s) {
 		if (name != "")
 			return (s.getServerName() == name && s.getListen() == port);
@@ -510,7 +509,18 @@ void client::matchHost(std::vector<serverconfig>& hosts)
 		host = *s;
 	}
 	else
-		host = *(std::find_if(hosts.begin(), hosts.end(), compare("", port)));
+	{
+		try
+		{
+		
+		std::string non = "";
+		host = *(std::find_if(hosts.begin(), hosts.end(), compare(non, port)));
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << "i don't want to " << '\n';
+		}
+	}
 }
 
 serverconfig& client::getHost(void) { return (this->host); }
