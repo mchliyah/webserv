@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 08:44:52 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/13 01:28:54 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 02:35:26 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ server::server(std::vector<std::string>& ports_, std::vector<serverconfig>& serv
 
 std::pair<int, std::string> server::createBindListen(std::string& port)
 {
-		struct addrinfo hints, *res, *p;
+	struct addrinfo hints, *res, *p;
 	int yes = 1;
 	int listner;
 	memset(&hints, 0, sizeof hints);

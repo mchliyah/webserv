@@ -14,7 +14,7 @@
 
 std::string& locationconfig::readlocation(std::ifstream& inputFile, std::string& line) {
 	std::string key, value;
-	while (g_tab_count == 2)
+	while (g_tab_count == 2 && !inputFile.eof())
 	{
 		if (line.find("#") != std::string::npos || line.find(";") != std::string::npos)
 			throw std::runtime_error("Error: invalid caracter in the file");

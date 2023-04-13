@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 17:08:17 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/13 00:38:33 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 02:35:09 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,10 +95,10 @@ std::vector<serverconfig>& parse(std::vector<serverconfig>& servers, std::string
 			throw std::runtime_error("Error: ruller is not at the top of the file");
 		line = server.readServer(os, line);
 		if (std::find_if(servers.begin(), servers.end(), compare(server)) == servers.end())
-				servers.push_back(server);
+			servers.push_back(server);
 		else
 			throw std::runtime_error("Error: server name and listen must be unique");
-		
+		// server.printServer();
 	}
 	check_all_set(servers);
 	return (servers);

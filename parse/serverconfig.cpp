@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 23:37:35 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/13 01:54:22 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 02:33:12 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ std::string& serverconfig::readServer(std::ifstream& inputFile, std::string& lin
 		getline(inputFile, line);
 		g_tab_count = tab_count(line);
 	}
-	while (g_tab_count == 1) 
+	while (g_tab_count == 1 && !inputFile.eof()) 
 	{
 		if (has_only_spaces(line) || line.empty())
 			throw std::runtime_error("Error: empty line inside server block\n \t or line with only spaces");

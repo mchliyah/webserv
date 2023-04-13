@@ -6,7 +6,7 @@
 /*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/13 02:04:43 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 02:44:48 by mchliyah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,18 +233,15 @@ void client::handleMultipart(void)
 			http_request["body"] = "multipart";
 			std::ifstream file(getBodyname().c_str());
 			std::ofstream output;
-			std::ofstream outputt("eee.txt");
 			int track = 0;
 			if (file.is_open())
 			{
 				char	buf[1000000];
 				std::string rest;
-				std::string buff = "a";
-				while (!file.eof() && buff != "")
+				while (1)
 				{
 					file.read(buf, 1000000);
 					std::string buff(buf, buf + file.gcount());
-					outputt << buff;
 					buff = rest + buff;
 					if (track == 0)
 					{
