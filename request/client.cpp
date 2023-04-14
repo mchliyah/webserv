@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <mchliyah@student.1337.ma>       +#+  +:+       +#+        */
+/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/13 22:39:59 by codespace        ###   ########.fr       */
+/*   Updated: 2023/04/14 02:14:50 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -484,40 +484,45 @@ int client::checkMandatoryElements()
 	return (0);
 }
 
-struct compare
-{
-	std::string name;
-	std::string port;
-	compare(std::string& my_, std::string& port_): name(my_), port(port_) {}
-	bool operator()(serverconfig& s) {
-		if (name != "")
-			return (s.getServerName() == name && s.getListen() == port);
-		else
-			return s.getListen() == port;
-	}
-};
-
+// struct compare
+// {
+// 	std::string name;
+// 	std::string port;
+// 	compare(std::string my_, std::string port_): name(my_), port(port_) {}
+ 
+// 	bool operator()(serverconfig& s) {
+// 		bool a;
+// 		if (name != "")
+// 			a= s.getServerName() == name && s.getListen() == port;
+// 		else
+// 			a = s.getListen() == port;
+// 		return a;
+// 	}
+// };
 void client::matchHost(std::vector<serverconfig>& hosts)
 {
 	std::string name = http_request["Host"];
 	size_t f = name.find(":");
 	if (f != std::string::npos)
 		name = name.substr(0, f);
-	std::vector<serverconfig>::iterator s = std::find_if(hosts.begin(), hosts.end(), compare(name, port));
-	if (s != hosts.end())
+	std::vector<serverconfig>::iterator s;
+	for (s = hosts.begin(); s != hosts.end(); s++)
 	{
-		host = *s;
-	}
-	else
-	{
-		try
+		if (s->getServerName() == name && s->getListen() == port)
 		{
-		std::string non = "";
-		host = *(std::find_if(hosts.begin(), hosts.end(), compare(non, port)));
+			host = *s;
+			break ;
 		}
-		catch(const std::exception& e)
+	}
+	if (s == hosts.end())
+	{
+		for (s = hosts.begin(); s != hosts.end(); s++)
 		{
-			std::cerr << "i don't want to " << '\n';
+			if (s->getListen() == port)
+			{
+				host = *s;
+				break ;
+			}
 		}
 	}
 }
