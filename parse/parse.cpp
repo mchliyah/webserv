@@ -12,15 +12,26 @@
 
 #include "../includes/server.hpp"
 
-struct compare
-{
-    serverconfig my;
-    compare(serverconfig& mine): my(mine) {}
+// struct compare
+// {
+//     serverconfig my;
+//     compare(serverconfig& mine): my(mine) {}
  
-    bool operator()(serverconfig& s) {
-        return (s.getListen() == my.getListen() && s.getServerName() == my.getServerName());
-    }
-};
+//     bool operator()(serverconfig& s) {
+//         return (s.getListen() == my.getListen() && s.getServerName() == my.getServerName());
+//     }
+// };
+
+bool duplicate_server(std::vector<serverconfig>& servers, serverconfig& s)
+{
+	std::vector<serverconfig>::iterator it;
+	for (it = servers.begin(); it != servers.end(); it++)
+	{
+		if (it->getListen() == s.getListen() && it->getServerName() == s.getServerName())
+			return (true);
+	}
+	return (false);
+}
 
 void check_all_set(std::vector<serverconfig>& servers)
 {
@@ -134,10 +145,10 @@ std::vector<serverconfig>& parse(std::vector<serverconfig>& servers, std::string
 		if (line.find("server") == std::string::npos || line.find("server") != 0)
 			throw std::runtime_error("Error: ruller is not at the top of the file");
 		line = server.readServer(os, line);
-		// if (std::find_if(servers.begin(), servers.end(), compare(server)) == servers.end())
+		if (!duplicate_server(servers, server))
 			servers.push_back(server);
-		// else
-		// 	throw std::runtime_error("Error: server name and listen must be unique");
+		else
+			throw std::runtime_error("Error: server name and listen must be unique");
 		// server.printServer();
 	}
 	check_all_set(servers);

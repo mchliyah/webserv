@@ -26,9 +26,9 @@ struct compare
  
 int main(int argc, char **argv)
 {
-		std::vector<serverconfig> servers;
 	try
 	{
+		std::vector<serverconfig> servers;
 		if (argc != 2)
 			throw std::runtime_error("Usage: ./webserv <config_file>");
 		servers = parse(servers, argv[1]);
