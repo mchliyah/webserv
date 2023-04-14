@@ -143,46 +143,9 @@ serverconfig::serverconfig() {
 	server_name = "";
 	listen = "";
 	maxclientboddysize = "";
-	default_page["404"] ="<html><head><title>404 Page Not Found</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }"
-						"</style></head><body><div class='box'><h1>404</h1><p>Page not found</p>"
-						"</div></body></html>";
-	default_page["405"] ="<html><head><title>405 Method Not Allowed</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
-						"</head><body><div class='box'><h1>405</h1><p>Method not allowed</p>"
-						"</div></body></html>";
-	default_page["400"] ="<html><head><title>400 Bad Request</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
-						"</head><body><div class='box'><h1>400</h1><p>Bad request</p>"
-						"</div></body></html>";
-	default_page["413"] ="<html><head><title>413 Request Entity Too Large</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
-						"</head><body><div class='box'><h1>413</h1><p>Request entity too large</p>"
-						"</div></body></html>";
-	default_page["403"] ="<html><head><title>403 Forbidden</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
-						"</head><body><div class='box'><h1>403</h1><p>Forbidden</p>"
-						"</div></body></html>";
-	default_page["500"] ="<html><head><title>500 Internal Server Error</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
-						"</head><body><div class='box'><h1>500</h1><p>Internal server error</p>"
-						"</div></body></html>";
-	default_page["505"] ="<html><head><title>505 HTTP Version Not Supported</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
-						"</head><body><div class='box'><h1>505</h1><p>HTTP version not supported</p>"
-						"</div></body></html>";
-	default_page["408"] ="<html><head><title>408 Request Timeout</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
-						"</head><body><div class='box'><h1>408</h1><p>Request timeout</p>"
-						"</div></body></html>";
-	default_page["414"] ="<html><head><title>414 Request-URI Too Long</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
-						"</head><body><div class='box'><h1>414</h1><p>Request-URI too long</p>"
-						"</div></body></html>";
-	default_page["508"] ="<html><head><title>508 Loop Detected</title><style>"
-						"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
-						"</head><body><div class='box'><h1>508</h1><p>Loop detected</p>"
-						"</div></body></html>";
+	default_page.clear();
+	errorpages.clear();
+	locations.clear();
 }
 
 std::map<std::string, std::string>& serverconfig::getDefaultPage() {
@@ -207,5 +170,5 @@ serverconfig::~serverconfig() {
 	maxclientboddysize.clear();
 	errorpages.clear();
 	locations.clear();
-
+	default_page.clear();
 }

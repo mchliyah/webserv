@@ -329,8 +329,8 @@ void client::generateBodyName(void)
 			if (f < depo.length() && depo[f] == '"')
 				f++;
 			bodyname = depo.substr(f, pos - f);
-			if (bodyname.back() == '"')
-				bodyname.pop_back();
+			if (bodyname[bodyname.length() - 1] == '"')
+				bodyname.erase(bodyname.end() - 1);
 			return ;
 		}
 	}

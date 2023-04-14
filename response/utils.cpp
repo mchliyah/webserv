@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: codespace <mchliyah@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 14:33:29 by mchliyah          #+#    #+#             */
-/*   Updated: 2023/04/12 04:00:02 by mchliyah         ###   ########.fr       */
+/*   Updated: 2023/04/13 21:39:40 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
-#include <unordered_map>
 
 bool default_index(response &res, client &client, locationconfig& loc, std::string& path)
 {
@@ -104,7 +103,7 @@ std::string get_type(const std::string& path) {
 	if (path.find_last_of('.') == std::string::npos) {
 		return "application/octet-stream";
 	}
-    std::unordered_map<std::string, std::string> extension_to_type ;
+    std::map<std::string, std::string> extension_to_type ;
 	extension_to_type[".html"] = "text/html";
 	extension_to_type[".txt"] = "text/plain";
 	extension_to_type[".css"] = "text/css";
@@ -145,10 +144,16 @@ std::string get_type(const std::string& path) {
 	extension_to_type[".c"] = "text/plain";
 	extension_to_type[".h"] = "text/plain";
 	extension_to_type[".conf"] = "text/plain";
+	extension_to_type[".php"] = "text/plain";
+	extension_to_type[".py"] = "text/plain";
+	extension_to_type[".rb"] = "text/plain";
+	extension_to_type[".sh"] = "text/plain";
+	extension_to_type[".pl"] = "text/plain";
+	extension_to_type[".java"] = "text/plain";
+	extension_to_type[".xml"] = "text/plain";	
 	extension_to_type[".json"] = "application/json";
-	extension_to_type[".dmg"] = "application/octet-stream";
     std::string extension = path.substr(path.find_last_of('.'));
-    std::unordered_map<std::string, std::string>::iterator it = extension_to_type.find(extension);
+    std::map<std::string, std::string>::iterator it = extension_to_type.find(extension);
     if (it != extension_to_type.end()) {
         return it->second;
     } else {

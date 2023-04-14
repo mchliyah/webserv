@@ -46,6 +46,8 @@ void response::delete_response(client& client) {
 	std::string full_path = location.getRoot() + path;
 	if (full_path[full_path.length() - 1] == '/')
 		full_path = full_path.substr(0, full_path.length() - 1);
+	status_code = "204";
+	status_message = "No Content";
 	if (location.getAllowsMethod()["DELETE"] == false) {
 		status_code = "405";
 		client.errorResponse(*this);

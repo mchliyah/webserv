@@ -28,14 +28,14 @@ void response::clear() {
 }
 
 response::response() {
-	std::time_t t = std::time(nullptr);
+	std::time_t t = std::time(NULL);
 	char buffer[128];
 	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S %Z", std::localtime(&t));
 	this->date = "Date: " + std::string(buffer) + "\r\n";
 	status_code = "200";
 	status_message = "OK";
 	status_code_map["200"] = "OK";
-	status_code_map["201"] = "Created";
+	status_code_map["201"] = "no content";
 	status_code_map["400"] = "Bad Request";
 	status_code_map["403"] = "Forbidden";
 	status_code_map["404"] = "Not Found";

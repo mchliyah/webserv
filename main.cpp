@@ -28,9 +28,9 @@ int main(int argc, char **argv)
 {
 	try
 	{
+		std::vector<serverconfig> servers;
 		if (argc != 2)
 			throw std::runtime_error("Usage: ./webserv <config_file>");
-		std::vector<serverconfig> servers;
 		servers = parse(servers, argv[1]);
 		std::vector<std::string> v;
 		std::vector<serverconfig>::iterator it1;
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cerr << "main cached exeption " << '\n';
 	}
 	return (0);
 }

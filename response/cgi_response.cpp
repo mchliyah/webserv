@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   cgi_response.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mchliyah <mchliyah@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: codespace <mchliyah@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 03:23:26 by mchliyah          #+#    #+#             */
 /*   Updated: 2023/04/13 04:06:09 by mchliyah         ###   ########.fr       */
@@ -16,8 +16,10 @@
 
 std::string getName()
 {
+	std::stringstream stream;
 	static int i = 0;
-	return ("outFiles/d_" + std::to_string(i++) + ".html");
+	stream << i;
+	return ("outFiles/d_" + stream.str() + ".html");
 }
 
 void client::cgi_response(response &res, std::string& file_path, bool php)

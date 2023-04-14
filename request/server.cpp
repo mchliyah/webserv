@@ -165,6 +165,7 @@ void server::start()
 					toSend -= bytes;
 					if (bytes == -1)
 					{
+						std::cout << "closing socket" << c->getSocket() << std::endl;
 						close(c->getSocket());
 						FD_CLR(c->getSocket(), &read_fds);
 						FD_CLR(c->getSocket(), &write_fds);
