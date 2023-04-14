@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: codespace <mchliyah@student.1337.ma>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/25 05:09:29 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/14 00:15:40 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/14 03:13:49 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@ struct compare
  
 int main(int argc, char **argv)
 {
+		std::vector<serverconfig> servers;
 	try
 	{
-		std::vector<serverconfig> servers;
 		if (argc != 2)
 			throw std::runtime_error("Usage: ./webserv <config_file>");
 		servers = parse(servers, argv[1]);
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "main cached exeption " << '\n';
+		std::cerr << e.what() << '\n';
 	}
 	return (0);
 }
