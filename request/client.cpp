@@ -512,7 +512,6 @@ void client::matchHost(std::vector<serverconfig>& hosts)
 	{
 		try
 		{
-		
 		std::string non = "";
 		host = *(std::find_if(hosts.begin(), hosts.end(), compare(non, port)));
 		}

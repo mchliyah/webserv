@@ -31,7 +31,7 @@ OBJECTS = $(FILES:.cpp=.o)
 all : $(NAME)
 
 $(NAME) :  $(OBJECTS)
-	@$(CC) $(CFLAGS) $(STDFLAGS) $(OBJECTS) -o $(NAME) -fsanitize=address 
+	@$(CC) $(CFLAGS) $(STDFLAGS) $(OBJECTS) -o $(NAME) #-fsanitize=address 
 
 
 clean :

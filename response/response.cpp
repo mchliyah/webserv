@@ -35,7 +35,7 @@ response::response() {
 	status_code = "200";
 	status_message = "OK";
 	status_code_map["200"] = "OK";
-	status_code_map["201"] = "Created";
+	status_code_map["201"] = "no content";
 	status_code_map["400"] = "Bad Request";
 	status_code_map["403"] = "Forbidden";
 	status_code_map["404"] = "Not Found";

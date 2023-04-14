@@ -144,8 +144,14 @@ std::string get_type(const std::string& path) {
 	extension_to_type[".c"] = "text/plain";
 	extension_to_type[".h"] = "text/plain";
 	extension_to_type[".conf"] = "text/plain";
+	extension_to_type[".php"] = "text/plain";
+	extension_to_type[".py"] = "text/plain";
+	extension_to_type[".rb"] = "text/plain";
+	extension_to_type[".sh"] = "text/plain";
+	extension_to_type[".pl"] = "text/plain";
+	extension_to_type[".java"] = "text/plain";
+	extension_to_type[".xml"] = "text/plain";	
 	extension_to_type[".json"] = "application/json";
-	extension_to_type[".dmg"] = "application/octet-stream";
     std::string extension = path.substr(path.find_last_of('.'));
     std::map<std::string, std::string>::iterator it = extension_to_type.find(extension);
     if (it != extension_to_type.end()) {
