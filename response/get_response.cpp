@@ -39,7 +39,9 @@ void response::get_response(client& client) {
 			}
 			else if (is_file(file_path))
 			{
-				std::string extension = file_path.substr(file_path.find_last_of('.'));
+				std::string extension = "";
+				if(file_path.find('.') != std::string::npos)
+					extension = file_path.substr(file_path.find_last_of('.'));
 				if ((extension == ".php" || extension == ".py") && location.getCgiPass() == "on")
 					client.cgi_response(*this, file_path, extension == ".php");
 				else if (client.getValue("Method") == "POST")
