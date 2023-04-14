@@ -59,8 +59,8 @@ void response::delete_response(client& client) {
 			if ((is_dir(full_path) && delete_directory(full_path)) ||
 				(is_file(full_path) && remove(full_path.c_str()) == 0))
 				{
-					status_code = "200";
-					status_message = "Deleted";
+					status_code = "204";
+					status_message = "No Content";
 					header = "HTTP/1.1 " + status_code + " " + status_message + "\r\n";
 					content_length += "Content-Length: 0\r\n";
 					header += date + content_type + content_length + "\r\n";

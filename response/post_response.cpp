@@ -10,6 +10,8 @@ void response::post_response(client& client) {
 	location = matchlocation(server, in_path);
 	std::string path = location.getUploadStore();
 	std::string full_path;
+	status_code = "201";
+	status_message = "Created";
 	if (location.getAllowsMethod()["POST"] == false) {
 		status_code = "405";
 		client.errorResponse(*this);
