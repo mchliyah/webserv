@@ -143,7 +143,7 @@ int	client::checkMethod_URL()
 			found = 1;
 	if (!found)
 	{
-		makeError(405, "Bad Request: Method Not supported");
+		makeError(501, "Bad Request: Method not implemented");
 		return (1);
 	}
 	if (getValue("URL").length() > 1000)
@@ -232,84 +232,91 @@ void client::handleMultipart(void)
 			std::string boundry = type.substr(pos, found -pos);
 			http_request["body"] = "multipart";
 			std::ifstream file(getBodyname().c_str());
+			if (!file.is_open())
+			{
+				error = 500;
+				return ;
+			}
 			std::ofstream output;
 			int track = 0;
-			if (file.is_open())
+			char	buf[1000000];
+			std::string rest;
+			while (1)
 			{
-				char	buf[1000000];
-				std::string rest;
-				while (1)
+				file.read(buf, 1000000);
+				std::string buff(buf, buf + file.gcount());
+				buff = rest + buff;
+				if (track == 0)
 				{
-					file.read(buf, 1000000);
-					std::string buff(buf, buf + file.gcount());
-					buff = rest + buff;
-					if (track == 0)
+					size_t found = buff.find("--" + boundry + "\r\n");
+					size_t pos = buff.find("\r\n\r\n", found + 4 + boundry.length());
+					if (found == std::string::npos || pos == std::string::npos)
 					{
-						size_t found = buff.find("--" + boundry + "\r\n");
-						size_t pos = buff.find("\r\n\r\n", found + 4 + boundry.length());
-						if (found == std::string::npos || pos == std::string::npos)
-						{
-							error = 400;
-							return ;
-						}
-						found = found + 4 + boundry.length();
-						std::string headers = buff.substr(found, pos - found);
-						buff = buff.substr(pos + 4);
-						std::string newfile = "";
-						std::string quote(1, '"');
-						size_t f = headers.find("filename=" + quote);
-						if (f != std::string::npos)
-						{
-							f += 10;
-							size_t q = headers.find(quote, f);
-							if (q != std::string::npos)
-								newfile = headers.substr(f, q - f);
-						}
-						if (newfile == "")
-							newfile = generateString(5) + ".txt";
-						this->multipart.push_back(newfile);
-						if (output.is_open())
-							output.close();
-						output.open(newfile.c_str(), std::ios::out | std::ios::trunc);
-						output.close();
-						output.open(newfile.c_str(), std::ios::app);
-						track = 1;
+						error = 400;
+						return ;
 					}
-					if (track == 1)
+					found = found + 4 + boundry.length();
+					std::string headers = buff.substr(found, pos - found);
+					buff = buff.substr(pos + 4);
+					std::string newfile = "";
+					std::string quote(1, '"');
+					size_t f = headers.find("filename=" + quote);
+					if (f != std::string::npos)
 					{
-						size_t b = buff.find("\r\n--" + boundry + "\r\n");
-						if (b != std::string::npos)
-						{
-							track = 0;
-							rest = buff.substr(0, b);
-							buff = buff.substr(b + 2);
-							output << rest;
-						}
-						else if (buff.find("\r\n--" + boundry + "--\r\n") != std::string::npos)
-						{
-							b = buff.find("\r\n--" + boundry + "--\r\n");
-							buff = buff.substr(0, b);
-							output << buff;
-							output.close();
-							file.close();
-							remove(getBodyname().c_str());
-							return ;
-						}
-						else if (buff.find("\r") != std::string::npos)
-						{
-							b = buff.find("\r");
-							rest = buff.substr(0, b);
-							buff = buff.substr(b);
-							output << rest;
-						}
-						else
-						{
-							output << buff;
-							buff = "";
+						f += 10;
+						size_t q = headers.find(quote, f);
+						if (q != std::string::npos)
+							newfile = headers.substr(f, q - f);
+					}
+					if (newfile == "")
+						newfile = generateString(5) + ".txt";
+					this->multipart.push_back(newfile);
+					if (output.is_open())
+						output.close();
+					output.open(newfile.c_str(), std::ios::out | std::ios::trunc);
+					output.close();
+					output.open(newfile.c_str(), std::ios::app);
+					if (!output.is_open())
+					{
+						error = 500;
+						return ;
+					}
+					track = 1;
+				}
+				if (track == 1)
+				{
+					size_t b = buff.find("\r\n--" + boundry + "\r\n");
+					if (b != std::string::npos)
+					{
+						track = 0;
+						rest = buff.substr(0, b);
+						buff = buff.substr(b + 2);
+						output << rest;
+					}
+					else if (buff.find("\r\n--" + boundry + "--\r\n") != std::string::npos)
+					{
+						b = buff.find("\r\n--" + boundry + "--\r\n");
+						buff = buff.substr(0, b);
+						output << buff;
+						output.close();
+						file.close();
+						remove(getBodyname().c_str());
+						return ;
+					}
+					else if (buff.find("\r") != std::string::npos)
+					{
+						b = buff.find("\r");
+						rest = buff.substr(0, b);
+						buff = buff.substr(b);
+						output << rest;
+					}
+					else
+					{
+						output << buff;
+						buff = "";
 						}
 					}
 					rest = buff;
-				}
 			}
 		}
 	}
@@ -365,6 +372,12 @@ void client::addToBody(std::string body)
 			file.close();
 	}
 	file.open(bodyname.c_str(), std::ios::app);
+	if (!file.is_open())
+	{
+		error = 500;
+		rcv = 4;
+		return ;
+	}
 	if (http_request["Transfer-Encoding"] == "chunked")
 	{
 		chunked += body;
@@ -484,21 +497,6 @@ int client::checkMandatoryElements()
 	return (0);
 }
 
-// struct compare
-// {
-// 	std::string name;
-// 	std::string port;
-// 	compare(std::string my_, std::string port_): name(my_), port(port_) {}
- 
-// 	bool operator()(serverconfig& s) {
-// 		bool a;
-// 		if (name != "")
-// 			a= s.getServerName() == name && s.getListen() == port;
-// 		else
-// 			a = s.getListen() == port;
-// 		return a;
-// 	}
-// };
 void client::matchHost(std::vector<serverconfig>& hosts)
 {
 	std::string name = http_request["Host"];

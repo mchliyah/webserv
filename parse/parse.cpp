@@ -12,24 +12,12 @@
 
 #include "../includes/server.hpp"
 
-// struct compare
-// {
-//     serverconfig my;
-//     compare(serverconfig& mine): my(mine) {}
- 
-//     bool operator()(serverconfig& s) {
-//         return (s.getListen() == my.getListen() && s.getServerName() == my.getServerName());
-//     }
-// };
-
 bool duplicate_server(std::vector<serverconfig>& servers, serverconfig& s)
 {
 	std::vector<serverconfig>::iterator it;
 	for (it = servers.begin(); it != servers.end(); it++)
-	{
 		if (it->getListen() == s.getListen() && it->getServerName() == s.getServerName())
 			return (true);
-	}
 	return (false);
 }
 
@@ -67,6 +55,10 @@ void check_all_set(std::vector<serverconfig>& servers)
 		it->getDefaultPage()["500"] ="<html><head><title>500 Internal Server Error</title><style>"
 							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
 							"</head><body><div class='box'><h1>500</h1><p>Internal server error</p>"
+							"</div></body></html>";
+		it->getDefaultPage()["501"] ="<html><head><title>501 Not Implemented</title><style>"
+							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
+							"</head><body><div class='box'><h1>501</h1><p>Not implemented</p>"
 							"</div></body></html>";
 		it->getDefaultPage()["505"] ="<html><head><title>505 HTTP Version Not Supported</title><style>"
 							"body { text-align: center; }h1 { font-size: 5em; color: #444; }.box { width: 300px; margin: 0 auto; background-color: #f7f7f7; border: 1px solid #ddd; padding: 20px; }</style>"
@@ -109,14 +101,8 @@ void check_all_set(std::vector<serverconfig>& servers)
 				throw std::runtime_error("Error: location name must end with '/'");
 			if (it2->second.getRoot().empty())
 				it2->second.setRoot(std::getenv("PWD"));
-			if (it2->second.getAllowsMethod().empty())
-			{
-				std::map<std::string, bool> m;
-				m.insert(std::pair<std::string, bool>("GET", true));
-				m.insert(std::pair<std::string, bool>("POST", false));
-				m.insert(std::pair<std::string, bool>("DELETE", false));
-				it2->second.setAllowsMethod(m);
-			}
+			if (it2->second.getAllowsMethod()["GET"] == false && it2->second.getAllowsMethod()["POST"] == false && it2->second.getAllowsMethod()["DELETE"] == false)
+				throw std::runtime_error("Error: at least one method must be allowed");
 			if (it2->second.getCgiPass().empty())
 				it2->second.setCgiPass("off");
 			if (it2->second.getIndex().empty())
@@ -149,7 +135,6 @@ std::vector<serverconfig>& parse(std::vector<serverconfig>& servers, std::string
 			servers.push_back(server);
 		else
 			throw std::runtime_error("Error: server name and listen must be unique");
-		// server.printServer();
 	}
 	check_all_set(servers);
 	return (servers);

@@ -82,8 +82,7 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 			int status;
 			while (1)
 			{
-				int result = waitpid(pid, &status, WNOHANG);
-				if (result != 0 && WIFEXITED(status))
+				if (waitpid(pid, &status, WNOHANG) == pid)
 					break;
 				if (count > 5)
 				{
@@ -93,7 +92,7 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 					std::cout << "timeout" << std::endl;
 					close(fd);
 					close(fd1);
-					kill(pid, SIGKILL);
+					kill(pid, SIGTERM);
 					res.set_status_code("508");
 					errorResponse(res);
 					return;

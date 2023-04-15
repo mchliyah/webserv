@@ -45,6 +45,7 @@ class locationconfig
 	std::string cgi_pass;
 	std::string autoindex;
 	std::string upload_store;
+	std::string redirect;
 	std::vector<std::string> index;
 	std::map<std::string, bool> allowsmethod;
 
@@ -63,6 +64,7 @@ class locationconfig
 		std::string& getAutoIndex() ;
 		std::string& getName() ;
 		std::string& getUploadStore() ;
+		std::string& getRedirect() ;
 		void setRoot(std::string name);
 		void setCgiPass(std::string name);
 		void setIndex(std::vector<std::string>& name);

@@ -16,6 +16,8 @@ void response::get_response(client& client) {
 		status_code = "405";
 		client.errorResponse(*this);
 	}
+	else if (location.getRedirect() != "")
+		return redirect(client, location.getRedirect());
 	else if (access(file_path.c_str(), F_OK) != -1)
 	{
 		if (access(file_path.c_str(), R_OK) != -1)
@@ -82,7 +84,8 @@ void response::get_response(client& client) {
 
 void response::redirect(client &client, std::string &in_path) {
 	std::stringstream stream;
-	in_path += "/";
+	if (in_path[in_path.length() - 1] != '/')
+		in_path += "/";
     status_code = "301";
 	status_message = "Moved Permanently";
 	body = "";

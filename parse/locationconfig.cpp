@@ -28,10 +28,12 @@ std::string& locationconfig::readlocation(std::ifstream& inputFile, std::string&
 		iss >> key >> value;
 		if (value.empty() || value == "")
 			throw std::runtime_error("Error: location block value is empty");
-		if (key != "root" && key != "index" && key != "allow_method" && key != "cgi_pass" && key != "autoindex" && key != "upload_store")
+		if (key != "root" && key != "index" && key != "allow_method" && key != "cgi_pass" && key != "autoindex" && key != "upload_store" && key != "return")
 			throw std::runtime_error("Error: location block key is not valid");
 		if (key == "root")
 			root = value;
+		else if (key == "return")
+			redirect = value;
 		else if (key == "cgi_pass")
 			cgi_pass = value;
 		else if (key == "upload_store")
@@ -70,6 +72,7 @@ void locationconfig::printlocation() {
 	std::cout << "	cgi_pass: " << cgi_pass << std::endl;
 	std::cout << "	autoindex: " << autoindex << std::endl;
 	std::cout << "	upload_store: " << upload_store << std::endl;
+	std::cout << "	return : " << redirect << std::endl;
 	for (std::vector<std::string>::iterator it = index.begin(); it != index.end() ; it++)
 		std::cout << "	index: " << *it << std::endl;
 	for (std::map<std::string, bool>::iterator it = allowsmethod.begin(); it != allowsmethod.end(); it++)
@@ -91,6 +94,7 @@ locationconfig &locationconfig::operator=(const locationconfig &other) {
 		this->index = other.index;
 		this->allowsmethod = other.allowsmethod;
 		this->upload_store = other.upload_store;
+		this->redirect = other.redirect;
 	}
 	return (*this);
 }
@@ -101,6 +105,7 @@ locationconfig::locationconfig() {
 	this->cgi_pass = "";
 	this->autoindex = "";
 	this->upload_store = "";
+	this->redirect = "";
 	allowsmethod["GET"] = false;
 	allowsmethod["POST"] = false;
 	allowsmethod["DELETE"] = false;
@@ -136,6 +141,11 @@ void locationconfig::setName(std::string name){
 std::string& locationconfig::getUploadStore(){
 	return (this->upload_store);
 }
+
+std::string& locationconfig::getRedirect(){
+	return (this->redirect);
+}
+
 void locationconfig::setRoot(std::string root){
 	this->root = root;
 }
@@ -164,4 +174,5 @@ locationconfig::~locationconfig() {
 	cgi_pass.clear();
 	autoindex.clear();
 	upload_store.clear();
+	redirect.clear();
 }

@@ -3,7 +3,6 @@
 #include "../includes/server.hpp"
 
 void response::post_response(client& client) {
-	try{
 	serverconfig server = client.getHost();
 	std::string in_path = client.getValue("URL");
 	locationconfig location;
@@ -13,6 +12,7 @@ void response::post_response(client& client) {
 	status_code = "201";
 	status_message = "Created";
 	if (location.getAllowsMethod()["POST"] == false) {
+		std::cout << "got you " << std::endl;
 		status_code = "405";
 		client.errorResponse(*this);
 	}
@@ -21,6 +21,8 @@ void response::post_response(client& client) {
 		status_code = "400";
 		client.errorResponse(*this);
 	}
+	else if (location.getRedirect() != "")
+		return redirect(client, location.getRedirect());
 	else if (path != "")
 	{
 		if (client.getFirstTime())
@@ -95,9 +97,4 @@ void response::post_response(client& client) {
 	}
 	else
 		get_response(client);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << "error exception in post " << '\n';
-	}
 }

@@ -52,6 +52,8 @@ void response::delete_response(client& client) {
 		status_code = "405";
 		client.errorResponse(*this);
 	}
+	else if (location.getRedirect() != "")
+		return redirect(client, location.getRedirect());
 	else if (access(full_path.c_str(), F_OK) != -1)
 	{
 		if (access(full_path.c_str(), W_OK) != -1)
