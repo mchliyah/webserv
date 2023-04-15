@@ -102,6 +102,8 @@ std::string& serverconfig::readServer(std::ifstream& inputFile, std::string& lin
 				server_name = value;
 			}
 			else if (key == "host") {
+				if (value == "localhost")
+					value = "127.0.0.1";
 				host_name = value;
 			}
 			else if (key == "listen") {
@@ -153,7 +155,7 @@ void serverconfig::printServer() {
 serverconfig::serverconfig() {
 	server_name = "";
 	listen = "";
-	host_name = "localhost";
+	host_name = "127.0.0.1";
 	maxclientboddysize = "";
 	default_page.clear();
 	errorpages.clear();

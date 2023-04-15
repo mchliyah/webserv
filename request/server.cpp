@@ -32,7 +32,7 @@ std::pair<int,std::pair<std::string, std::string> > server::createBindListen(std
 	fcntl(listner, F_SETFL, O_NONBLOCK);
 	if (listen(listner, 128) != 0)
 		throw std::runtime_error("webserver (listen)");
-	std::cout << "listening on port " << port << std::endl;
+	std::cout << "listening on " << ph.second << ":" <<port << std::endl;
 	std::pair<int, std::pair<std::string, std::string> > r(listner, ph);
 	return (r);
 }
@@ -82,7 +82,7 @@ void server::start()
 					std::cout << "accept failed" << std::endl;
 					continue;
 				}
-				std::cout << "new connection on port " << listner->second.first << " : " << newSocket <<  std::endl;
+				std::cout << "new connection on port " << listner->second.second << ":" <<listner->second.first << " : " << newSocket <<  std::endl;
 				fcntl(newSocket, F_SETFL, O_NONBLOCK);
 				client c(newSocket, listner->second);
 				clients.push_back(c);
