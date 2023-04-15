@@ -47,7 +47,7 @@ void client::cgi_response(response &res, std::string& file_path, bool php)
 	std::string redirect = std::string ("REDIRECT_STATUS=true");
 	std::string uri = std::string("REQUEST_URI=") + getValue("URL");
 	std::string host = std::string("HTTP_HOST=") + getValue("Host");
-	std::string port = std::string("SERVER_PORT=") + getPort();
+	std::string port = std::string("SERVER_PORT=") + port_host.first;
 	std::string gateway = std::string("GATEWAY_INTERFACE=CGI/1.1");
 	char *const env[] = {(char *)script_name.c_str(), (char *)q.c_str(), (char *)cookie.c_str(), (char *)method.c_str(), (char *)script_filename.c_str(),
 		(char *)protocol.c_str(), (char *)software.c_str(), (char *)redirect.c_str(), (char *)uri.c_str(), (char *)host.c_str(), (char *)port.c_str(),(char *)gateway.c_str(),(char*)type.c_str(), (char*)length.c_str(), (char*)path.c_str(), NULL};

@@ -12,35 +12,35 @@
 
 #include "../includes/server.hpp"
 
-server::server(std::vector<std::string>& ports_, std::vector<serverconfig>& servers) : ports(ports_), hosts(servers) {}
+server::server(std::vector<std::pair<std::string, std::string> >ph, std::vector<serverconfig>& servers) : ports_hosts(ph), hosts(servers) {}
 
-std::pair<int, std::string> server::createBindListen(std::string& port)
+std::pair<int,std::pair<std::string, std::string> > server::createBindListen(std::pair<std::string, std::string>&ph)
 {
 	int yes = 1;
+	int port = atoi(ph.first.c_str());
 	int listner = socket(AF_INET, SOCK_STREAM, 0);
 	if (listner == -1)
 		throw std::runtime_error("webserver (socket)");
 	struct sockaddr_in host_addr;
-	int host_addrlen = sizeof(host_addr);
-	memset(&host_addr, 0, sizeof(host_addr));
+	//memset(&host_addr, 0, sizeof(host_addr));
 	host_addr.sin_family = AF_INET;
-	host_addr.sin_port = htons(atoi(port.c_str()));
-	host_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	host_addr.sin_addr.s_addr = inet_addr(ph.second.c_str());
+	host_addr.sin_port = htons(port);
 	setsockopt(listner, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-	if (bind(listner, (struct sockaddr *)&host_addr, host_addrlen) != 0)
+	if (bind(listner, (struct sockaddr *)&host_addr, sizeof(host_addr)) != 0)
 		throw std::runtime_error("webserver (bind)");
 	fcntl(listner, F_SETFL, O_NONBLOCK);
 	if (listen(listner, 128) != 0)
 		throw std::runtime_error("webserver (listen)");
 	std::cout << "listening on port " << port << std::endl;
-	std::pair<int, std::string> r(listner, port);
+	std::pair<int, std::pair<std::string, std::string> > r(listner, ph);
 	return (r);
 }
 
 void server::start()
 {
 	clients.reserve(300);
-	for (std::vector<std::string>::iterator p = ports.begin(); p < ports.end(); p++)
+	for (std::vector<std::pair<std::string, std::string> >::iterator p = ports_hosts.begin(); p < ports_hosts.end(); p++)
 		listners.push_back(createBindListen(*p));
 	while (1)
 	{
@@ -49,7 +49,7 @@ void server::start()
 		fd_set write_fds;
 		FD_ZERO(&read_fds);
 		FD_ZERO(&write_fds);
-		for (std::vector<std::pair<int, std::string> >::iterator l = listners.begin(); l < listners.end(); l++)
+		for (std::vector<std::pair<int, std::pair<std::string, std::string> > >::iterator l = listners.begin(); l < listners.end(); l++)
 			FD_SET(l->first, &read_fds);
 		int maxSocket = std::max_element(listners.begin(), listners.end())->first;
 		for (std::vector<client>::iterator c = clients.begin(); c < clients.end(); c++)
@@ -70,7 +70,7 @@ void server::start()
 			std::cout << "select error" << std::endl;
 			continue;
 		}
-		for (std::vector<std::pair<int, std::string> >::iterator listner = listners.begin(); listner < listners.end(); listner++)
+		for (std::vector<std::pair<int, std::pair<std::string, std::string> > >::iterator listner = listners.begin(); listner < listners.end(); listner++)
 		{
 			if (FD_ISSET(listner->first, &read_fds))
 			{
@@ -82,7 +82,7 @@ void server::start()
 					std::cout << "accept failed" << std::endl;
 					continue;
 				}
-				std::cout << "new connection on port " << listner->second << " : " << newSocket <<  std::endl;
+				std::cout << "new connection on port " << listner->second.first << " : " << newSocket <<  std::endl;
 				fcntl(newSocket, F_SETFL, O_NONBLOCK);
 				client c(newSocket, listner->second);
 				clients.push_back(c);

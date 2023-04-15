@@ -12,12 +12,12 @@
 
 #include "../includes/client.hpp"
 
-client::client(int sock, std::string& port_) : request("") ,port(port_),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), bodyname(""), rcv(0), last_rcv(std::clock())
+client::client(int sock, std::pair<std::string, std::string> ph) : request("") ,port_host(ph),socket_fd(sock), isSent(0), error(200), first_time(true), err_message(""), buff(""), bodyname(""), rcv(0), last_rcv(std::clock())
 {
 	snd = 0;
 }
 
-client::client(const client& other) : request(other.request), port(other.port), socket_fd(other.socket_fd), isSent(other.isSent), error(other.error), first_time(other.first_time), err_message(other.err_message), http_request(other.http_request), host(other.host), sent_bytes(other.sent_bytes), res(other.res), rcv(other.rcv), snd(other.snd), last_rcv(other.last_rcv)
+client::client(const client& other) : request(other.request), port_host(other.port_host), socket_fd(other.socket_fd), isSent(other.isSent), error(other.error), first_time(other.first_time), err_message(other.err_message), http_request(other.http_request), host(other.host), sent_bytes(other.sent_bytes), res(other.res), rcv(other.rcv), snd(other.snd), last_rcv(other.last_rcv)
 {
 }
 
@@ -36,7 +36,7 @@ client& client::operator=(const client& other)
 	if (this != &other)
 	{
 		this->request = other.request;
-		this->port = other.port;
+		this->port_host = other.port_host;
 		this->socket_fd = other.socket_fd;
 		this->isSent = other.isSent;
 		this->error = other.error;
@@ -68,7 +68,6 @@ std::string generateString(int length) {
 }
 
 int& client::getSocket() {return socket_fd;}
-std::string& client::getPort() {return port;}
 bool& client::getIsSent() {return isSent;}
 void client::setIsSent(bool b) {isSent = b;}
 void client::resetClient()
@@ -506,7 +505,7 @@ void client::matchHost(std::vector<serverconfig>& hosts)
 	std::vector<serverconfig>::iterator s;
 	for (s = hosts.begin(); s != hosts.end(); s++)
 	{
-		if (s->getServerName() == name && s->getListen() == port)
+		if (s->getServerName() == name && s->getListen() == port_host.first && s->getHostName() == port_host.second)
 		{
 			host = *s;
 			break ;
@@ -516,7 +515,7 @@ void client::matchHost(std::vector<serverconfig>& hosts)
 	{
 		for (s = hosts.begin(); s != hosts.end(); s++)
 		{
-			if (s->getListen() == port)
+			if (s->getListen() == port_host.first && s->getHostName() == port_host.second)
 			{
 				host = *s;
 				break ;

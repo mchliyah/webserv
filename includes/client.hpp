@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <ctime>
 #include "config.hpp"
+#include <arpa/inet.h>
 #include "../includes/response.hpp"
 
 class response;
@@ -29,7 +30,7 @@ class client
 {
 private:
 	std::string request;
-	std::string port;
+	std::pair<std::string, std::string> port_host;
 	int socket_fd;
 	bool isSent;
 	int error;
@@ -49,7 +50,7 @@ public:
 	int rcv;
 	int snd;
 	std::clock_t last_rcv;
-	client(int sock, std::string &port_);
+	client(int sock, std::pair<std::string, std::string> ph);
 	client(const client &other);
 	client &operator=(const client &other);
 	int &getSocket();

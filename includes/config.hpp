@@ -75,6 +75,7 @@ class locationconfig
 class serverconfig
 {
 	private:
+		std::string host_name;
 		std::string server_name;
 		std::map<std::string, locationconfig> locations;
 		std::string listen;
@@ -87,16 +88,18 @@ class serverconfig
 	serverconfig& operator=(const serverconfig& other);
 	~serverconfig();
 	std::string& readServer(std::ifstream& inputFile, std::string& line);
-	void printServer();
-	std::string& getServerName();
-	std::string& getListen();
-	std::string& getMaxClientBodySize();
-	std::map<std::string, std::string>& getErrorPages();
-	std::map<std::string, locationconfig>& getLocations();
-	std::map<std::string, std::string>& getDefaultPage();
+	void printServer(void);
+	std::string& getServerName(void);
+	std::string& getListen(void);
+	std::string& getMaxClientBodySize(void);
+	std::string &getHostName(void);
+	std::map<std::string, std::string>& getErrorPages(void);
+	std::map<std::string, locationconfig>& getLocations(void);
+	std::map<std::string, std::string>& getDefaultPage(void);
 	void setServerName(std::string name);
 	void setListen(std::string name);
 	void setLocations(std::map<std::string, locationconfig>& loc);
+	void setHostName(std::string name);
 	// serverconfig getServers() const;
 };
 

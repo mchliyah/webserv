@@ -24,6 +24,10 @@ std::string& serverconfig::getMaxClientBodySize() {
 	return (this->maxclientboddysize);
 }
 
+std::string& serverconfig::getHostName() {
+	return (this->host_name);
+}
+
 std::map<std::string, std::string>& serverconfig::getErrorPages() {
 	return (this->errorpages);
 }
@@ -45,6 +49,7 @@ serverconfig &serverconfig::operator=(const serverconfig &src) {
 	this->errorpages = src.errorpages;
 	this->locations = src.locations;
 	this->default_page = src.default_page;
+	this->host_name = src.host_name;
 	return (*this);
 }
 
@@ -91,12 +96,17 @@ std::string& serverconfig::readServer(std::ifstream& inputFile, std::string& lin
 			iss >> key >> value;
 			if (value.empty())
 				throw std::runtime_error("Error: server block has empty value");
-			if (key != "server_name" && key != "listen" && key != "max_client_body_size" && key != "location" && key != "error_page")
+			if (key != "server_name" && key != "listen" && key != "max_client_body_size" && key != "location" && key != "error_page" && key != "host")
 					throw std::runtime_error("Error: server block has invalid key");
 			if (key == "server_name") {
 				server_name = value;
 			}
+			else if (key == "host") {
+				host_name = value;
+			}
 			else if (key == "listen") {
+				if (value.find_first_not_of("0123456789") != std::string::npos)
+					throw std::runtime_error("Error: put a valid port number");
 				listen = value;
 			}
 			else if (key == "max_client_body_size") {
@@ -129,6 +139,7 @@ std::string& serverconfig::readServer(std::ifstream& inputFile, std::string& lin
 void serverconfig::printServer() {
 	std::cout << "server_name: " << server_name << std::endl;
 	std::cout << "listen: " << listen << std::endl;
+	std::cout << "host: " << host_name << std::endl;
 	std::cout << "max_client_body_size: " << maxclientboddysize << std::endl;
 	for (std::map<std::string, std::string>::iterator it = errorpages.begin(); it != errorpages.end(); it++)
 		std::cout << "error_page: " << it->first << " " << it->second << std::endl;
@@ -142,6 +153,7 @@ void serverconfig::printServer() {
 serverconfig::serverconfig() {
 	server_name = "";
 	listen = "";
+	host_name = "localhost";
 	maxclientboddysize = "";
 	default_page.clear();
 	errorpages.clear();
@@ -162,6 +174,10 @@ void serverconfig::setListen(std::string listen) {
 
 void serverconfig::setLocations(std::map<std::string, locationconfig>& loc) {
 	locations = loc;
+}
+
+void serverconfig::setHostName(std::string host) {
+	host_name = host;
 }
 
 serverconfig::~serverconfig() {

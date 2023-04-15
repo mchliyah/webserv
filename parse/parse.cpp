@@ -16,7 +16,7 @@ bool duplicate_server(std::vector<serverconfig>& servers, serverconfig& s)
 {
 	std::vector<serverconfig>::iterator it;
 	for (it = servers.begin(); it != servers.end(); it++)
-		if (it->getListen() == s.getListen() && it->getServerName() == s.getServerName())
+		if (it->getListen() == s.getListen() && it->getServerName() == s.getServerName() && it->getHostName() == s.getHostName())
 			return (true);
 	return (false);
 }
@@ -134,7 +134,7 @@ std::vector<serverconfig>& parse(std::vector<serverconfig>& servers, std::string
 		if (!duplicate_server(servers, server))
 			servers.push_back(server);
 		else
-			throw std::runtime_error("Error: server name and listen must be unique");
+			throw std::runtime_error("Error: duplicate server detected!");
 	}
 	check_all_set(servers);
 	return (servers);
