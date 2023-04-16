@@ -6,7 +6,7 @@
 /*   By: slahrach <slahrach@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 09:12:48 by slahrach          #+#    #+#             */
-/*   Updated: 2023/04/14 02:14:50 by slahrach         ###   ########.fr       */
+/*   Updated: 2023/04/16 06:18:10 by slahrach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,11 +112,9 @@ int client::fileSize(std::string filename)
 }
 void client::checkBodySize(void)
 {
-    if (error == 200)
+    if (error == 200 && http_request["body"] != "")
     {
         std::string max = getHost().getMaxClientBodySize();
-		if (max == "")
-			return ;
         std::stringstream size(max);
         int maxBodySize;
         size >> maxBodySize;
@@ -128,8 +126,14 @@ void client::checkBodySize(void)
             for (std::vector<std::string>::iterator it = multipart.begin(); it != multipart.end(); it++)
                 sz += fileSize(*it);
         }
-        if (sz <= 0 || sz > maxBodySize)
+		if (sz == 0)
+			error = 400;
+		if (max == "")
+			return ;
+        if (sz > maxBodySize)
             error = 413;
+		else if (sz < 0)
+			error = 500;
     }
 }
 int	client::checkMethod_URL()
