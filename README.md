@@ -9,10 +9,13 @@ This is a teamwork project where we built a small http server designed to handle
 Team : slahrach/mchliyah
 
 ## Visual explanation
-
+<p align="center">
 <img width="400" src="request/req_res_cycle.png" />
+</p>
 <br> </br>
-<img width="400" src="request/HTTP_message_syntax.png" />
+<p align="center">
+<img width="400" src="request/HTTP_message_syntax.png" /></p>
+<br> </br>
 
 ## Usage
 
