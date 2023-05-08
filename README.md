@@ -14,8 +14,8 @@ Team : slahrach/mchliyah
 </p>
 <br> </br>
 <p align="center">
-<img width="400" src="request/HTTP_message_syntax.png" /></p>
-<br> </br>
+<img width="400" src="request/HTTP_message_syntax.png" />
+</p>
 
 ## Usage
 
