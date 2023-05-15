@@ -22,15 +22,24 @@ bool default_index(response &res, client &client, locationconfig& loc, std::stri
 		std::string file_path = loc.getRoot() + path + *it;
 		if (access(file_path.c_str(), F_OK) != -1)
 		{
-			if (access(file_path.c_str(), R_OK) == -1 || client.getValue("Method") == "POST")
+			if (access(file_path.c_str(), R_OK) == -1)
 			{
+				std::cout << "acceess " << std::endl;
 				res.set_status_code("403");
 				client.errorResponse(res);
 				return true;
 			}
 			else 
 			{
-				if (client.getFirstTime())
+				std::string extension = "";
+				if(file_path.find('.') != std::string::npos)
+					extension = file_path.substr(file_path.find_last_of('.'));
+				if ((extension == ".php" || extension == ".py") && loc.getCgiPass() == "on")
+				{
+					client.cgi_response(res, file_path, extension == ".php");
+					return true;
+				}
+				else if (client.getFirstTime())
 				{
 					client.openFile(res, file_path);
 					client.setFirstTime(false);

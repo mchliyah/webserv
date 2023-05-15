@@ -28,8 +28,9 @@ void response::get_response(client& client) {
 					return redirect(client, in_path);
 				if (!default_index(*this, client, location, path))
 				{
-					if (location.getAutoIndex() == "off" || client.getValue("Method") == "POST")
+					if (location.getAutoIndex() == "off")
 					{
+						std::cout << "is dir " << std::endl;
 						status_code = "403";
 						client.errorResponse(*this);
 					}
@@ -48,6 +49,7 @@ void response::get_response(client& client) {
 					client.cgi_response(*this, file_path, extension == ".php");
 				else if (client.getValue("Method") == "POST")
 				{
+					std::cout << "is file " << std::endl;
 					status_code = "403";
 					client.errorResponse(*this);
 				}
